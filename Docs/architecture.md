@@ -3,11 +3,22 @@
 ## Design Principles
 
 - **Feature-First Organization**: Code is grouped by business features, not technical layers
+  - *Why*: Makes related code discoverable, enables teams to work on features independently without conflicts
+
 - **Co-location**: Feature documentation lives alongside feature code
+  - *Why*: Keeps context close to implementation, making maintenance faster and reducing outdated docs
+
 - **Type Safety**: Strict TypeScript throughout the entire codebase
+  - *Why*: Catches bugs at compile-time, provides autocomplete, makes refactoring safe and confident
+
 - **Server Components First**: Leverage Next.js App Router and React Server Components by default
+  - *Why*: Reduces client bundle size, improves performance, enables direct data fetching without API overhead
+
 - **Progressive Enhancement**: Start with server-rendered HTML, enhance with client-side interactivity
+  - *Why*: Ensures core functionality works without JavaScript, improves SEO and perceived performance
+
 - **Separation of Concerns**: Clear boundaries between UI, business logic, and data access
+  - *Why*: Makes code testable, reusable, and maintainable; prevents mixing presentation with business rules
 
 ## Technology Stack
 
@@ -24,8 +35,9 @@
 ### State Management
 - **Server State**: React Server Components (default)
 - **URL State**: Next.js searchParams and route params
-- **Client State**: React hooks (useState, useReducer)
-- **Global Client State**: React Context (minimal usage)
+- **Client State**: React hooks (useState, useReducer) for local component state
+- **Global Client State**: Zustand for deep/complex global state management
+- **Props Drilling**: Use normal props for 2-level value passing (avoid over-engineering)
 
 ### Data Fetching
 - **Server Components**: Native fetch with Next.js caching
@@ -92,45 +104,69 @@ export async function createEvent(formData: FormData) {
 
 ### Global Structure
 ```
-├── app/                    # Next.js App Router pages
-│   ├── (routes)/          # Route groups
-│   ├── api/               # API routes
+├── app/                    # Next.js App Router pages & routes
+│   ├── (routes)/          # Route groups for pages
+│   ├── api/               # ⚠️ API ROUTES DEFINED HERE (Next.js API endpoints)
+│   │   ├── events/        # Example: /api/events endpoints
+│   │   └── hackathons/    # Example: /api/hackathons endpoints
+|.  |.  |__ others.../
 │   └── layout.tsx         # Root layout
 ├── src/
 │   ├── features/          # Feature modules (see below)
 │   ├── shared/            # Shared utilities and components
 │   │   ├── components/    # Reusable UI components
+│   │   │   ├── factories/ # Component factories (Button, Toast, Loader, Modal)
+│   │   │   ├── ui/        # Base UI components
+│   │   │   └── layout/    # Layout components
 │   │   ├── hooks/         # Reusable React hooks
 │   │   ├── utils/         # Utility functions
 │   │   ├── types/         # Shared TypeScript types
-│   │   └── constants/     # App-wide constants
+│   │   ├── stores/        # Zustand store definitions
+│   │   ├── constants/     # App-wide constants
+│   │   │   └── errorCodes.ts  # ⚠️ API ERROR CODES MAPPING (all error definitions)
+│   │   └── errors/        # Error handling utilities
+│   │       ├── ApiError.ts     # Custom API error class
+│   │       └── errorHandler.ts # Global error handler
 │   └── lib/               # Third-party library configurations
+│      
+│       
 ├── docs/                  # Common architecture documentation
 └── public/                # Static assets
 ```
 
 ### Feature Module Structure
-Each feature follows this consistent pattern:
+Each feature follows this consistent pattern with **strict separation of concerns**:
 
 ```
 feature-name/
-├── components/            # Feature-specific components
-│   ├── FeatureCard.tsx
-│   ├── FeatureList.tsx
-│   └── FeatureFilters.tsx
-├── hooks/                 # Feature-specific hooks
-│   └── useFeatureData.ts
-├── services/              # API calls and business logic
-│   └── featureService.ts
+├── components/
+│   ├── featureUI/         # Pure UI components (presentation only)
+│   │   ├── FeatureCard.tsx
+│   │   ├── FeatureList.tsx
+│   │   └── FeatureFilters.tsx
+│   └── featureService/    # Business logic, hooks, API calls
+│       ├── useFeatureData.ts
+│       ├── useFeatureFilters.ts
+│       ├── featureService.ts
+│       └── featureHelpers.ts
+|--page.tsx
+|--layout.tsx
 ├── actions/               # Server actions
 │   └── featureActions.ts
 ├── types/                 # Feature-specific types
 │   └── feature.types.ts
-├── utils/                 # Feature-specific utilities
-│   └── featureHelpers.ts
-└── docs/
-    └── context.md         # Feature documentation
+├── stores/                # Zustand stores (if needed)
+│   └── featureStore.ts
+└── context.md             # ⚠️ SINGLE feature documentation file (NO docs/ folder)
 ```
+
+**Key Principles:**
+- **UI components** (`featureUI/`) are PURE presentation - no business logic, only UI rendering
+- **Service components** (`featureService/`) handle all hooks, API calls, data fetching, and business logic
+- UI components receive data via props from service layer
+- Use Zustand stores for deep/global state that needs to be accessed across multiple components
+- Use props for simple 2-level value passing
+- **STRICT**: Only ONE `context.md` file per feature (directly in feature root, no `docs/` folder)
 
 ## Naming Conventions
 
@@ -150,6 +186,25 @@ feature-name/
 - **React Components**: PascalCase (e.g., `EventCard`, `EventList`)
 
 ## Component Patterns
+
+### Shared Component Factories
+All common UI patterns are defined as factories in `src/shared/components/factories/`:
+
+```typescript
+// factories/Button.tsx - Configurable button factory
+export const Button = ({ variant, size, children, ...props }) => {...}
+
+// factories/Toast.tsx - Toast notification factory
+export const useToast = () => {...}
+
+// factories/Loader.tsx - Loading state factory
+export const Loader = ({ size, variant }) => {...}
+
+// factories/Modal.tsx - Modal dialog factory
+export const Modal = ({ isOpen, onClose, children }) => {...}
+```
+
+**Always use these factories** instead of creating custom implementations.
 
 ### Server Components (Default)
 Use for data fetching and static content:
@@ -196,19 +251,37 @@ export function EventFilters({ onFilterChange }: Props) {
 Break down complex components into smaller, focused units:
 
 ```typescript
-// ✅ Good: Composed
-export function EventCard({ event }: { event: Event }) {
+// ✅ Good: Composed with UI/Service separation
+// featureUI/EventCard.tsx (Pure UI)
+export function EventCard({ event, onSelect }: { event: Event, onSelect: () => void }) {
   return (
     <Card>
       <EventHeader title={event.title} date={event.date} />
       <EventBody description={event.description} />
       <EventFooter location={event.location} />
+      <Button onClick={onSelect}>Select</Button>
     </Card>
   )
 }
 
-// ❌ Avoid: Monolithic
+// featureService/useEventCard.ts (Business logic)
+export function useEventCard(eventId: string) {
+  const { data: event, isLoading } = useQuery({
+    queryKey: ['event', eventId],
+    queryFn: () => fetchEvent(eventId)
+  })
+  
+  const handleSelect = () => {
+    // Business logic for selection
+  }
+  
+  return { event, isLoading, handleSelect }
+}
+
+// ❌ Avoid: Monolithic with mixed concerns
 export function EventCard({ event }: { event: Event }) {
+  const [loading, setLoading] = useState(false) // ❌ Business logic in UI
+  const handleClick = async () => { /* API call */ } // ❌ API call in UI
   return (
     <div>
       {/* 200+ lines of markup */}
@@ -216,6 +289,36 @@ export function EventCard({ event }: { event: Event }) {
   )
 }
 ```
+
+### State Management with Zustand
+Use Zustand for global/deep state that needs to be accessed across multiple components:
+
+```typescript
+// stores/eventStore.ts
+import { create } from 'zustand'
+
+interface EventStore {
+  selectedEvent: Event | null
+  filters: EventFilters
+  setSelectedEvent: (event: Event | null) => void
+  setFilters: (filters: EventFilters) => void
+}
+
+export const useEventStore = create<EventStore>((set) => ({
+  selectedEvent: null,
+  filters: {},
+  setSelectedEvent: (event) => set({ selectedEvent: event }),
+  setFilters: (filters) => set({ filters })
+}))
+
+// Usage in components
+const { selectedEvent, setSelectedEvent } = useEventStore()
+```
+
+**When to use what:**
+- **Zustand**: Deep state, cross-feature state, complex state that needs persistence
+- **Props**: Simple 2-level parent-child data passing
+- **useState**: Local component state that doesn't need to be shared
 
 ## Data Flow Patterns
 
@@ -298,17 +401,210 @@ export default function EventsError({
 ### API Route Errors
 ```typescript
 // app/api/events/route.ts
+import { handleApiError, ApiError } from '@/src/shared/errors/errorHandler'
+import { ErrorCode } from '@/src/shared/constants/errorCodes'
+
 export async function GET() {
   try {
     const events = await fetchEventsFromDB()
     return Response.json(events)
   } catch (error) {
-    console.error('Events API error:', error)
+    return handleApiError(error, ErrorCode.EVENT_FETCH_FAILED)
+  }
+}
+```
+
+## API Error Handling System
+
+### Error Codes Mapping
+All API errors are centrally defined in `src/shared/constants/errorCodes.ts`:
+
+```typescript
+// src/shared/constants/errorCodes.ts
+export enum ErrorCode {
+  // Authentication Errors (1000-1099)
+  AUTH_INVALID_CREDENTIALS = 'AUTH_1001',
+  AUTH_TOKEN_EXPIRED = 'AUTH_1002',
+  AUTH_WALLET_NOT_CONNECTED = 'AUTH_1003',
+  
+  // Event Errors (2000-2099)
+  EVENT_NOT_FOUND = 'EVENT_2001',
+  EVENT_FETCH_FAILED = 'EVENT_2002',
+  EVENT_CREATE_FAILED = 'EVENT_2003',
+  EVENT_ALREADY_REGISTERED = 'EVENT_2004',
+  
+  // Hackathon Errors (3000-3099)
+  HACKATHON_NOT_FOUND = 'HACKATHON_3001',
+  HACKATHON_SUBMISSION_CLOSED = 'HACKATHON_3002',
+  
+  // Stellar/Blockchain Errors (4000-4099)
+  STELLAR_TRANSACTION_FAILED = 'STELLAR_4001',
+  STELLAR_INSUFFICIENT_BALANCE = 'STELLAR_4002',
+  STELLAR_NETWORK_ERROR = 'STELLAR_4003',
+  
+  // User Errors (5000-5099)
+  USER_NOT_FOUND = 'USER_5001',
+  USER_PROFILE_INCOMPLETE = 'USER_5002',
+  
+  // Validation Errors (6000-6099)
+  VALIDATION_INVALID_INPUT = 'VALIDATION_6001',
+  VALIDATION_MISSING_FIELD = 'VALIDATION_6002',
+  
+  // System Errors (9000-9099)
+  INTERNAL_SERVER_ERROR = 'SYSTEM_9001',
+  SERVICE_UNAVAILABLE = 'SYSTEM_9002',
+}
+
+export const ERROR_MESSAGES: Record<ErrorCode, { 
+  userMessage: string
+  logMessage: string
+  httpStatus: number
+  showToast: boolean
+}> = {
+  [ErrorCode.AUTH_INVALID_CREDENTIALS]: {
+    userMessage: 'Invalid credentials. Please check your wallet signature.',
+    logMessage: 'Authentication failed - invalid credentials',
+    httpStatus: 401,
+    showToast: true
+  },
+  [ErrorCode.EVENT_NOT_FOUND]: {
+    userMessage: 'Event not found. It may have been removed.',
+    logMessage: 'Event lookup failed - ID not in database',
+    httpStatus: 404,
+    showToast: true
+  },
+  [ErrorCode.STELLAR_TRANSACTION_FAILED]: {
+    userMessage: 'Transaction failed. Please check your balance and try again.',
+    logMessage: 'Stellar SDK transaction submission failed',
+    httpStatus: 500,
+    showToast: true
+  },
+  // ... all other error codes
+}
+```
+
+### Custom Error Class
+```typescript
+// src/shared/errors/ApiError.ts
+export class ApiError extends Error {
+  constructor(
+    public code: ErrorCode,
+    public statusCode: number,
+    public userMessage: string,
+    public originalError?: unknown
+  ) {
+    super(userMessage)
+    this.name = 'ApiError'
+  }
+}
+```
+
+### Global Error Handler
+```typescript
+// src/shared/errors/errorHandler.ts
+import { ApiError } from './ApiError'
+import { ErrorCode, ERROR_MESSAGES } from '../constants/errorCodes'
+
+export function handleApiError(error: unknown, fallbackCode: ErrorCode) {
+  if (error instanceof ApiError) {
+    const config = ERROR_MESSAGES[error.code]
+    console.error(`[${error.code}] ${config.logMessage}`, error.originalError)
+    
     return Response.json(
-      { error: 'Failed to fetch events' },
-      { status: 500 }
+      { 
+        error: config.userMessage,
+        code: error.code
+      },
+      { status: config.httpStatus }
     )
   }
+  
+  // Unknown error - use fallback
+  const config = ERROR_MESSAGES[fallbackCode]
+  console.error(`[${fallbackCode}] Unexpected error`, error)
+  
+  return Response.json(
+    { 
+      error: config.userMessage,
+      code: fallbackCode
+    },
+    { status: config.httpStatus }
+  )
+}
+
+export function throwApiError(code: ErrorCode, originalError?: unknown): never {
+  const config = ERROR_MESSAGES[code]
+  throw new ApiError(code, config.httpStatus, config.userMessage, originalError)
+}
+```
+
+### Client-Side Error Display
+```typescript
+// src/shared/hooks/useApiError.ts
+'use client'
+
+import { useToast } from '@/src/shared/components/factories/Toast'
+import { ErrorCode, ERROR_MESSAGES } from '../constants/errorCodes'
+
+export function useApiError() {
+  const { showToast } = useToast()
+  
+  const handleError = (error: { code: ErrorCode; error: string }) => {
+    const config = ERROR_MESSAGES[error.code]
+    
+    if (config.showToast) {
+      showToast({
+        type: 'error',
+        message: error.error,
+        duration: 5000
+      })
+    }
+    
+    // Log to monitoring service if needed
+    console.error(`[${error.code}]`, error.error)
+  }
+  
+  return { handleError }
+}
+```
+
+### Usage Example
+```typescript
+// Feature service using error handling
+// src/features/events/components/featureService/eventService.ts
+import { throwApiError } from '@/src/shared/errors/errorHandler'
+import { ErrorCode } from '@/src/shared/constants/errorCodes'
+
+export async function fetchEventById(id: string) {
+  try {
+    const response = await fetch(`/api/events/${id}`)
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.code)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    throwApiError(ErrorCode.EVENT_FETCH_FAILED, error)
+  }
+}
+
+// Client component handling errors
+'use client'
+export function EventDetails({ eventId }: { eventId: string }) {
+  const { handleError } = useApiError()
+  
+  const handleFetch = async () => {
+    try {
+      const event = await fetchEventById(eventId)
+      // use event
+    } catch (error: any) {
+      handleError(error)
+    }
+  }
+  
+  // ... component logic
 }
 ```
 
@@ -493,16 +789,12 @@ Follow Conventional Commits:
 
 ### Code Documentation
 - JSDoc comments for public functions and complex logic
-- README.md in each feature folder (optional, use docs/context.md instead)
 - Inline comments for non-obvious code
+- NO README files in feature folders
 
 ### Feature Documentation
-Each feature must have a `docs/context.md` covering:
-- Purpose and user stories
-- Key components and their responsibilities
-- Data flow and API endpoints
-- Dependencies and edge cases
-- Future enhancements
+- Each feature has a `context.md` file in the feature root directory
+- See `.github/copilot-instructions.md` for strict documentation rules
 
 ## Deployment & CI/CD
 
