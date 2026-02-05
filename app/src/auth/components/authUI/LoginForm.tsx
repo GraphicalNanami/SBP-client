@@ -28,7 +28,7 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
         Let's build something amazing
       </h1>
       <p className="text-sm text-muted-foreground mb-8">
-        Enter your email below to receive a magic sign-in link.
+        Enter your email below .
         <br />
         We recommend using a personal email for continuity.
       </p>
