@@ -5,8 +5,10 @@
  
  const Navbar = () => {
    return (
-     <nav className="w-full py-4 bg-transparent backdrop-blur-sm sticky top-0 z-50">
-       <div className="container-main flex items-center justify-between">
+     <nav className="relative w-full py-4 backdrop-blur-sm bg-transparent sticky top-0 z-50 rounded-9xl "
+      
+     >
+       <div className="container-main flex items-center justify-between ">
          {/* Logo */}
          <Link href="/src/landingPage" className="flex items-center gap-2">
            <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
@@ -17,9 +19,9 @@
          
          {/* Navigation Links */}
          <div className="hidden md:flex items-center gap-8">
+           <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</a>
            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Hackathons</a>
-           <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Ecosystem</a>
-           <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Developers</a>
+           <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Builds</a>
          </div>
          
          {/* CTAs */}
