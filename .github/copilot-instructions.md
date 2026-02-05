@@ -24,11 +24,39 @@ pnpm lint     # Run ESLint
 
 ## Design System & UI Conventions
 
-### Layout & Spacing
-- **8px Grid System**: All spacing follows 8px increments (16, 24, 32, 64, 120)
-- **Container Width**: 1200px max-width, centered with fluid gutters
-- **Hero Padding**: 120px top / 80px bottom
-- **Element Gaps**: 24px (tag-to-title), 32px (title-to-subtitle), 40px (subtitle-to-buttons)
+### Responsive Design Principles
+- **Mobile-First Approach**: Design for mobile, progressively enhance for larger screens
+- **Fluid Typography**: Use `clamp()` for font sizes that scale smoothly
+- **Flexible Spacing**: Use `rem` for spacing (1rem = 16px base) instead of fixed px
+- **Breakpoint System** (Tailwind v4):
+  ```
+  sm:  640px   (tablets portrait)
+  md:  768px   (tablets landscape)
+  lg:  1024px  (small desktops)
+  xl:  1280px  (desktops)
+  2xl: 1536px  (large desktops)
+  ```
+
+### Layout & Spacing (Responsive)
+- **Spacing Scale**: Use Tailwind's rem-based spacing
+  - `space-2` = 0.5rem (8px)
+  - `space-4` = 1rem (16px)
+  - `space-6` = 1.5rem (24px)
+  - `space-8` = 2rem (32px)
+  - `space-16` = 4rem (64px)
+  - `space-30` = 7.5rem (120px)
+- **Container**: `max-w-7xl` (1280px) with responsive padding
+  - Mobile: `px-4` (1rem / 16px)
+  - Tablet: `sm:px-6` (1.5rem / 24px)
+  - Desktop: `lg:px-8` (2rem / 32px)
+- **Hero Padding**: 
+  - Mobile: `py-12` (3rem / 48px top/bottom)
+  - Tablet: `md:py-20` (5rem / 80px)
+  - Desktop: `lg:py-30` (7.5rem / 120px)
+- **Element Gaps**: 
+  - Small: `gap-4` (1rem / 16px)
+  - Medium: `gap-6` (1.5rem / 24px)
+  - Large: `gap-8` (2rem / 32px)
 
 ### Color Palette (from `Docs/design.md`)
 ```
@@ -40,23 +68,66 @@ Brand Accent:  #E6FF80 (lime highlight)
 Border:        #E5E5E5
 ```
 
-### Typography
+### Typography (Responsive & Fluid)
 - **Font**: Inter with system fallbacks (currently using Geist)
-- **Headings**: font-weight 600, letter-spacing -0.03em, line-height 1.1
-- **Body**: font-weight 400, line-height 1.6
-- **Hero Headlines**: 84px with hand-drawn SVG highlights on key words
+- **Font Weights**: 
+  - Headings: `font-semibold` (600)
+  - Body: `font-normal` (400)
+- **Tracking**: Headings use `-tracking-tight` (letter-spacing: -0.03em)
+- **Line Heights**: 
+  - Headings: `leading-tight` (1.1)
+  - Body: `leading-relaxed` (1.6)
+- **Responsive Font Sizes** (use clamp):
+  ```css
+  /* Hero Headlines */
+  font-size: clamp(2.5rem, 5vw, 5.25rem);  /* 40px → 84px */
+  
+  /* H1 */
+  font-size: clamp(2rem, 4vw, 3rem);       /* 32px → 48px */
+  
+  /* H2 */
+  font-size: clamp(1.5rem, 3vw, 2.25rem);  /* 24px → 36px */
+  
+  /* H3 */
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem); /* 20px → 30px */
+  
+  /* Body */
+  font-size: clamp(1rem, 1.5vw, 1.125rem); /* 16px → 18px */
+  ```
+- **Tailwind Classes**:
+  - Hero: `text-4xl md:text-6xl lg:text-[5.25rem]`
+  - H1: `text-3xl md:text-4xl lg:text-5xl`
+  - H2: `text-2xl md:text-3xl lg:text-4xl`
+  - H3: `text-xl md:text-2xl lg:text-3xl`
+  - Body: `text-base md:text-lg`
 
-### Component Patterns
-- **Buttons**: 12px border-radius, `transition: all 0.2s ease`
-  - Solid variant: `#1A1A1A` background
-  - Outline variant: 1px `#E5E5E5` border
-- **Cards**: 24px border-radius, subtle shadows `0px 4px 20px rgba(0,0,0,0.05)`
-- **Badges**: Pill-shaped (100px border-radius), 8px/16px padding
-- **Icons**: Use Lucide-style slim-profile icons, precisely centered
+### Component Patterns (Responsive)
+- **Buttons**: 
+  - Border radius: `rounded-xl` (0.75rem / 12px)
+  - Padding: `px-6 py-3` (mobile), `md:px-8 md:py-4` (desktop)
+  - Font: `text-sm md:text-base`
+  - Transition: `transition-all duration-200 ease-in-out`
+  - Solid variant: `bg-[#1A1A1A] text-white hover:bg-[#333]`
+  - Outline variant: `border border-[#E5E5E5] hover:border-[#1A1A1A]`
+- **Cards**: 
+  - Border radius: `rounded-2xl` (1.5rem / 24px)
+  - Shadow: `shadow-sm hover:shadow-md transition-shadow`
+  - Padding: `p-4 md:p-6 lg:p-8`
+  - Width: `w-full` with max constraints
+- **Badges**: 
+  - Border radius: `rounded-full`
+  - Padding: `px-3 py-1 md:px-4 md:py-2`
+  - Font: `text-xs md:text-sm`
+- **Icons**: 
+  - Size: `w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6`
+  - Use Lucide React icons with responsive sizing
+- **Grid Layouts**:
+  - Cards: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6`
+  - Features: `grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8`
 
 ### Background Effects
-- Subtle dot-grid pattern overlay using repeating radial gradient
-- Dark overlays for hero cards: `rgba(0,0,0,0.6)`
+- Subtle dot-grid pattern overlay using repeating radial gradient (scales with viewport)
+- Dark overlays for hero cards: `bg-black/60` (60% opacity)
 
 ## File Structure & Conventions
 
@@ -86,13 +157,18 @@ Reference `Docs/design.md` and `Docs/design1.md` for:
 ## Component Development Guidelines
 
 When building UI components:
-- Follow the 8px spacing grid strictly
-- Use the color palette from design docs for consistency
-- Implement smooth transitions (0.2s ease) on interactive elements
-- Ensure responsive behavior with Tailwind's mobile-first approach
-- Add dark mode support using CSS variables and `dark:` variants
-- Center-align hero sections with vertical flex stacks
-- Use 3-column grid layouts for feature/plan cards with 24px gaps
+- **Mobile-First**: Start with mobile layout, add breakpoints for larger screens
+- **Fluid Spacing**: Use Tailwind's rem-based spacing (space-4, space-6, etc.), never fixed px
+- **Responsive Typography**: Use clamp() or Tailwind's responsive text classes
+- **Flexible Containers**: Use `max-w-*` with percentage-based padding
+- **Grid & Flex**: Leverage responsive grid/flex with breakpoint modifiers (md:, lg:)
+- **Touch Targets**: Minimum 44×44px (2.75rem) for interactive elements on mobile
+- **Viewport Units**: Use `vh`/`vw` sparingly, prefer rem/% for predictability
+- **Color Consistency**: Use color palette from design docs
+- **Smooth Transitions**: Apply `transition-all duration-200 ease-in-out` to interactive elements
+- **Dark Mode**: Support using CSS variables and `dark:` variants
+- **Responsive Images**: Always use `next/image` with responsive sizes
+- **Aspect Ratios**: Use `aspect-*` classes for consistent media ratios across breakpoints
 
 ## Accessibility & Best Practices
 
