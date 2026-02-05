@@ -3,6 +3,7 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import PlansSection from "./components/plansSection";
+import Footer from "./components/Footer";
 
 export default function LandingPage() {
   return (
@@ -12,7 +13,7 @@ export default function LandingPage() {
         <Hero />
         <PlansSection />
       </main>
-      {/* Add Footer here if needed */}
+      <Footer />
     </div>
   );
 }
