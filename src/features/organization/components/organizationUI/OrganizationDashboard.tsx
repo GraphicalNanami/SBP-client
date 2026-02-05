@@ -313,13 +313,8 @@ export function OrganizationDashboard({
         <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between px-6">
           {/* Left: breadcrumb-style nav */}
           <div className="flex items-center gap-4">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{
-                background: 'linear-gradient(135deg, #6b3fa0 0%, #a13670 100%)',
-              }}
-            >
-              <Building2 className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand">
+              <Building2 className="h-5 w-5 text-brand-fg" />
             </div>
             <div className="hidden h-6 w-px bg-border sm:block" />
             <div>
@@ -590,35 +585,21 @@ export function OrganizationDashboard({
             </Card>
 
             {/* Create Hackathon CTA */}
-            <div
-              className="relative overflow-hidden rounded-2xl p-6 text-center"
-              style={{
-                background: 'linear-gradient(135deg, #6b3fa0 0%, #a13670 100%)',
-              }}
-            >
-              <div
-                className="absolute inset-0 opacity-[0.1]"
-                style={{
-                  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)',
-                  backgroundSize: '16px 16px',
-                }}
-              />
-              <div className="relative">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm">
-                  <Rocket className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="text-base font-semibold text-white">Create Hackathon</h3>
-                <p className="mt-1.5 text-sm text-white/70">
-                  Launch a hackathon and bring builders together on Stellar.
-                </p>
-                <button
-                  disabled
-                  className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-white text-sm font-semibold text-[#6b3fa0] transition-all duration-200 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-80"
-                >
-                  Coming Soon
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+            <div className="rounded-2xl border border-border bg-brand p-6 text-center">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-brand-fg/20 bg-brand-fg/10">
+                <Rocket className="h-5 w-5 text-brand-fg" />
               </div>
+              <h3 className="text-base font-semibold text-brand-fg">Create Hackathon</h3>
+              <p className="mt-1.5 text-sm text-brand-fg/60">
+                Launch a hackathon and bring builders together on Stellar.
+              </p>
+              <button
+                disabled
+                className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand-fg text-sm font-semibold text-brand transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-80"
+              >
+                Coming Soon
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
