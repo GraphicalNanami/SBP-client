@@ -4,7 +4,7 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
  const PlansSection = () => {
    return (
      <section className="py-24">
-       <div className="container-main">
+       <div className="container-main min-h-[100vh] ">
          {/* Heading */}
          <div className="text-center mb-6">
            <h2 className="heading-section">

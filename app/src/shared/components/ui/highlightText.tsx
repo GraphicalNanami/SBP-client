@@ -18,7 +18,7 @@
            cy="40"
            rx="95"
            ry="35"
-           stroke="hsl(75 100% 75%)"
+           stroke="hsl(75, 96%, 68%)"
            strokeWidth="3"
            fill="none"
            strokeLinecap="round"

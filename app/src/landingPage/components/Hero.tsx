@@ -1,9 +1,13 @@
  import { ArrowRight } from "lucide-react";
 import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
- 
+import { Component } from "@/src/shared/components/ui/heroBackground";
+
  const Hero = () => {
    return (
-     <section className="pt-20 pb-16 min-h-[100vh] flex ">
+     <section className="pt-20 pb-16 min-h-[100vh] flex items-top">
+              <Component />
+
+
        <div className="container-main">
          {/* Badge */}
          <div className="flex justify-center mb-8">
@@ -48,9 +52,7 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
     </div>
   </div>
 </div>
-         
-         {/* Dashboard Preview */}
-        
+                 
        </div>
      </section>
    );
