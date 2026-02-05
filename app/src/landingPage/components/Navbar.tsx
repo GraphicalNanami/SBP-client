@@ -5,14 +5,14 @@
  
  const Navbar = () => {
    return (
-     <nav className="w-full py-4 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+     <nav className="w-full py-4 bg-transparent backdrop-blur-sm sticky top-0 z-50">
        <div className="container-main flex items-center justify-between">
          {/* Logo */}
          <Link href="/src/landingPage" className="flex items-center gap-2">
            <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
              <span className="text-background text-xs font-bold">≡</span>
            </div>
-           <span className="text-xl font-semibold text-foreground">Stellar</span>
+           <span className="text-xl font-semibold text-foreground">SBP</span>
          </Link>
          
          {/* Navigation Links */}
