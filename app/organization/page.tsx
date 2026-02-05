@@ -7,10 +7,13 @@ import { useOrganization } from '@/src/features/organization/components/organiza
 export default function OrganizationPage() {
   const {
     step,
+    organizations,
+    activeOrgId,
     profile,
     isSaving,
     saveSuccess,
     handleCreate,
+    handleSwitchOrg,
     handleProfileChange,
     handleSocialChange,
     handleAddMember,
@@ -26,6 +29,8 @@ export default function OrganizationPage() {
   return (
     <OrganizationDashboard
       profile={profile}
+      organizations={organizations}
+      activeOrgId={activeOrgId}
       isSaving={isSaving}
       saveSuccess={saveSuccess}
       onProfileChange={handleProfileChange}
@@ -33,6 +38,8 @@ export default function OrganizationPage() {
       onAddMember={handleAddMember}
       onRemoveMember={handleRemoveMember}
       onUpdateMemberRole={handleUpdateMemberRole}
+      onSwitchOrg={handleSwitchOrg}
+      onCreate={handleCreate}
       onSave={handleSave}
     />
   );

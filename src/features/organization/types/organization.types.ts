@@ -14,6 +14,7 @@ export interface TeamMember {
 }
 
 export interface OrganizationProfile {
+  id: string;
   name: string;
   logo: string;
   tagline: string;
