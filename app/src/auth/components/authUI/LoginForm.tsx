@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/src/auth/hooks/useAuth';
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
@@ -9,17 +11,28 @@ interface LoginFormProps {
 const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading, error, clearError } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Login:', { email, password });
-    setIsLoading(false);
+    try {
+      await login(email, password);
+      router.push('/'); // Redirect to home page on success
+    } catch (err) {
+      // Error handled in context
+    }
+  };
+
+  // Clear error when user starts typing
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) clearError();
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) clearError();
   };
 
   return (
@@ -33,12 +46,18 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
         We recommend using a personal email for continuity.
       </p>
 
+      {error && (
+        <div className="text-sm text-red-600 mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
           placeholder="example@domain.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailChange}
           required
           className="w-full px-4 py-3.5 text-sm bg-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
         />
@@ -47,7 +66,7 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handlePasswordChange}
           required
           className="w-full px-4 py-3.5 text-sm bg-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
         />

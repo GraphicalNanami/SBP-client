@@ -49,8 +49,19 @@ Authentication feature for user registration and login with JWT-based session ma
   - `fullName`, `email`, `password`, `confirmPassword` (form inputs)
   - `isLoading` (submission state)
 
-### Service Layer
-**Note**: Currently not implemented - using local state management only. API integration will be added in future iterations.
+### Service Layer (`lib/auth/` & `context/`)
+
+#### Token Management & API Integration
+- **TokenManager**: Handles secure token storage using sessionStorage + memory
+- **AuthService**: Manages API calls for login, register, logout, refresh, getCurrentUser  
+- **ApiClient**: Base fetch wrapper with automatic token injection and error handling
+- **Error Handler**: Transforms API errors into user-friendly messages
+
+#### Authentication Context
+- **AuthContext**: Global state management with React Context
+- **useAuth Hook**: Clean API for components to access auth state and methods
+- **State**: `{ user, isLoading, isAuthenticated, error }`
+- **Methods**: `login()`, `signup()`, `logout()`, `refreshAuth()`, `clearError()`
 
 ## Design Implementation
 
@@ -87,20 +98,15 @@ Authentication feature for user registration and login with JWT-based session ma
 
 ## Data Flow
 
-### Current Implementation (Local State)
+### Current Implementation (With Backend API)
 1. User enters form data
-2. Form validates inputs locally
-3. On submit, simulates API call with `setTimeout`
-4. Console logs the form data
-5. Resets loading state
-
-### Future Implementation (With API)
-1. User enters form data
-2. Form validates inputs locally
-3. On submit, sends request to auth API endpoint
-4. Receives JWT tokens (access + refresh)
-5. Stores tokens securely
-6. Redirects to dashboard/home
+2. Form validates inputs locally (password match, required fields)
+3. On submit, calls auth service API endpoint
+4. AuthService makes API request and stores JWT tokens securely
+5. AuthContext updates global state with user data
+6. Redirects to home page on success
+7. Displays error inline if request fails
+8. On app load: Attempts to restore session using refresh token
 
 ## Dependencies
 - `react` - Component framework
@@ -117,7 +123,7 @@ Authentication feature for user registration and login with JWT-based session ma
 - Required fields enforced by HTML5 validation
 
 ## Recent Changes
-**2026-02-06**
+**2026-02-06 (Initial Implementation)**
 - Initial implementation of auth feature
 - Created split-screen layout matching design specs
 - Implemented login and signup forms with local state
@@ -125,15 +131,27 @@ Authentication feature for user registration and login with JWT-based session ma
 - Updated navbar with Link to auth page
 - No API integration yet (using simulated delays)
 
+**2026-02-06 (Backend Integration)**
+- ✅ Integrated with backend auth API following comprehensive auth integration plan
+- ✅ Created foundation layer: env config, types, error handler
+- ✅ Implemented API layer: endpoints, client, token manager, auth service
+- ✅ Added global state management with AuthContext and useAuth hook
+- ✅ Updated UI components to use real auth API (removed simulations)
+- ✅ Added JWT token storage in sessionStorage with memory fallback
+- ✅ Implemented proper error handling and user feedback
+- ✅ Added auto-refresh auth mechanism for session restoration
+- ✅ Connected forms to backend endpoints (/auth/login, /auth/register)
+- ✅ Added redirect to home page after successful login/signup
+
 ## Future Enhancements
-- [ ] Connect to backend auth API
-- [ ] Implement JWT token storage (localStorage/cookies)
 - [ ] Add password strength indicator
 - [ ] Add social login options (Google, GitHub)
 - [ ] Implement "Forgot Password" flow
 - [ ] Add email verification step
 - [ ] Implement protected route HOC/middleware
 - [ ] Add form validation library (e.g., Zod, React Hook Form)
-- [ ] Implement proper error handling and toast notifications
+- [ ] Implement toast notifications for better UX
 - [ ] Add loading skeleton for better UX
 - [ ] Make image URL configurable (move to env or CMS)
+- [ ] Add auto-refresh before token expires
+- [ ] Implement 401 error interception and retry logic

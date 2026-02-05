@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/src/auth/hooks/useAuth';
 
 interface SignupFormProps {
   onSwitchToLogin: () => void;
@@ -11,24 +13,38 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [localError, setLocalError] = useState('');
+  const { signup, isLoading, error, clearError } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Clear local error
+    setLocalError('');
+    
+    // Client-side validation
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      setLocalError('Passwords do not match');
       return;
     }
 
-    setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Signup:', { fullName, email, password });
-    setIsLoading(false);
+    try {
+      await signup(email, password, fullName);
+      router.push('/'); // Redirect to home page on success
+    } catch (err) {
+      // Error handled in context
+    }
   };
+
+  // Clear errors when user starts typing
+  const handleInputChange = (setter: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setter(e.target.value);
+    if (error) clearError();
+    if (localError) setLocalError('');
+  };
+
+  const displayError = error || localError;
 
   return (
     <div className="text-center">
@@ -39,12 +55,18 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
         Create your account to access hackathons, grants, and connect with the community.
       </p>
 
+      {displayError && (
+        <div className="text-sm text-red-600 mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+          {displayError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Full Name"
           value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          onChange={handleInputChange(setFullName)}
           required
           className="w-full px-4 py-3.5 text-sm bg-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
         />
@@ -53,7 +75,7 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
           type="email"
           placeholder="example@domain.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleInputChange(setEmail)}
           required
           className="w-full px-4 py-3.5 text-sm bg-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
         />
@@ -62,7 +84,7 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handleInputChange(setPassword)}
           required
           minLength={8}
           className="w-full px-4 py-3.5 text-sm bg-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
@@ -72,7 +94,7 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
           type="password"
           placeholder="Confirm Password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={handleInputChange(setConfirmPassword)}
           required
           minLength={8}
           className="w-full px-4 py-3.5 text-sm bg-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
