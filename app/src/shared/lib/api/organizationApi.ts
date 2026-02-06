@@ -1,11 +1,22 @@
 /**
  * Organization API Service
- * Handles all organization-related API calls and data transformations
+ * Handles all organization-related API calls using the centralized API client
  */
 
-import { TeamMemberRole, BackendOrganization, BackendOrganizationMember, OrganizationProfile, TeamMember, OrganizationCreatePayload, CreateOrganizationResponse, UserOrganizationsResponse, OrganizationDetailsResponse, SocialLinks } from '@/src/organization/types/organization.types';
-import api from './apiClient';
-
+import { apiClient } from './client';
+import { ENDPOINTS } from './endpoints';
+import type {
+  OrganizationCreatePayload,
+  OrganizationProfile,
+  TeamMember,
+  TeamMemberRole,
+  SocialLinks,
+  CreateOrganizationResponse,
+  UserOrganizationsResponse,
+  OrganizationDetailsResponse,
+  BackendOrganization,
+  BackendOrganizationMember,
+} from '@/src/organization/types/organization.types';
 
 // ============================================
 // Data Transformation Utilities
@@ -51,15 +62,31 @@ function transformStatus(backendStatus: 'PENDING' | 'ACTIVE' | 'REMOVED'): 'Pend
  * Transform backend organization to frontend format
  */
 function transformOrganization(backend: BackendOrganization, members: BackendOrganizationMember[] = []): OrganizationProfile {
-  return {
+  if (!backend) {
+    throw new Error('Organization data is undefined');
+  }
+
+  if (!backend._id) {
+    console.error('Invalid organization data:', backend);
+    throw new Error('Organization is missing required _id field');
+  }
+
+  console.log('🔄 Transforming organization:', {
+    backend,
+    hasTagline: !!backend.tagline,
+    hasAbout: !!backend.about,
+    hasSocialLinks: !!backend.socialLinks,
+  });
+
+  const transformed = {
     id: backend._id,
-    name: backend.name,
-    slug: backend.slug,
+    name: backend.name || '',
+    slug: backend.slug || '',
     logo: backend.logo || '',
     tagline: backend.tagline || '',
     about: backend.about || '',
-    website: backend.website,
-    status: backend.status,
+    website: backend.website || '',
+    status: backend.status || 'ACTIVE',
     socialLinks: {
       x: backend.socialLinks?.x || '',
       telegram: backend.socialLinks?.telegram || '',
@@ -68,9 +95,18 @@ function transformOrganization(backend: BackendOrganization, members: BackendOrg
       linkedin: backend.socialLinks?.linkedin || '',
     },
     teamMembers: members.map(transformMember),
-    createdAt: backend.createdAt,
+    createdAt: backend.createdAt || new Date().toISOString(),
     updatedAt: backend.updatedAt,
   };
+
+  console.log('✅ Transformed organization:', {
+    id: transformed.id,
+    tagline: transformed.tagline,
+    about: transformed.about,
+    socialLinks: transformed.socialLinks,
+  });
+
+  return transformed;
 }
 
 /**
@@ -94,56 +130,73 @@ function transformMember(backend: BackendOrganizationMember): TeamMember {
 }
 
 // ============================================
-// Organization API Class
+// Organization API Service
 // ============================================
 
-class OrganizationApi {
+export const organizationApi = {
   /**
    * Create a new organization
    */
   async createOrganization(payload: OrganizationCreatePayload): Promise<OrganizationProfile> {
-    const response = await api.post<CreateOrganizationResponse>('/organizations', {
-      name: payload.name,
-      website: payload.website,
-      agreeToTerms: payload.termsAccepted,
-    });
+    console.log('📤 Creating organization with payload:', payload);
+    
+    const response = await apiClient.post<BackendOrganization>(
+      ENDPOINTS.ORGANIZATIONS.CREATE,
+      {
+        name: payload.name,
+        website: payload.website,
+        agreeToTerms: payload.termsAccepted,
+      }
+    );
 
+    console.log('📥 Create organization API response:', response);
+
+    // API returns organization directly, not wrapped
     // Transform response to frontend format
-    return transformOrganization(response.organization, [
-      response.membership,
-    ]);
-  }
+    return transformOrganization(response, []);
+  },
 
   /**
    * Get all organizations for the current user
    */
   async getUserOrganizations(): Promise<OrganizationProfile[]> {
-    const response = await api.get<UserOrganizationsResponse[]>('/organizations/me');
-
-    // Fetch full details for each organization
-    const organizations = await Promise.all(
-      response.map(async (item) => {
-        try {
-          const details = await this.getOrganization(item.organization._id);
-          return details;
-        } catch (error) {
-          // Fallback to basic info if full details fail
-          console.error(`Failed to fetch details for org ${item.organization._id}:`, error);
-          return transformOrganization(item.organization, []);
-        }
-      })
+    const response = await apiClient.get<UserOrganizationsResponse[]>(
+      ENDPOINTS.ORGANIZATIONS.ME
     );
 
+    // Transform each organization in the response
+    const organizations = response.map((item) => {
+      return transformOrganization(item.organization, []);
+    });
+
     return organizations;
-  }
+  },
 
   /**
    * Get organization details by ID
    */
   async getOrganization(orgId: string): Promise<OrganizationProfile> {
-    const response = await api.get<OrganizationDetailsResponse>(`/organizations/${orgId}`);
-    return transformOrganization(response.organization, response.members);
-  }
+    console.log('📤 Fetching organization:', orgId);
+    
+    const response = await apiClient.get<BackendOrganization>(
+      ENDPOINTS.ORGANIZATIONS.BY_ID(orgId)
+    );
+    
+    console.log('📥 Get organization API response:', response);
+    
+    // API returns organization directly
+    // Fetch members separately if needed
+    let members: BackendOrganizationMember[] = [];
+    try {
+      members = await apiClient.get<BackendOrganizationMember[]>(
+        ENDPOINTS.ORGANIZATIONS.MEMBERS(orgId)
+      );
+      console.log('📥 Got members:', members);
+    } catch (error) {
+      console.warn('Failed to fetch members:', error);
+    }
+    return transformOrganization(response, members);
+  },
 
   /**
    * Update organization profile (logo, tagline, about)
@@ -156,21 +209,27 @@ class OrganizationApi {
       about?: string;
     }
   ): Promise<BackendOrganization> {
-    return api.patch<BackendOrganization>(`/organizations/${orgId}/profile`, updates);
-  }
+    return apiClient.patch<BackendOrganization>(
+      ENDPOINTS.ORGANIZATIONS.PROFILE(orgId),
+      updates
+    );
+  },
 
   /**
    * Update organization social links
    */
   async updateSocialLinks(orgId: string, socialLinks: SocialLinks): Promise<BackendOrganization> {
-    return api.patch<BackendOrganization>(`/organizations/${orgId}/social-links`, {
-      x: socialLinks.x || undefined,
-      telegram: socialLinks.telegram || undefined,
-      github: socialLinks.github || undefined,
-      discord: socialLinks.discord || undefined,
-      linkedin: socialLinks.linkedin || undefined,
-    });
-  }
+    return apiClient.patch<BackendOrganization>(
+      ENDPOINTS.ORGANIZATIONS.SOCIAL_LINKS(orgId),
+      {
+        x: socialLinks.x || undefined,
+        telegram: socialLinks.telegram || undefined,
+        github: socialLinks.github || undefined,
+        discord: socialLinks.discord || undefined,
+        linkedin: socialLinks.linkedin || undefined,
+      }
+    );
+  },
 
   /**
    * Get organization members
@@ -179,13 +238,13 @@ class OrganizationApi {
     orgId: string,
     status?: 'PENDING' | 'ACTIVE' | 'REMOVED'
   ): Promise<TeamMember[]> {
-    const params = status ? `?status=${status}` : '';
-    const response = await api.get<BackendOrganizationMember[]>(
-      `/organizations/${orgId}/members${params}`
-    );
+    const endpoint = status
+      ? `${ENDPOINTS.ORGANIZATIONS.MEMBERS(orgId)}?status=${status}`
+      : ENDPOINTS.ORGANIZATIONS.MEMBERS(orgId);
 
+    const response = await apiClient.get<BackendOrganizationMember[]>(endpoint);
     return response.map(transformMember);
-  }
+  },
 
   /**
    * Invite a team member
@@ -195,8 +254,8 @@ class OrganizationApi {
     email: string,
     role: TeamMemberRole
   ): Promise<TeamMember> {
-    const response = await api.post<BackendOrganizationMember>(
-      `/organizations/${orgId}/members/invite`,
+    const response = await apiClient.post<BackendOrganizationMember>(
+      ENDPOINTS.ORGANIZATIONS.INVITE_MEMBER(orgId),
       {
         email,
         role: transformRoleToBackend(role),
@@ -204,7 +263,7 @@ class OrganizationApi {
     );
 
     return transformMember(response);
-  }
+  },
 
   /**
    * Update member role
@@ -214,31 +273,29 @@ class OrganizationApi {
     memberId: string,
     role: TeamMemberRole
   ): Promise<TeamMember> {
-    const response = await api.patch<BackendOrganizationMember>(
-      `/organizations/${orgId}/members/${memberId}/role`,
+    const response = await apiClient.patch<BackendOrganizationMember>(
+      ENDPOINTS.ORGANIZATIONS.MEMBER_ROLE(orgId, memberId),
       {
         role: transformRoleToBackend(role),
       }
     );
 
     return transformMember(response);
-  }
+  },
 
   /**
    * Remove a team member
    */
   async removeMember(orgId: string, memberId: string): Promise<void> {
-    await api.delete<void>(`/organizations/${orgId}/members/${memberId}`);
-  }
+    await apiClient.delete<void>(
+      ENDPOINTS.ORGANIZATIONS.REMOVE_MEMBER(orgId, memberId)
+    );
+  },
 
   /**
    * Get organization hackathons (future feature)
    */
   async getOrganizationHackathons(orgId: string): Promise<any[]> {
-    return api.get<any[]>(`/organizations/${orgId}/hackathons`);
-  }
-}
-
-// Export singleton instance
-export const organizationApi = new OrganizationApi();
-export default organizationApi;
+    return apiClient.get<any[]>(ENDPOINTS.ORGANIZATIONS.HACKATHONS(orgId));
+  },
+};

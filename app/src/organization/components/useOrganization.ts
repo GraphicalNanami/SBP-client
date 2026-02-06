@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { organizationApi } from '../../../../src/services/api/organizationApi';
+import { organizationApi } from '@/src/shared/lib/api/organizationApi';
 import type {
   OrganizationCreatePayload,
   OrganizationProfile,
@@ -90,12 +90,15 @@ export function useOrganization() {
 
         const newOrg = await organizationApi.createOrganization(payload);
 
+        // Fetch complete organization details to ensure all data is loaded
+        const completeOrg = await organizationApi.getOrganization(newOrg.id);
+
         // Add to organizations list
-        setOrganizations((prev) => [...prev, newOrg]);
-        setActiveOrgId(newOrg.id);
+        setOrganizations((prev) => [...prev, completeOrg]);
+        setActiveOrgId(completeOrg.id);
         setStep('dashboard');
 
-        return newOrg;
+        return completeOrg;
       } catch (err: any) {
         console.error('Failed to create organization:', err);
         const errorMessage =
@@ -311,6 +314,12 @@ export function useOrganization() {
       if (activeOrg.socialLinks.linkedin) socialLinks.linkedin = activeOrg.socialLinks.linkedin;
 
       await organizationApi.updateSocialLinks(activeOrgId, socialLinks);
+
+      // Refetch organization to sync with backend
+      const updatedOrg = await organizationApi.getOrganization(activeOrgId);
+      setOrganizations((prev) =>
+        prev.map((org) => (org.id === activeOrgId ? updatedOrg : org))
+      );
 
       // Show success message
       setSaveSuccess(true);
