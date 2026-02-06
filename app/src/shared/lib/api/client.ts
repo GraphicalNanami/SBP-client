@@ -95,7 +95,7 @@ class ApiClient {
     if (typeof window === 'undefined') return null;
     
     // Try memory first, then sessionStorage
-    const memoryToken = (globalThis as any).__accessToken__;
+    const memoryToken = (globalThis as { __accessToken__?: string }).__accessToken__;
     if (memoryToken) return memoryToken;
     
     try {

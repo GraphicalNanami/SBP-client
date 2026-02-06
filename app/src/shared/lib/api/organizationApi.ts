@@ -309,7 +309,7 @@ export const organizationApi = {
   /**
    * Get organization hackathons (future feature)
    */
-  async getOrganizationHackathons(orgId: string): Promise<any[]> {
-    return apiClient.get<any[]>(ENDPOINTS.ORGANIZATIONS.HACKATHONS(orgId));
+  async getOrganizationHackathons(orgId: string): Promise<unknown[]> {
+    return apiClient.get<unknown[]>(ENDPOINTS.ORGANIZATIONS.HACKATHONS(orgId));
   },
 };

@@ -19,7 +19,7 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
     try {
       await login(email, password);
       router.push('/'); // Redirect to home page on success
-    } catch (err) {
+    } catch {
       // Error handled in context
     }
   };
@@ -83,7 +83,7 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
 
       <div className="mt-4">
         <p className="text-sm text-muted-foreground">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <button
             onClick={onSwitchToSignup}
             className="text-foreground font-medium hover:underline"

@@ -27,7 +27,7 @@ export const HowItWorksSection = () => {
               Discover events
             </h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              See who's hosting local Stellar events for all the things you love. Search by category, location, or date.
+              See who&apos;s hosting local Stellar events for all the things you love. Search by category, location, or date.
             </p>
             <a href="#" className="text-accent-foreground font-semibold hover:underline">
               Search events →

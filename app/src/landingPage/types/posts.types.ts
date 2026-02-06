@@ -21,7 +21,7 @@ export interface StatsResponse {
     topic: string;
     count: number;
   }>;
-  recent_activity: any[];
+  recent_activity: unknown[];
 }
 
 export interface RecentPostsResponse {

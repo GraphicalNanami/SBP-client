@@ -72,7 +72,7 @@ const FeaturedSection = () => {
         <div className="flex items-end justify-between mb-12">
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-4">
-              What's happening
+              What&apos;s happening
             </span>
             <h2 className="heading-section" style={{ fontFamily: 'var(--font-jersey)' }}>
               Featured <UnderlineHighlight>Events</UnderlineHighlight>

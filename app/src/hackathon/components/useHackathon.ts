@@ -86,9 +86,10 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
           setHackathon(data);
           setIsLoading(false);
         })
-        .catch((err) => {
+        .catch((err: unknown) => {
           console.error('Failed to load hackathon:', err);
-          setError(err.message || 'Failed to load hackathon');
+          const error = err as { message?: string };
+          setError(error.message || 'Failed to load hackathon');
           setIsLoading(false);
         });
     }
@@ -241,16 +242,17 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to save hackathon:', err);
 
       // Check if this is a validation error (400 status) or file too large (413 status)
-      if (err.status === 400 || err.status === 413) {
+      const error = err as { status?: number; message?: string };
+      if (error.status === 400 || error.status === 413) {
         // This is a validation error - don't break the page
-        setValidationError(err.message || 'Please fix the validation errors');
+        setValidationError(error.message || 'Please fix the validation errors');
 
         // Map common error messages to field names
-        const errorMessage = err.message || '';
+        const errorMessage = error.message || '';
         const errors: Record<string, string> = {};
 
         if (errorMessage.includes('Start time')) {
@@ -287,7 +289,7 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
         }, 5000);
       } else {
         // This is a fatal error (network, server, etc.)
-        const errorMessage = err.message || 'Failed to save hackathon';
+        const errorMessage = error.message || 'Failed to save hackathon';
         setError(errorMessage);
       }
     } finally {
@@ -320,15 +322,16 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
       setHackathon(updated);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to submit hackathon for review:', err);
 
       // Check if this is a validation error
-      if (err.status === 400 || err.status === 403) {
-        setValidationError(err.message || 'Failed to submit hackathon for review');
+      const error = err as { status?: number; message?: string };
+      if (error.status === 400 || error.status === 403) {
+        setValidationError(error.message || 'Failed to submit hackathon for review');
         setTimeout(() => setValidationError(null), 5000);
       } else {
-        setError(err.message || 'Failed to submit hackathon for review');
+        setError(error.message || 'Failed to submit hackathon for review');
       }
     } finally {
       setIsSaving(false);

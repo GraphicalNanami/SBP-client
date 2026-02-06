@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
+import React from "react";
 
 // SVG Icons for topics
 const TopicIcon = ({ name }: { name: string }) => {
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactElement> = {
     'stellar': (
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/>

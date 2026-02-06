@@ -24,7 +24,8 @@ const calendarEvents = MOCK_EVENTS.map(event => ({
 }));
 
 // Group events by date
-const groupedEvents = calendarEvents.reduce((acc: any[], curr) => {
+type CalendarEvent = typeof calendarEvents[number];
+const groupedEvents = calendarEvents.reduce((acc: CalendarEvent[], curr) => {
   const dateKey = curr.day.toDateString();
   const existing = acc.find(item => item.day.toDateString() === dateKey);
   
