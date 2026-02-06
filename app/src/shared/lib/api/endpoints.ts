@@ -11,6 +11,7 @@ export const ENDPOINTS = {
   },
   PROFILE: {
     ME: '/profile/me',
+    UPDATE: '/profile/me',
   },
   ORGANIZATIONS: {
     LIST: '/organizations',

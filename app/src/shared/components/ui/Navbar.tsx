@@ -21,9 +21,9 @@ const Navbar = () => {
         
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Hackathons</a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Builds</a>
+          <a href="/Events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</a>
+          <a href="/hackathons" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Hackathons</a>
+          <a href="/Builds" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Builds</a>
         </div>
         
         {/* CTAs - Conditional Rendering */}

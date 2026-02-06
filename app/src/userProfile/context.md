@@ -85,12 +85,42 @@ Manage Freighter wallets:
 - OAuth timeouts handled gracefully
 - Form auto-saves on blur with debounce
 
+## Feature Module Structure
+```
+userProfile/
+├── components/
+│   ├── userProfileUI/         # Pure UI components (presentation only)
+│   │   ├── SettingsLayout.tsx
+│   │   ├── ProfileDropdown.tsx
+│   │   └── PersonalInfoForm.tsx
+│   └── userProfileService/    # Business logic, hooks, API calls
+│       ├── profile-service.ts
+│       └── useProfile.ts
+├── types/
+│   └── profile.types.ts       # SocialLinks, UserProfile, ProfileMeResponse
+├── context.md
+└── page.tsx
+```
+
+## API Integration
+- **GET /profile/me** → Returns `{ user, profile }` with user data + profile (bio, stellarAddress, socialLinks)
+- **PUT /profile/me** → Updates profile with `UpdateProfilePayload`
+- Uses shared `apiClient` and `ENDPOINTS` from `@/src/shared/lib/api/`
+
 ## Recent Changes
 **2026-02-06**
 - Created profile dropdown with avatar and menu
 - Integrated conditional rendering in Navbar
 - Planned settings pages: Personal Info, Social Accounts (GitHub, Twitter), Experience, Wallets
 - Added Freighter wallet integration plan
+- Implemented proper separation of concerns for Personal Info:
+  - Created `profile.types.ts` with `ProfileMeResponse`, `UserProfile`, `SocialLinks`, `UpdateProfilePayload`
+  - Created `profile-service.ts` (API service layer using `apiClient`)
+  - Created `useProfile` hook (data fetching + update logic)
+  - Created `PersonalInfoForm` (pure UI component, no business logic)
+  - Refactored `personal-info/page.tsx` to use hook + UI component pattern
+  - Added `avatar` field to shared `User` type
+  - Added `PROFILE.UPDATE` endpoint
 
 ## Future Enhancements
 - Profile picture upload
