@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import type { HackathonCardData } from './mockData';
+import { getProxiedImageUrl } from '@/src/shared/utils/image-proxy';
 
 /* ── Pastel backgrounds for categories (matching EventCard pattern) ── */
 const getCategoryColor = (category: string) => {
@@ -82,7 +83,7 @@ function FeaturedHackathonCard({ hackathon }: { hackathon: HackathonCardData }) 
         <>
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${hackathon.poster})` }}
+            style={{ backgroundImage: `url(${getProxiedImageUrl(hackathon.poster)})` }}
           />
           {/* Darker overlay for better text readability with images */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
@@ -158,7 +159,7 @@ function RegularHackathonCard({ hackathon }: { hackathon: HackathonCardData }) {
         <div className="relative w-full h-32 bg-gray-100">
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${hackathon.poster})` }}
+            style={{ backgroundImage: `url(${getProxiedImageUrl(hackathon.poster)})` }}
           />
           <div className="absolute top-3 right-3">
             <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${statusStyles[hackathon.status]}`}>

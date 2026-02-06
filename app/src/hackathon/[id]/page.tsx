@@ -21,6 +21,7 @@ import {
 import { hackathonApi } from '@/src/shared/lib/api/hackathonApi';
 import type { HackathonCardData } from '../components/mockData';
 import type { Hackathon } from '@/src/hackathon/types/hackathon.types';
+import { getProxiedImageUrl } from '@/src/shared/utils/image-proxy';
 
 /* ── Status badge colors ── */
 const statusStyles: Record<string, { bg: string; dot: string; text: string }> = {
@@ -199,7 +200,7 @@ export default function HackathonDetailPage() {
             <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20">
               {hackathon.poster ? (
                 <img
-                  src={hackathon.poster}
+                  src={getProxiedImageUrl(hackathon.poster)}
                   alt={hackathon.name}
                   className="w-full h-full object-cover"
                 />

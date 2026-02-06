@@ -463,3 +463,23 @@ Backend enforces valid state transitions:
   - Regular cards have consistent thumbnail + content layout
   - Better visual hierarchy with real imagery vs solid colors
 
+### February 7, 2026 - Image Proxy for ngrok URLs
+- ✅ **Created image proxy endpoint to bypass ngrok browser warning**:
+  - **Problem**: ngrok requires `ngrok-skip-browser-warning` header for all requests
+  - CSS `background-image` cannot set custom headers, causing images to fail loading
+  - **Solution**: Created `/api/image-proxy` route that proxies images with proper headers
+- **Implementation**:
+  - Created `app/api/image-proxy/route.ts` - Next.js API route that fetches images with ngrok header
+  - Created `getProxiedImageUrl()` utility in `@/src/shared/utils/image-proxy.ts`
+  - Automatically detects ngrok URLs and proxies them through local endpoint
+  - Non-ngrok URLs are returned as-is (no unnecessary proxying)
+- **Updated Components**:
+  - `HackathonCard` (featured & regular) now use `getProxiedImageUrl()`
+  - Hackathon detail page banner now uses `getProxiedImageUrl()`
+- **Caching**: Proxy endpoint sets `Cache-Control: public, max-age=31536000, immutable` for performance
+- **Data Flow**:
+  ```
+  ngrok image URL → getProxiedImageUrl() → /api/image-proxy?url=...
+  → Fetch with ngrok header → Return image to browser
+  ```
+
