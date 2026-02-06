@@ -30,7 +30,7 @@ const FeaturedSection = () => {
             <span className="inline-block px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-4">
               What's happening
             </span>
-            <h2 className="heading-section">
+            <h2 className="heading-section" style={{ fontFamily: 'var(--font-jersey)' }}>
               Featured <UnderlineHighlight>Events</UnderlineHighlight>
             </h2>
           </div>

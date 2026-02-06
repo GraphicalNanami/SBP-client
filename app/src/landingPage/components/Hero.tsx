@@ -3,7 +3,7 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
 
  const Hero = () => {
    return (
-     <section className="pt-20 pb-16 min-h-screen ">
+     <section className="pt-20 pb-5 min-h-screen ">
        <div className="container-main">
          {/* Badge */}
         

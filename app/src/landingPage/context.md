@@ -88,6 +88,12 @@ All endpoints use base URL from `process.env.NEXT_PUBLIC_API_BASE_URL`
 - ✅ Implemented loading/error/empty states
 - ✅ Used 3-column responsive grid with scroll animations
 
+## Recent Changes (2026-02-07)
+- ✅ Improved Plans section hover contrast (title/description text and CTA button)
+- ✅ Updated logo carousel with Stellar ecosystem topic tags and custom SVG icons
+- ✅ Replaced generic company logos with 8 Stellar-specific topics from TOPIC_TAGS
+- ✅ Created black & white SVG icons for each topic (stellar, network, payments, soroban, etc.)
+
 ## Future Enhancements
 - Add infinite scroll for posts loading
 - Implement real-time updates via WebSocket

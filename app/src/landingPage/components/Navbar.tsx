@@ -24,6 +24,8 @@ const Navbar = () => {
           <Link href="/Events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</Link>
           <Link href="/hackathon" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Hackathons</Link>
           <Link href="/Builds" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Builds</Link>
+                    <Link href="/Swags" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Swags</Link>
+
         </div>
         
         {/* CTAs - Conditional Rendering */}
