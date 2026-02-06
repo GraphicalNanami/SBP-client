@@ -15,7 +15,7 @@ import type {
   OrganizationDetailsResponse,
   BackendOrganization,
   BackendOrganizationMember,
-} from '@/src/features/organization/types/organization.types';
+} from '@/src/organization/types/organization.types';
 
 // ============================================
 // Data Transformation Utilities

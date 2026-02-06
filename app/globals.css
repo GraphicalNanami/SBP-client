@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-/* ─── Light theme (default — matches login/landing page) ─── */
+/* ─── Light theme only ─── */
 :root {
+  color-scheme: light;
   --bg: #f5f5f5;
   --bg-card: #ffffff;
   --bg-input: #ffffff;
@@ -36,58 +37,6 @@
   --success: #16a34a;
 }
 
-/* ─── Dark theme ─── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0a0a0a;
-    --bg-card: #161616;
-    --bg-input: #1e1e1e;
-    --bg-hover: #222222;
-    --bg-muted: #141414;
-
-    --text: #f5f5f5;
-    --text-secondary: #a0a0a0;
-    --text-muted: #666666;
-
-    --brand: #f5f5f5;
-    --brand-fg: #0a0a0a;
-
-    --border: #2a2a2a;
-    --border-hover: #3a3a3a;
-
-    --shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0px 4px 16px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0px 8px 30px rgba(0, 0, 0, 0.4);
-
-    --error: #ef4444;
-    --success: #22c55e;
-  }
-}
-
-.dark {
-  --bg: #0a0a0a;
-  --bg-card: #161616;
-  --bg-input: #1e1e1e;
-  --bg-hover: #222222;
-  --bg-muted: #141414;
-
-  --text: #f5f5f5;
-  --text-secondary: #a0a0a0;
-  --text-muted: #666666;
-
-  --brand: #f5f5f5;
-  --brand-fg: #0a0a0a;
-
-  --border: #2a2a2a;
-  --border-hover: #3a3a3a;
-
-  --shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0px 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0px 8px 30px rgba(0, 0, 0, 0.4);
-
-  --error: #ef4444;
-  --success: #22c55e;
-}
 
 @theme inline {
   --color-bg: var(--bg);
@@ -132,6 +81,8 @@ body {
 ::selection {
   background: var(--accent);
   color: #1a1a1a;
+}
+
 /* Remote Landing Page Design System */
 
 @theme {

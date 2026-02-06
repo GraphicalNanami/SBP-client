@@ -92,9 +92,9 @@ const inputClass =
 /* ── Role Badge ── */
 function RoleBadge({ role }: { role: TeamMember['role'] }) {
   const styles: Record<TeamMember['role'], string> = {
-    Admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-    Editor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-    Viewer: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+    Admin: 'bg-purple-100 text-purple-700',
+    Editor: 'bg-blue-100 text-blue-700',
+    Viewer: 'bg-gray-100 text-gray-600',
   };
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[role]}`}>
@@ -283,11 +283,11 @@ function InviteModal({
 function Avatar({ name }: { name: string }) {
   const initial = name.charAt(0).toUpperCase();
   const colors = [
-    'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300',
-    'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300',
-    'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300',
-    'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300',
-    'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300',
+    'bg-purple-100 text-purple-600',
+    'bg-blue-100 text-blue-600',
+    'bg-emerald-100 text-emerald-600',
+    'bg-amber-100 text-amber-600',
+    'bg-rose-100 text-rose-600',
   ];
   const color = colors[name.charCodeAt(0) % colors.length];
   return (
@@ -342,7 +342,7 @@ export function OrganizationDashboard({
                     <h1 className="text-sm font-semibold text-text" style={{ letterSpacing: '-0.02em' }}>
                       {profile.name || 'Organization'}
                     </h1>
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ">
                       Active
                     </span>
                   </div>
@@ -664,7 +664,7 @@ export function OrganizationDashboard({
                           ) : (
                             <button
                               onClick={() => onRemoveMember(member.id)}
-                              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-red-50 hover:text-red-500"
                               title="Remove member"
                             >
                               <Trash2 className="h-3.5 w-3.5" />

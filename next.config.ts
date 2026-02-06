@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         source: "/organization",
         destination: "/src/organization",
       },
+      {
+        source: "/hackathon",
+        destination: "/src/hackathon",
+      },
     ];
   },
 };

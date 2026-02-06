@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import { Onest } from "next/font/google";
+import { Inter, Onest } from "next/font/google";
+import { AuthProvider } from "./src/auth/context/AuthContext";
 import "./globals.css";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
 
 const onest = Onest({
   variable: "--font-onest",
@@ -20,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: 'light' }} data-theme="light">
       <body className={`${inter.variable} ${onest.variable} antialiased font-sans`}>
         <AuthProvider>
           {children}

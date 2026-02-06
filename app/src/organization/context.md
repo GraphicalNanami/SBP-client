@@ -220,7 +220,7 @@ All components use CSS custom properties defined in `app/globals.css` for consis
 - **Feedback:** `--error`, `--success`
 - **Shadows:** `--shadow`, `--shadow-md`, `--shadow-lg`
 
-Light and dark themes are handled automatically via `@media (prefers-color-scheme: dark)`. All inputs use rounded-full pill style. Buttons follow brand colors with hover opacity and active scale transforms.
+The app supports **light theme only** (dark theme has been removed from `globals.css`). All inputs use rounded-full pill style. Buttons follow brand colors with hover opacity and active scale transforms.
 
 **Font:** Onest (loaded via `next/font/google` in `app/layout.tsx`)
 
