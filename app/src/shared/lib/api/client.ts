@@ -16,18 +16,28 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    isFormData: boolean = false
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
     // Get access token from TokenManager
     const accessToken = this.getAccessToken();
     
+    // Build headers object
+    const headers: Record<string, string> = {
+      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+    };
+
+    // Only set Content-Type for non-FormData requests
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
+
     const config: RequestInit = {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
-        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        ...headers,
         ...options.headers,
       },
     };
@@ -99,24 +109,39 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, body: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
+    const isFormData = body instanceof FormData;
+    return this.request<T>(
+      endpoint,
+      {
+        method: 'POST',
+        body: isFormData ? body : JSON.stringify(body),
+      },
+      isFormData
+    );
   }
 
   async put<T>(endpoint: string, body: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(body),
-    });
+    const isFormData = body instanceof FormData;
+    return this.request<T>(
+      endpoint,
+      {
+        method: 'PUT',
+        body: isFormData ? body : JSON.stringify(body),
+      },
+      isFormData
+    );
   }
 
   async patch<T>(endpoint: string, body: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PATCH',
-      body: JSON.stringify(body),
-    });
+    const isFormData = body instanceof FormData;
+    return this.request<T>(
+      endpoint,
+      {
+        method: 'PATCH',
+        body: isFormData ? body : JSON.stringify(body),
+      },
+      isFormData
+    );
   }
 
   async delete<T>(endpoint: string): Promise<T> {

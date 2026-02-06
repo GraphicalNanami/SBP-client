@@ -1,27 +1,47 @@
 import type { User } from '@/src/shared/types/auth.types';
+import type { Experience } from './experience.types';
+import type { Wallet } from './wallet.types';
 
 export interface SocialLinks {
-  twitter?: string;
+  github?: {
+    username: string;
+    profileUrl: string;
+    connectedAt: string;
+  };
+  twitter?: {
+    handle: string;
+    profileUrl: string;
+    connectedAt: string;
+  };
   linkedin?: string;
-  github?: string;
 }
 
 export interface UserProfile {
-  _id: string;
   userId: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: 'MALE' | 'FEMALE' | 'NON_BINARY' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+  city?: string;
+  country?: string;
+  website?: string;
+  profilePictureUrl?: string;
   bio?: string;
   stellarAddress?: string;
-  socialLinks: SocialLinks;
+  socialLinks?: SocialLinks;
+}
+
+export interface UpdatePersonalInfoPayload {
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  city?: string;
+  country?: string;
+  website?: string;
 }
 
 export interface ProfileMeResponse {
   user: User;
   profile: UserProfile;
-}
-
-export interface UpdateProfilePayload {
-  name?: string;
-  bio?: string;
-  stellarAddress?: string;
-  socialLinks?: SocialLinks;
+  experience: Experience;
+  wallets: Wallet[];
 }

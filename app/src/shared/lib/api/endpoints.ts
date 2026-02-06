@@ -11,7 +11,26 @@ export const ENDPOINTS = {
   },
   PROFILE: {
     ME: '/profile/me',
-    UPDATE: '/profile/me',
+    UPDATE_PERSONAL_INFO: '/profile/personal-info',
+    UPLOAD_PICTURE: '/profile/upload-picture',
+  },
+  EXPERIENCE: {
+    ME: '/experience/me',
+    UPDATE: '/experience',
+    PATCH: '/experience',
+  },
+  WALLETS: {
+    LIST: '/wallets',
+    CREATE: '/wallets',
+    UPDATE: (id: string) => `/wallets/${id}`,
+    DELETE: (id: string) => `/wallets/${id}`,
+    VERIFY: (id: string) => `/wallets/${id}/verify`,
+    SET_PRIMARY: (id: string) => `/wallets/${id}/set-primary`,
+  },
+  SOCIAL: {
+    CONNECT_GITHUB: '/social/github/connect',
+    CONNECT_TWITTER: '/social/twitter/connect',
+    DISCONNECT: (provider: string) => `/social/${provider}`,
   },
   ORGANIZATIONS: {
     LIST: '/organizations',

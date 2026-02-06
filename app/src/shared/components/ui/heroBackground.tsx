@@ -1,7 +1,6 @@
 // This is file of your component
 // You can use any dependencies from npm; we import them automatically in package.json
 
-import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const  Component= () => {
