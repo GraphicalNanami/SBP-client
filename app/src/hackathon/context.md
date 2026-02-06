@@ -425,3 +425,21 @@ Backend enforces valid state transitions:
 - **Analytics**: Builder and project counts pulled from backend `analytics` or `analyticsTracking` fields
 - Client-side search and category filtering still applied after fetching from API
 
+### February 7, 2026 - Hackathon Detail Page API Data Integration
+- ✅ **Aligned hackathon detail page with actual API response**:
+  - Added `fullHackathon` state to store complete `Hackathon` object from API
+  - Updated About section to display actual `description` from API instead of mocked content
+  - Added **Tracks section** displaying all tracks from API with numbered cards
+  - Added **Submission Requirements section** showing custom instructions from API
+  - Updated **Prizes section** to show actual prize data when available, fallback to calculated prizes
+  - Updated **Timeline section** to include pre-registration end time when present
+  - Connected "Contact the Host" button to actual `adminContact` email with mailto link
+  - Updated Build Resources links to point to real Stellar documentation URLs
+- **Data Flow**:
+  - Page fetches full hackathon via `hackathonApi.getPublicHackathon(slug)`
+  - Stores both card format (for compatibility) and full format (for detailed data)
+  - UI renders tracks, description, submission requirements directly from API response
+- **Dynamic Content**: Description, tracks, prizes, and submission requirements now come from backend
+- **Graceful Fallbacks**: Shows calculated prize breakdown if no structured prizes exist in API
+- **Organization Info**: Using placeholder "Stellar Community" until organization data endpoint is integrated
+

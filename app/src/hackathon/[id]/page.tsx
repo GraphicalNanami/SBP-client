@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { hackathonApi } from '@/src/shared/lib/api/hackathonApi';
 import type { HackathonCardData } from '../components/mockData';
+import type { Hackathon } from '@/src/hackathon/types/hackathon.types';
 
 /* ── Status badge colors ── */
 const statusStyles: Record<string, { bg: string; dot: string; text: string }> = {
@@ -59,6 +60,7 @@ export default function HackathonDetailPage() {
   const router = useRouter();
 
   const [hackathon, setHackathon] = useState<HackathonCardData | null>(null);
+  const [fullHackathon, setFullHackathon] = useState<Hackathon | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,7 +103,10 @@ export default function HackathonDetailPage() {
           status = 'Ongoing';
         }
 
-        // Transform to card data format
+        // Store the full hackathon response for detailed data (tracks, description, etc.)
+        setFullHackathon(response);
+
+        // Transform to card data format for UI compatibility
         const cardData: HackathonCardData = {
           id: response.id,
           name: response.general.name,
@@ -115,7 +120,7 @@ export default function HackathonDetailPage() {
           submissionDeadline: response.general.submissionDeadline,
           tags: response.general.tags,
           venue: response.general.venue === 'Online' ? 'Online' : response.general.venueLocation,
-          organizationName: '', // Will need to fetch separately or include in response
+          organizationName: 'Stellar Community', // Placeholder until org data is fetched
           organizationLogo: '',
           builderCount: response.builders?.length || 0,
           projectCount: response.projects?.length || 0,
@@ -273,9 +278,14 @@ export default function HackathonDetailPage() {
               )}
 
               <div className="flex items-center gap-4 text-xs text-[#4D4D4D]">
-                <button className="hover:text-[#1A1A1A] transition-colors">
-                  Contact the Host
-                </button>
+                {fullHackathon?.general.adminContact && (
+                  <a
+                    href={`mailto:${fullHackathon.general.adminContact}`}
+                    className="hover:text-[#1A1A1A] transition-colors"
+                  >
+                    Contact the Host
+                  </a>
+                )}
                 <button className="hover:text-[#1A1A1A] transition-colors flex items-center gap-1">
                   <Flag className="w-3 h-3" />
                   Report Hackathon
@@ -363,60 +373,113 @@ export default function HackathonDetailPage() {
             <div className="bg-white rounded-xl border border-[#E5E5E5] p-8">
               <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">About this Hackathon</h2>
               <div className="prose prose-sm max-w-none text-[#4D4D4D] leading-relaxed space-y-4">
-                <p>{hackathon.tagline}</p>
-                <p>
-                  This hackathon brings together builders from across the Stellar ecosystem to create
-                  innovative solutions in the <strong>{hackathon.category}</strong> space. Whether
-                  you&apos;re a seasoned Stellar developer or just getting started with Soroban, this
-                  is your chance to build something impactful.
-                </p>
+                {/* Description from API */}
+                {fullHackathon?.description ? (
+                  <div className="whitespace-pre-wrap">{fullHackathon.description}</div>
+                ) : (
+                  <p>{hackathon.tagline}</p>
+                )}
 
-                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Prizes</h3>
-                <div className="space-y-2 not-prose">
-                  {[
-                    { place: '1st Place', pct: 50 },
-                    { place: '2nd Place', pct: 30 },
-                    { place: '3rd Place', pct: 20 },
-                  ].map((p) => (
-                    <div
-                      key={p.place}
-                      className="flex items-center justify-between rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-5 py-3.5"
-                    >
-                      <span className="text-sm font-medium text-[#1A1A1A]">{p.place}</span>
-                      <span className="text-sm font-semibold text-[#1A1A1A]">
-                        {formatPrize(Math.round(hackathon.prizePool * (p.pct / 100)))} {hackathon.prizeAsset}
-                      </span>
+                {/* Tracks Section (from API) */}
+                {fullHackathon?.tracks && fullHackathon.tracks.length > 0 && (
+                  <>
+                    <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Tracks</h3>
+                    <div className="space-y-3 not-prose">
+                      {fullHackathon.tracks.map((track, idx) => (
+                        <div
+                          key={track.id}
+                          className="rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-5 py-4"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-[#1A1A1A] text-white text-xs font-semibold">
+                              {idx + 1}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-sm font-semibold text-[#1A1A1A] mb-1">{track.name}</h4>
+                              <p className="text-sm text-[#4D4D4D]">{track.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </>
+                )}
 
-                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Rules &amp; Eligibility</h3>
-                <ul>
-                  <li>Open to all developers worldwide</li>
-                  <li>Projects must be built on Stellar or Soroban</li>
-                  <li>Teams of 1–5 members</li>
-                  <li>All code must be original work created during the hackathon period</li>
-                </ul>
+                {/* Prizes Section */}
+                {fullHackathon?.prizes && fullHackathon.prizes.length > 0 ? (
+                  <>
+                    <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Prizes</h3>
+                    <div className="space-y-2 not-prose">
+                      {fullHackathon.prizes.map((prize) => (
+                        <div key={prize.id} className="rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-5 py-3.5">
+                          <div className="font-medium text-[#1A1A1A] text-sm mb-2">{prize.name}</div>
+                          {prize.placements.map((placement) => (
+                            <div key={placement.id} className="flex items-center justify-between text-sm mt-1">
+                              <span className="text-[#4D4D4D]">{placement.label}</span>
+                              <span className="font-semibold text-[#1A1A1A]">
+                                {formatPrize(placement.amount)} {placement.currency}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Prizes</h3>
+                    <div className="space-y-2 not-prose">
+                      {[
+                        { place: '1st Place', pct: 50 },
+                        { place: '2nd Place', pct: 30 },
+                        { place: '3rd Place', pct: 20 },
+                      ].map((p) => (
+                        <div
+                          key={p.place}
+                          className="flex items-center justify-between rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-5 py-3.5"
+                        >
+                          <span className="text-sm font-medium text-[#1A1A1A]">{p.place}</span>
+                          <span className="text-sm font-semibold text-[#1A1A1A]">
+                            {formatPrize(Math.round(hackathon.prizePool * (p.pct / 100)))} {hackathon.prizeAsset}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
 
-                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Schedule</h3>
+                {/* Submission Requirements (from API) */}
+                {fullHackathon?.general.submissionRequirements && (
+                  <>
+                    <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Submission Requirements</h3>
+                    <div className="whitespace-pre-wrap text-sm">{fullHackathon.general.submissionRequirements}</div>
+                  </>
+                )}
+
+                {/* Schedule */}
+                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Timeline</h3>
                 <ul>
-                  <li><strong>Kickoff:</strong> {formatDate(hackathon.startTime)}</li>
+                  <li><strong>Start:</strong> {formatDate(hackathon.startTime)}</li>
                   <li><strong>Submission Deadline:</strong> {formatDate(hackathon.submissionDeadline)}</li>
-                  <li><strong>Judging Period:</strong> 2 weeks after deadline</li>
-                  <li><strong>Winners Announced:</strong> 3 weeks after deadline</li>
+                  {fullHackathon?.general.preRegEndTime && (
+                    <li><strong>Pre-Registration Ends:</strong> {formatDate(fullHackathon.general.preRegEndTime)}</li>
+                  )}
                 </ul>
 
+                {/* Build Resources */}
                 <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Build Resources</h3>
                 <div className="not-prose space-y-2">
                   {[
-                    { label: 'Soroban Documentation', icon: <BookOpen className="h-4 w-4" />, href: '#' },
-                    { label: 'Stellar Laboratory', icon: <Code className="h-4 w-4" />, href: '#' },
-                    { label: 'Horizon API Reference', icon: <Globe className="h-4 w-4" />, href: '#' },
-                    { label: 'Freighter Wallet', icon: <Wallet className="h-4 w-4" />, href: '#' },
+                    { label: 'Soroban Documentation', icon: <BookOpen className="h-4 w-4" />, href: 'https://soroban.stellar.org/docs' },
+                    { label: 'Stellar Laboratory', icon: <Code className="h-4 w-4" />, href: 'https://laboratory.stellar.org/' },
+                    { label: 'Horizon API Reference', icon: <Globe className="h-4 w-4" />, href: 'https://developers.stellar.org/api' },
+                    { label: 'Freighter Wallet', icon: <Wallet className="h-4 w-4" />, href: 'https://www.freighter.app/' },
                   ].map((res) => (
                     <a
                       key={res.label}
                       href={res.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#4D4D4D] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
                     >
                       <span className="text-[#999]">{res.icon}</span>
