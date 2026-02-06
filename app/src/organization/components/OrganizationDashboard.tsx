@@ -990,7 +990,7 @@ export function OrganizationDashboard({
                 Launch a hackathon and bring builders together on Stellar.
               </p>
               <Link
-                href={`/hackathon/manage/new?orgId=${activeOrgId}`}
+                href={`/src/hackathon/manage/new?orgId=${activeOrgId}`}
                 className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-white text-sm font-semibold text-[#1A1A1A] transition-all duration-200 hover:opacity-90 active:scale-[0.97]"
               >
                 Create Hackathon

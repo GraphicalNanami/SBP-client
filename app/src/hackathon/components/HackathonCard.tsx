@@ -74,7 +74,7 @@ function FeaturedHackathonCard({ hackathon }: { hackathon: HackathonCardData }) 
 
   return (
     <Link
-      href={`/hackathon/${hackathon.id}`}
+      href={`/src/hackathon/${hackathon.id}`}
       className="group relative overflow-hidden rounded-3xl min-h-[400px] lg:min-h-[520px] cursor-pointer flex"
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
@@ -136,7 +136,7 @@ function FeaturedHackathonCard({ hackathon }: { hackathon: HackathonCardData }) 
 function RegularHackathonCard({ hackathon }: { hackathon: HackathonCardData }) {
   return (
     <Link
-      href={`/hackathon/${hackathon.id}`}
+      href={`/src/hackathon/${hackathon.id}`}
       className={`group rounded-3xl ${getCategoryColor(hackathon.category)} p-6 flex flex-col justify-between min-h-[240px] hover:shadow-lg transition-all duration-300 cursor-pointer`}
     >
       <div>

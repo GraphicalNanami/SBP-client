@@ -93,7 +93,7 @@ export default function HackathonPreviewPage() {
   }, [hackathonId]);
 
   const handleClose = () => {
-    router.push(`/hackathon/manage/${hackathonId}`);
+    router.push(`/src/hackathon/manage/${hackathonId}`);
   };
 
   if (!hackathon) {

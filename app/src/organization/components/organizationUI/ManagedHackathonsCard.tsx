@@ -98,7 +98,7 @@ export function ManagedHackathonsCard({
             Create your first hackathon to get started
           </p>
           <Link
-            href={`/hackathon/manage/new?orgId=${organizationId}`}
+            href={`/src/hackathon/manage/new?orgId=${organizationId}`}
             className="inline-flex items-center gap-2 rounded-full border border-[#E5E5E5] bg-white px-4 py-2 text-sm font-medium text-[#1A1A1A] transition-all hover:border-[#E5E5E5] hover:bg-[#F5F5F5]"
           >
             <Rocket className="h-4 w-4" />

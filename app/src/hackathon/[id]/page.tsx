@@ -157,7 +157,7 @@ export default function HackathonDetailPage() {
             {error || 'Hackathon Not Found'}
           </h1>
           <button
-            onClick={() => router.push('/hackathon')}
+            onClick={() => router.push('/src/hackathon')}
             className="text-[#1A1A1A] hover:underline"
           >
             Back to Hackathons
@@ -176,7 +176,7 @@ export default function HackathonDetailPage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E5E5E5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <button
-            onClick={() => router.push('/hackathon')}
+            onClick={() => router.push('/src/hackathon')}
             className="flex items-center gap-2 text-white bg-black px-3 py-1 rounded-xl cursor-pointer hover:bg-black/80 transition-colors text-sm"
           >
             Back

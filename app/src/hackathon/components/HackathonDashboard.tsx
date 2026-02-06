@@ -301,7 +301,7 @@ export default function HackathonDashboard({
           <div className="flex items-center gap-3">
             {/* Preview Button */}
             <Link
-              href={`/hackathon/preview/${hackathon.id}`}
+              href={`/src/hackathon/preview/${hackathon.id}`}
               target="_blank"
               className="flex h-9 items-center gap-2 rounded-full border border-[#E5E5E5] px-4 text-sm font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5] active:scale-[0.97]"
             >

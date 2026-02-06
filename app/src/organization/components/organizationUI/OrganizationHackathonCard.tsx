@@ -36,7 +36,7 @@ function formatPrize(amount: number) {
 export function OrganizationHackathonCard({ hackathon }: OrganizationHackathonCardProps) {
   return (
     <Link
-      href={`/hackathon/manage/${hackathon.id}`}
+      href={`/src/hackathon/manage/${hackathon.id}`}
       className="group block overflow-hidden rounded-xl border border-[#E5E5E5] bg-white transition-all duration-200 hover:shadow-md hover:border-[#E5E5E5]"
     >
       <div className="p-5">
