@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -32,6 +32,7 @@ import {
   MessageSquare,
   HelpCircle,
   ExternalLink,
+  AlertCircle,
 } from 'lucide-react';
 import type {
   Hackathon,
@@ -53,6 +54,8 @@ interface HackathonDashboardProps {
   saveSuccess: boolean;
   isLoading?: boolean;
   error?: string | null;
+  validationError?: string | null;
+  fieldErrors?: Record<string, string>;
   isNew: boolean;
   canPublish: boolean;
   updateGeneral: <K extends keyof HackathonGeneral>(field: K, value: HackathonGeneral[K]) => void;
@@ -151,6 +154,8 @@ export default function HackathonDashboard({
   saveSuccess,
   isLoading = false,
   error = null,
+  validationError = null,
+  fieldErrors = {},
   isNew,
   canPublish,
   updateGeneral,
@@ -165,21 +170,35 @@ export default function HackathonDashboard({
   handleSave,
 }: HackathonDashboardProps) {
   const posterInputRef = useRef<HTMLInputElement>(null);
+  const [posterError, setPosterError] = useState<string | null>(null);
+
+  // Auto-clear poster error after 5 seconds
+  useEffect(() => {
+    if (posterError) {
+      const timer = setTimeout(() => {
+        setPosterError(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [posterError]);
 
   // Handle poster upload
   const handlePosterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Clear any previous error
+    setPosterError(null);
+
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+    if (!file.type || !file.type.startsWith('image/')) {
+      setPosterError('Please select an image file');
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
+    // Validate file size (max 2MB to account for base64 inflation and leave buffer)
+    if (file.size > 2 * 1024 * 1024) {
+      setPosterError('Image size should be less than 2MB');
       return;
     }
 
@@ -208,8 +227,8 @@ export default function HackathonDashboard({
     );
   }
 
-  // Show error state
-  if (error) {
+  // Show error state (only for fatal errors, not validation errors)
+  if (error && !validationError) {
     return (
       <div className="aurora-bg min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md">
@@ -304,6 +323,29 @@ export default function HackathonDashboard({
         </div>
       </header>
 
+      {/* ── Validation Error Banner ── */}
+      {validationError && (
+        <div className="border-b border-red-200 bg-red-50">
+          <div className="mx-auto max-w-[1200px] px-6 py-3">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 shrink-0 text-red-600 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-red-900">Validation Error</p>
+                <p className="text-sm text-red-700 mt-0.5">{validationError}</p>
+              </div>
+              <button
+                onClick={() => {
+                  // This will be handled by the auto-clear timeout
+                }}
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Tabs ── */}
       <div className="border-b border-[var(--border)] bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-[1200px] px-6">
@@ -337,6 +379,8 @@ export default function HackathonDashboard({
             posterInputRef={posterInputRef}
             handlePosterUpload={handlePosterUpload}
             triggerPosterInput={triggerPosterInput}
+            fieldErrors={fieldErrors}
+            posterError={posterError}
           />
         )}
         {activeTab === 'tracks' && (
@@ -367,14 +411,18 @@ function GeneralTab({
   posterInputRef,
   handlePosterUpload,
   triggerPosterInput,
+  fieldErrors = {},
+  posterError,
 }: {
   hackathon: Hackathon;
   updateGeneral: <K extends keyof HackathonGeneral>(field: K, value: HackathonGeneral[K]) => void;
   addTag: (tag: string) => void;
   removeTag: (tag: string) => void;
-  posterInputRef: React.RefObject<HTMLInputElement>;
+  posterInputRef: React.RefObject<HTMLInputElement | null>;
   handlePosterUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   triggerPosterInput: () => void;
+  fieldErrors?: Record<string, string>;
+  posterError: string | null;
 }) {
   const g = hackathon.general;
   const [tagInput, setTagInput] = useState('');
@@ -384,6 +432,16 @@ function GeneralTab({
       addTag(tagInput.trim());
       setTagInput('');
     }
+  };
+
+  // Helper to get error styling for inputs
+  const getInputClass = (fieldName: string) => {
+    const hasError = fieldErrors[fieldName];
+    return `h-[46px] w-full rounded-full border px-5 text-sm transition-all placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 ${
+      hasError
+        ? 'border-red-500 bg-red-50 text-red-900 focus:border-red-600 focus:ring-red-500/10'
+        : 'border-[var(--border)] bg-[var(--bg-input)] text-[var(--text)] hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:ring-[var(--brand)]/10'
+    }`;
   };
 
   return (
@@ -401,8 +459,14 @@ function GeneralTab({
               value={g.name}
               onChange={(e) => updateGeneral('name', e.target.value)}
               placeholder="e.g. Soroban Buildathon 2026"
-              className={inputClass}
+              className={getInputClass('name')}
             />
+            {fieldErrors.name && (
+              <p className="mt-1.5 pl-5 text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {fieldErrors.name}
+              </p>
+            )}
           </div>
 
           <div className="mb-5 grid gap-5 sm:grid-cols-2">
@@ -459,17 +523,29 @@ function GeneralTab({
             />
             <div
               onClick={triggerPosterInput}
-              className="flex h-32 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-muted)] transition-colors hover:border-[var(--border-hover)]"
+              className={`flex h-32 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed transition-colors ${
+                posterError || fieldErrors.poster
+                  ? 'border-red-500 bg-red-50 hover:border-red-600'
+                  : 'border-[var(--border)] bg-[var(--bg-muted)] hover:border-[var(--border-hover)]'
+              }`}
             >
               {g.poster ? (
                 <img src={g.poster} alt="Poster" className="h-full w-full rounded-2xl object-cover" />
               ) : (
                 <div className="text-center">
-                  <ImageIcon className="mx-auto mb-2 h-6 w-6 text-[var(--text-muted)]" />
-                  <p className="text-xs text-[var(--text-muted)]">Click to upload poster (recommended 1200×630)</p>
+                  <ImageIcon className={`mx-auto mb-2 h-6 w-6 ${posterError || fieldErrors.poster ? 'text-red-500' : 'text-[var(--text-muted)]'}`} />
+                  <p className={`text-xs ${posterError || fieldErrors.poster ? 'text-red-600' : 'text-[var(--text-muted)]'}`}>
+                    Click to upload poster (recommended 1200×630, max 2MB)
+                  </p>
                 </div>
               )}
             </div>
+            {(posterError || fieldErrors.poster) && (
+              <p className="mt-1.5 pl-2 text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {posterError || fieldErrors.poster}
+              </p>
+            )}
           </div>
 
           {/* Prize pool */}
@@ -482,8 +558,14 @@ function GeneralTab({
                 value={g.prizePool || ''}
                 onChange={(e) => updateGeneral('prizePool', Number(e.target.value))}
                 placeholder="50000"
-                className={inputClass}
+                className={getInputClass('prizePool')}
               />
+              {fieldErrors.prizePool && (
+                <p className="mt-1.5 pl-5 text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {fieldErrors.prizePool}
+                </p>
+              )}
             </div>
             <div>
               <Label>Prize Asset</Label>
@@ -558,9 +640,16 @@ function GeneralTab({
                 type="datetime-local"
                 value={g.startTime ? g.startTime.slice(0, 16) : ''}
                 onChange={(e) => updateGeneral('startTime', new Date(e.target.value).toISOString())}
-                className={inputClass}
+                className={getInputClass('startTime')}
               />
-              <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+              {fieldErrors.startTime ? (
+                <p className="mt-1.5 pl-5 text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {fieldErrors.startTime}
+                </p>
+              ) : (
+                <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+              )}
             </div>
             <div>
               <Label htmlFor="h-deadline">Submission Deadline</Label>
@@ -571,9 +660,16 @@ function GeneralTab({
                 onChange={(e) =>
                   updateGeneral('submissionDeadline', new Date(e.target.value).toISOString())
                 }
-                className={inputClass}
+                className={getInputClass('submissionDeadline')}
               />
-              <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+              {fieldErrors.submissionDeadline ? (
+                <p className="mt-1.5 pl-5 text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {fieldErrors.submissionDeadline}
+                </p>
+              ) : (
+                <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+              )}
             </div>
           </div>
 
@@ -586,9 +682,16 @@ function GeneralTab({
               onChange={(e) =>
                 updateGeneral('preRegEndTime', e.target.value ? new Date(e.target.value).toISOString() : '')
               }
-              className={inputClass}
+              className={getInputClass('preRegEndTime')}
             />
-            <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+            {fieldErrors.preRegEndTime ? (
+              <p className="mt-1.5 pl-5 text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {fieldErrors.preRegEndTime}
+              </p>
+            ) : (
+              <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+            )}
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
@@ -652,8 +755,14 @@ function GeneralTab({
               value={g.adminContact}
               onChange={(e) => updateGeneral('adminContact', e.target.value)}
               placeholder="Email or URL for participant support"
-              className={inputClass}
+              className={getInputClass('adminContact')}
             />
+            {fieldErrors.adminContact && (
+              <p className="mt-1.5 pl-5 text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {fieldErrors.adminContact}
+              </p>
+            )}
           </div>
         </Card>
       </div>
@@ -760,7 +869,7 @@ function TracksTab({
       ) : (
         <div className="space-y-4">
           {tracks.map((track, idx) => (
-            <Card key={track.id}>
+            <Card key={track.id || `track-${idx}`}>
               <div className="flex items-start gap-3">
                 <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-muted)] text-xs font-semibold text-[var(--text-muted)]">
                   {idx + 1}

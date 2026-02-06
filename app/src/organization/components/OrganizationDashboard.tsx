@@ -56,6 +56,45 @@ interface OrganizationDashboardProps {
   onRefreshHackathons?: () => void;
 }
 
+const validateSocialLink = (key: keyof SocialLinks, value: string): string | null => {
+  if (!value) return null;
+
+  const patterns: Record<string, { regex: RegExp; error: string }> = {
+    x: {
+      regex: /^https?:\/\/(www\.)?(twitter|x)\.com\/[a-zA-Z0-9_]+\/?$/,
+      error: 'Enter a valid X/Twitter profile URL',
+    },
+    telegram: {
+      regex: /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/?$/,
+      error: 'Enter a valid Telegram URL (e.g., https://t.me/username)',
+    },
+    github: {
+      regex: /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/,
+      error: 'Enter a valid GitHub profile URL',
+    },
+    discord: {
+      regex: /^https?:\/\/(www\.)?discord\.(gg|com)\/(invite\/)?[a-zA-Z0-9_-]+\/?$/,
+      error: 'Enter a valid Discord invite URL',
+    },
+    linkedin: {
+      regex: /^https?:\/\/(www\.)?linkedin\.com\/(company|in)\/[a-zA-Z0-9_-]+\/?$/,
+      error: 'Enter a valid LinkedIn URL',
+    },
+  };
+
+  const pattern = patterns[key];
+  if (pattern && !pattern.regex.test(value)) {
+    return pattern.error;
+  }
+
+  try {
+    new URL(value);
+    return null;
+  } catch {
+    return 'Enter a valid URL';
+  }
+};
+
 const SOCIAL_FIELDS: {
   key: keyof SocialLinks;
   label: string;
@@ -474,9 +513,35 @@ export function OrganizationDashboard({
   onClearError,
   onRefreshHackathons,
 }: OrganizationDashboardProps) {
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showInvite, setShowInvite] = useState(false);
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSaveClick = () => {
+    const newErrors: Record<string, string> = {};
+    SOCIAL_FIELDS.forEach(({ key }) => {
+      const value = profile.socialLinks[key] || '';
+      const error = validateSocialLink(key, value);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      // Optional: scroll to first error or show a global error message
+      return;
+    }
+
+    setFieldErrors({});
+    onSave();
+  };
+
+  const handleSocialChange = (key: keyof SocialLinks, value: string) => {
+    onSocialChange(key, value);
+    // Real-time validation
+    const error = validateSocialLink(key, value);
+    setFieldErrors((prev) => ({ ...prev, [key]: error || '' }));
+  };
 
   // Handle logo upload
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -622,7 +687,7 @@ export function OrganizationDashboard({
 
             {/* Save */}
             <button
-              onClick={onSave}
+              onClick={handleSaveClick}
               disabled={isSaving}
               className={`flex h-10 items-center gap-2 rounded-full px-5 text-sm font-medium transition-all duration-200 active:scale-[0.97] disabled:opacity-50 ${
                 saveSuccess
@@ -758,11 +823,16 @@ export function OrganizationDashboard({
                     </label>
                     <input
                       type="url"
-                      value={profile.socialLinks[key]}
-                      onChange={(e) => onSocialChange(key, e.target.value)}
+                      value={profile.socialLinks[key] || ''}
+                      onChange={(e) => handleSocialChange(key, e.target.value)}
                       placeholder={placeholder}
-                      className={inputClass}
+                      className={`${inputClass} ${fieldErrors[key] ? 'border-error focus:border-error focus:ring-error/10' : ''}`}
                     />
+                    {fieldErrors[key] && (
+                      <p className="mt-1.5 px-1 text-[11px] font-medium text-error">
+                        {fieldErrors[key]}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

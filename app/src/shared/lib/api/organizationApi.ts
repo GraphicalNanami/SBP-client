@@ -66,9 +66,9 @@ function transformOrganization(backend: BackendOrganization, members: BackendOrg
     throw new Error('Organization data is undefined');
   }
 
-  if (!backend._id) {
+  if (!backend.uuid) {
     console.error('Invalid organization data:', backend);
-    throw new Error('Organization is missing required _id field');
+    throw new Error('Organization is missing required uuid field');
   }
 
   console.log('🔄 Transforming organization:', {
@@ -79,7 +79,7 @@ function transformOrganization(backend: BackendOrganization, members: BackendOrg
   });
 
   const transformed = {
-    id: backend._id,
+    id: backend.uuid,
     name: backend.name || '',
     slug: backend.slug || '',
     logo: backend.logo || '',
@@ -121,14 +121,14 @@ function transformMember(backend: BackendOrganizationMember): TeamMember {
   // Handle populated invitedBy field
   const inviterId = typeof backend.invitedBy === 'string'
     ? backend.invitedBy
-    : backend.invitedBy._id;
+    : backend.invitedBy.uuid;
 
   const inviterName = typeof backend.invitedBy === 'string'
     ? 'Team Admin'
     : backend.invitedBy.name;
 
   return {
-    id: backend._id,
+    id: backend.uuid,
     email: user.email || '',
     name: user.name || 'Unknown User',
     role: transformRole(backend.role),

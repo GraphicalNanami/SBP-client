@@ -144,7 +144,7 @@ export interface BackendAnalyticsTracking {
  * Main Hackathon Schema
  */
 export interface BackendHackathon {
-  _id: string;
+  uuid: string;
   name: string;
   slug: string;
   category: BackendHackathonCategory;
@@ -182,7 +182,7 @@ export interface BackendHackathon {
     status: BackendHackathonStatus;
     changedBy: string;
     changedAt: Date;
-    _id: string;
+    id: string;
   }>;
 }
 
@@ -190,7 +190,7 @@ export interface BackendHackathon {
  * Hackathon Administrator
  */
 export interface BackendHackathonAdministrator {
-  _id: string;
+  id: string;
   hackathonId: string;
   userId?: string;
   email: string;
@@ -206,7 +206,7 @@ export interface BackendHackathonAdministrator {
  * Judge
  */
 export interface BackendJudge {
-  _id: string;
+  id: string;
   hackathonId: string;
   email: string;
   userId?: string;
@@ -221,7 +221,7 @@ export interface BackendJudge {
  * Registration
  */
 export interface BackendRegistration {
-  _id: string;
+  id: string;
   hackathonId: string;
   userId: string;
   userInfo: {
@@ -253,7 +253,7 @@ export interface BackendTeamMember {
  * Submission
  */
 export interface BackendSubmission {
-  _id: string;
+  id: string;
   hackathonId: string;
   projectName: string;
   trackId: string;
@@ -286,7 +286,7 @@ export interface BackendDistribution {
  * Winner
  */
 export interface BackendWinner {
-  _id: string;
+  id: string;
   hackathonId: string;
   prizeId: string;
   placement: number;
@@ -302,7 +302,7 @@ export interface BackendWinner {
  * Analytics Event
  */
 export interface BackendAnalyticsEvent {
-  _id: string;
+  id: string;
   hackathonId: string;
   eventType: 'PAGE_VIEW' | 'REGISTRATION' | 'SUBMISSION' | 'CLICK_REGISTER' | 'CLICK_SUBMIT';
   metadata: {

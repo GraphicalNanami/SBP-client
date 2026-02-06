@@ -273,6 +273,29 @@ All organization operations now communicate with the backend via the centralized
 
 ## Recent Changes
 
+### February 6, 2026 - Social Link Validations
+- ✅ **Added validation layer for social links** in organization dashboard:
+  - Implemented `validateSocialLink` utility with platform-specific regex patterns
+  - Added real-time validation feedback while typing (X/Twitter, Telegram, GitHub, Discord, LinkedIn)
+  - Added pre-save validation: prevent "Save Changes" if any social link format is invalid
+  - Styled error messages to match project design system
+- **Validation Rules**:
+  - **X (Twitter)**: Must be a valid profile URL (e.g., `https://x.com/user`)
+  - **Telegram**: Must be a valid `t.me` URL
+  - **GitHub**: Must be a valid GitHub profile/org URL
+  - **Discord**: Must be a valid Discord invite or profile URL
+  - **LinkedIn**: Must be a valid LinkedIn company or profile URL
+- **Components Modified**: `OrganizationDashboard.tsx` (added `fieldErrors` state and validation handlers)
+
+### February 6, 2026 - UUID Migration
+- 🔄 **Migrated from MongoDB ObjectId (_id) to UUID (uuid)**:
+  - Updated `BackendOrganization` and `BackendOrganizationMember` interfaces to use `uuid` instead of `_id`
+  - Updated `transformOrganization()` and `transformMember()` functions to use `backend.uuid`
+  - Fixed "Organization is missing required _id field" error
+  - All API responses now use UUID format: `"uuid": "e2ba96b2-5053-4f1e-aba6-89e6ff28641b"`
+- **Breaking Change**: All organization API responses now return UUIDs instead of MongoDB ObjectIds
+- **Data Flow**: Backend sends `uuid` → Frontend transforms to `id` → UI uses UUID consistently
+
 ### February 6, 2026 - Hackathon Management Section
 - ✅ **Added hackathon management section** to organization dashboard:
   - New "Managed Hackathons" card displays all hackathons for active organization

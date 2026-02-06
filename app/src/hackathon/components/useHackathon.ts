@@ -62,6 +62,8 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   /* ── Update organizationId when it changes (for new hackathons) ── */
   useEffect(() => {
@@ -201,6 +203,8 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     setError(null);
+    setValidationError(null);
+    setFieldErrors({});
 
     try {
       if (isNew) {
@@ -223,10 +227,55 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save hackathon';
+    } catch (err: any) {
       console.error('Failed to save hackathon:', err);
-      setError(errorMessage);
+      
+      // Check if this is a validation error (400 status) or file too large (413 status)
+      if (err.status === 400 || err.status === 413) {
+        // This is a validation error - don't break the page
+        setValidationError(err.message || 'Please fix the validation errors');
+        
+        // Map common error messages to field names
+        const errorMessage = err.message || '';
+        const errors: Record<string, string> = {};
+        
+        if (errorMessage.includes('Start time')) {
+          errors.startTime = errorMessage;
+        }
+        if (errorMessage.includes('submission deadline') || errorMessage.includes('Submission deadline')) {
+          errors.submissionDeadline = errorMessage;
+        }
+        if (errorMessage.includes('pre-registration') || errorMessage.includes('Pre-registration')) {
+          errors.preRegEndTime = errorMessage;
+        }
+        if (errorMessage.includes('Prize pool')) {
+          errors.prizePool = errorMessage;
+        }
+        if (errorMessage.includes('name') && errorMessage.includes('required')) {
+          errors.name = errorMessage;
+        }
+        if (errorMessage.includes('category')) {
+          errors.category = errorMessage;
+        }
+        if (errorMessage.includes('admin contact') || errorMessage.includes('contact')) {
+          errors.adminContact = errorMessage;
+        }
+        // Handle file size errors
+        if (errorMessage.toLowerCase().includes('too large') || errorMessage.toLowerCase().includes('entity too large')) {
+          errors.poster = 'Image file is too large. Please upload an image under 2MB.';
+        }
+        
+        setFieldErrors(errors);
+        
+        // Auto-clear validation error after 5 seconds
+        setTimeout(() => {
+          setValidationError(null);
+        }, 5000);
+      } else {
+        // This is a fatal error (network, server, etc.)
+        const errorMessage = err.message || 'Failed to save hackathon';
+        setError(errorMessage);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -254,6 +303,8 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
     saveSuccess,
     isLoading,
     error,
+    validationError,
+    fieldErrors,
     isNew,
     canPublish,
     updateGeneral,

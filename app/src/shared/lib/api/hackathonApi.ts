@@ -169,7 +169,7 @@ function transformPrize(backend: BackendPrize): HackathonPrize {
  */
 function transformHackathon(backend: BackendHackathon): Hackathon {
   return {
-    id: backend._id,
+    id: backend.uuid,
     organizationId: backend.organizationId,
     status: transformStatus(backend.status),
     general: {
@@ -260,7 +260,7 @@ function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload 
   // Tracks - Transform to backend format
   if (hackathon.tracks && hackathon.tracks.length > 0) {
     payload.tracks = hackathon.tracks.map((track) => ({
-      _id: track.id.startsWith('track-') ? undefined : track.id, // Exclude temp IDs
+      _id: track.id && track.id.startsWith('track-') ? undefined : track.id, // Exclude temp IDs
       name: track.name,
       description: track.description,
       order: track.order,
@@ -271,7 +271,7 @@ function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload 
   // Prizes - Transform to backend format
   if (hackathon.prizes && hackathon.prizes.length > 0) {
     payload.prizes = hackathon.prizes.map((prize) => ({
-      _id: prize.id.startsWith('prize-') ? undefined : prize.id, // Exclude temp IDs
+      _id: prize.id && prize.id.startsWith('prize-') ? undefined : prize.id, // Exclude temp IDs
       name: prize.name,
       trackId: prize.trackId || undefined,
       placements: prize.placements.map((p) => ({

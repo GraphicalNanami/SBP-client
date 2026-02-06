@@ -291,6 +291,18 @@ Backend enforces valid state transitions:
 
 ## Recent Changes
 
+### February 6, 2026 - UUID Migration
+- 🔄 **Migrated from MongoDB ObjectId (_id) to UUID (uuid)**:
+  - Updated `BackendHackathon` interface to use `uuid` instead of `_id` for main document
+  - Updated `BackendOrganization` interface to use `uuid` instead of `_id`
+  - **Subdocuments remain with `_id`**: `BackendTrack`, `BackendPrize`, `BackendCustomQuestion` still use `_id` (embedded MongoDB subdocuments)
+  - Updated all transformation functions in `hackathonApi.ts` and `organizationApi.ts`
+  - Fixed organization creation errors and hackathon routing by properly handling `uuid` field
+- **ID Structure**:
+  - Main documents (Hackathon, Organization): Use `uuid` (e.g., `"uuid": "eacb95b9-5b07-4951-8711-8f2d8bbca4e2"`)
+  - Embedded subdocuments (Tracks, Prizes, Questions): Use `_id` (MongoDB ObjectId for subdocuments)
+- **Data Flow**: Backend sends `uuid` for main docs → Frontend transforms to `id` → UI uses UUID consistently
+
 ### February 6, 2026 - Comprehensive Update Endpoint Integration
 - ✨ **Implemented comprehensive hackathon update functionality**:
   - Added `UpdateHackathonPayload` type to `backend.types.ts` with all updateable fields
