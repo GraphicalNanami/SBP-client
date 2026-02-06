@@ -18,7 +18,7 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
-import { hackathonApi, transformHackathonToCard } from '@/src/shared/lib/api/hackathonApi';
+import { hackathonApi } from '@/src/shared/lib/api/hackathonApi';
 import type { HackathonCardData } from '../components/mockData';
 
 /* ── Status badge colors ── */
@@ -69,29 +69,42 @@ export default function HackathonDetailPage() {
         setIsLoading(true);
         setError(null);
 
-        // Fetch hackathon by ID from backend
+        // Fetch hackathon by ID/slug from backend
         const response = await hackathonApi.getPublicHackathon(id);
 
+        // Determine status based on dates
+        const now = new Date();
+        const startTime = new Date(response.general.startTime);
+        const submissionDeadline = new Date(response.general.submissionDeadline);
+
+        let status: 'Upcoming' | 'Ongoing' | 'Ended';
+        if (response.status === 'Ended' || response.status === 'Cancelled' || submissionDeadline < now) {
+          status = 'Ended';
+        } else if (startTime > now) {
+          status = 'Upcoming';
+        } else {
+          status = 'Ongoing';
+        }
+
         // Transform to card data format
-        const cardData = transformHackathonToCard({
-          uuid: response.id,
+        const cardData: HackathonCardData = {
+          id: response.id,
           name: response.general.name,
-          description: response.description,
-          overview: response.description,
-          category: response.general.category as any,
-          visibility: response.general.visibility as any,
-          posterUrl: response.general.poster,
+          tagline: response.description,
+          category: response.general.category,
+          status,
+          poster: response.general.poster,
           prizePool: response.general.prizePool,
           prizeAsset: response.general.prizeAsset,
-          tags: response.general.tags,
           startTime: response.general.startTime,
           submissionDeadline: response.general.submissionDeadline,
+          tags: response.general.tags,
           venue: response.general.venue === 'Online' ? 'Online' : response.general.venueLocation,
-          status: response.status as any,
-          organizationId: response.organizationId,
-          createdAt: response.createdAt,
-          updatedAt: response.updatedAt,
-        } as any);
+          organizationName: '', // Will need to fetch separately or include in response
+          organizationLogo: '',
+          builderCount: response.builders?.length || 0,
+          projectCount: response.projects?.length || 0,
+        };
 
         setHackathon(cardData);
       } catch (err) {
