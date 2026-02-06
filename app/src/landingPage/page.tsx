@@ -12,9 +12,18 @@ import { Component } from "@/src/shared/components/ui/heroBackground";
 export default function LandingPage() {
   return (
     <div className="relative flex flex-col min-h-screen">
-      {/* Background Component for entire landing page */}
+      {/* Background Component with dot pattern for entire landing page */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Component />
+        {/* Subtle dot pattern overlay */}
+        <div 
+          className="absolute inset-0 w-full h-full"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+            opacity: 0.4
+          }}
+        />
       </div>
       
       <Navbar />
