@@ -21,11 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${onest.variable} antialiased`}
-        style={{ fontFamily: "var(--font-onest)" }}
-      >
-        <div className="relative z-10">{children}</div>
+      <body className={`${inter.variable} ${onest.variable} antialiased font-sans`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
