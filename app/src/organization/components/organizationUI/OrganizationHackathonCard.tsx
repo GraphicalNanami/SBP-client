@@ -37,7 +37,7 @@ export function OrganizationHackathonCard({ hackathon }: OrganizationHackathonCa
   return (
     <Link
       href={`/hackathon/manage/${hackathon.id}`}
-      className="group block overflow-hidden rounded-2xl border border-[var(--border)] bg-white transition-all duration-200 hover:shadow-md hover:border-[var(--border-hover)]"
+      className="group block overflow-hidden rounded-xl border border-[#E5E5E5] bg-white transition-all duration-200 hover:shadow-md hover:border-[#E5E5E5]"
     >
       <div className="p-5">
         {/* Header with status */}
@@ -49,24 +49,24 @@ export function OrganizationHackathonCard({ hackathon }: OrganizationHackathonCa
           >
             {hackathon.status}
           </span>
-          <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-4 w-4 text-[#4D4D4D] transition-transform group-hover:translate-x-1" />
         </div>
 
         {/* Title */}
-        <h3 className="mb-2 text-lg font-semibold text-[var(--text)] line-clamp-1">
+        <h3 className="mb-2 text-lg font-semibold text-[#1A1A1A] line-clamp-1">
           {hackathon.general.name}
         </h3>
 
         {/* Category */}
-        <span className="mb-3 inline-block rounded-full bg-[var(--bg-muted)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--text-secondary)]">
+        <span className="mb-3 inline-block rounded-full bg-[#F5F5F5] px-2.5 py-0.5 text-[11px] font-medium text-[#4D4D4D]">
           {hackathon.general.category}
         </span>
 
         {/* Meta information */}
-        <div className="space-y-2 text-sm text-[var(--text-secondary)]">
+        <div className="space-y-2 text-sm text-[#4D4D4D]">
           {/* Prize pool */}
           <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-[var(--text-muted)]" />
+            <Trophy className="h-4 w-4 text-[#999]" />
             <span>
               {formatPrize(hackathon.general.prizePool)} {hackathon.general.prizeAsset}
             </span>
@@ -74,7 +74,7 @@ export function OrganizationHackathonCard({ hackathon }: OrganizationHackathonCa
 
           {/* Dates */}
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-[var(--text-muted)]" />
+            <Calendar className="h-4 w-4 text-[#999]" />
             <span>
               {formatDate(hackathon.general.startTime)} - {formatDate(hackathon.general.submissionDeadline)}
             </span>
@@ -82,14 +82,14 @@ export function OrganizationHackathonCard({ hackathon }: OrganizationHackathonCa
 
           {/* Venue */}
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-[var(--text-muted)]" />
+            <MapPin className="h-4 w-4 text-[#999]" />
             <span>{hackathon.general.venue || 'Online'}</span>
           </div>
         </div>
 
         {/* Stats footer */}
         {(hackathon.builders?.length > 0 || hackathon.projects?.length > 0) && (
-          <div className="mt-4 flex items-center gap-4 border-t border-[var(--border)] pt-3 text-xs text-[var(--text-muted)]">
+          <div className="mt-4 flex items-center gap-4 border-t border-[#E5E5E5] pt-3 text-xs text-[#4D4D4D]">
             {hackathon.builders?.length > 0 && (
               <span>{hackathon.builders.length} Builders</span>
             )}

@@ -16,7 +16,7 @@ interface ManagedHackathonsCardProps {
 /* ── Card wrapper (matching OrganizationDashboard pattern) ── */
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-[var(--border)] bg-white p-6 ${className}`}>
+    <div className={`rounded-xl border border-[#E5E5E5] bg-white p-6 ${className}`}>
       {children}
     </div>
   );
@@ -24,7 +24,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 
 /* ── Section title (matching OrganizationDashboard pattern) ── */
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="mb-5 text-[15px] font-semibold text-[var(--text)]">{children}</h2>;
+  return <h2 className="mb-5 text-[15px] font-semibold text-[#1A1A1A]">{children}</h2>;
 }
 
 export function ManagedHackathonsCard({
@@ -41,7 +41,7 @@ export function ManagedHackathonsCard({
         <div className="flex items-center gap-2">
           <SectionTitle>Managed Hackathons</SectionTitle>
           {hackathons.length > 0 && !isLoading && (
-            <span className="inline-flex items-center rounded-full bg-[var(--bg-muted)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
+            <span className="inline-flex items-center rounded-full bg-[#F5F5F5] px-2.5 py-0.5 text-xs font-medium text-[#4D4D4D]">
               {hackathons.length}
             </span>
           )}
@@ -49,7 +49,7 @@ export function ManagedHackathonsCard({
         {onRefresh && !isLoading && (
           <button
             onClick={onRefresh}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-muted)] transition-all hover:border-[var(--border-hover)] hover:text-[var(--text)]"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E5E5E5] text-[#4D4D4D] transition-all hover:border-[#E5E5E5] hover:text-[#1A1A1A]"
             title="Refresh hackathons"
           >
             <RefreshCw className="h-4 w-4" />
@@ -60,8 +60,8 @@ export function ManagedHackathonsCard({
       {/* Loading State */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
-          <Loader2 className="mb-3 h-8 w-8 animate-spin text-[var(--text-muted)]" />
-          <p className="text-sm text-[var(--text-secondary)]">Loading hackathons...</p>
+          <Loader2 className="mb-3 h-8 w-8 animate-spin text-[#4D4D4D]" />
+          <p className="text-sm text-[#4D4D4D]">Loading hackathons...</p>
         </div>
       )}
 
@@ -90,16 +90,16 @@ export function ManagedHackathonsCard({
       {/* Empty State */}
       {!isLoading && !error && hackathons.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-muted)]">
-            <Rocket className="h-8 w-8 text-[var(--text-muted)]" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5F5F5]">
+            <Rocket className="h-8 w-8 text-[#4D4D4D]" />
           </div>
-          <h3 className="mb-1 text-base font-semibold text-[var(--text)]">No hackathons yet</h3>
-          <p className="mb-4 text-center text-sm text-[var(--text-secondary)]">
+          <h3 className="mb-1 text-base font-semibold text-[#1A1A1A]">No hackathons yet</h3>
+          <p className="mb-4 text-center text-sm text-[#4D4D4D]">
             Create your first hackathon to get started
           </p>
           <Link
             href={`/hackathon/manage/new?orgId=${organizationId}`}
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[var(--text)] transition-all hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]"
+            className="inline-flex items-center gap-2 rounded-full border border-[#E5E5E5] bg-white px-4 py-2 text-sm font-medium text-[#1A1A1A] transition-all hover:border-[#E5E5E5] hover:bg-[#F5F5F5]"
           >
             <Rocket className="h-4 w-4" />
             Create Hackathon

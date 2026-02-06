@@ -52,8 +52,8 @@ export default function HackathonManagePage() {
     return (
       <div className="aurora-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[var(--brand)]" />
-          <p className="text-sm text-[var(--text-muted)]">Loading organization...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#1A1A1A]" />
+          <p className="text-sm text-[#4D4D4D]">Loading organization...</p>
         </div>
       </div>
     );
