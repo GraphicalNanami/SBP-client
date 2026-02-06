@@ -12,6 +12,8 @@ export default function OrganizationPage() {
     profile,
     isSaving,
     saveSuccess,
+    isLoading,
+    error,
     handleCreate,
     handleSwitchOrg,
     handleStartCreateNew,
@@ -21,10 +23,17 @@ export default function OrganizationPage() {
     handleRemoveMember,
     handleUpdateMemberRole,
     handleSave,
+    clearError,
   } = useOrganization();
 
   if (step === 'create') {
-    return <OrganizationForm onSubmit={handleCreate} />;
+    return (
+      <OrganizationForm
+        onSubmit={handleCreate}
+        isLoading={isLoading}
+        error={error}
+      />
+    );
   }
 
   return (
@@ -34,6 +43,8 @@ export default function OrganizationPage() {
       activeOrgId={activeOrgId}
       isSaving={isSaving}
       saveSuccess={saveSuccess}
+      isLoading={isLoading}
+      error={error}
       onProfileChange={handleProfileChange}
       onSocialChange={handleSocialChange}
       onAddMember={handleAddMember}
@@ -42,6 +53,7 @@ export default function OrganizationPage() {
       onSwitchOrg={handleSwitchOrg}
       onCreateNew={handleStartCreateNew}
       onSave={handleSave}
+      onClearError={clearError}
     />
   );
 }

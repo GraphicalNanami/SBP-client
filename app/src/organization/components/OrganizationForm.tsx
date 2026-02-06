@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
-import type { OrganizationCreatePayload } from '../types/organization.types';
+import { ArrowRight, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { OrganizationCreatePayload } from '../types/organization.types';
+// import type { OrganizationCreatePayload } from '../../types/organization.types';
 
 interface OrganizationFormProps {
   onSubmit: (payload: OrganizationCreatePayload) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export function OrganizationForm({ onSubmit }: OrganizationFormProps) {
+export function OrganizationForm({ onSubmit, isLoading = false, error = null }: OrganizationFormProps) {
   const [name, setName] = useState('');
   const [website, setWebsite] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -47,6 +50,17 @@ export function OrganizationForm({ onSubmit }: OrganizationFormProps) {
         <p className="mb-8 text-center text-[15px] leading-relaxed text-text-secondary">
           Set up your organization profile to start creating hackathons on the Stellar platform.
         </p>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 px-4 py-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-error" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-error">Error</p>
+              <p className="mt-0.5 text-sm text-error/90">{error}</p>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -111,10 +125,20 @@ export function OrganizationForm({ onSubmit }: OrganizationFormProps) {
           <div className="pt-2">
             <button
               type="submit"
-              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-brand-fg transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+              disabled={isLoading}
+              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-brand-fg transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Continue
-              <ArrowRight className="h-4 w-4" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </button>
           </div>
         </form>

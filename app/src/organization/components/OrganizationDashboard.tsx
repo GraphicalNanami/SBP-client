@@ -24,6 +24,7 @@ import {
   Eye,
   X,
   Mail,
+  AlertCircle,
 } from 'lucide-react';
 import type { OrganizationProfile, SocialLinks, TeamMember } from '../types/organization.types';
 
@@ -33,6 +34,8 @@ interface OrganizationDashboardProps {
   activeOrgId: string | null;
   isSaving: boolean;
   saveSuccess: boolean;
+  isLoading?: boolean;
+  error?: string | null;
   onProfileChange: (field: keyof OrganizationProfile, value: string) => void;
   onSocialChange: (field: keyof SocialLinks, value: string) => void;
   onAddMember: (email: string, role: TeamMember['role']) => void;
@@ -41,6 +44,7 @@ interface OrganizationDashboardProps {
   onSwitchOrg: (orgId: string) => void;
   onCreateNew: () => void;
   onSave: () => void;
+  onClearError?: () => void;
 }
 
 const SOCIAL_FIELDS: {
@@ -54,7 +58,6 @@ const SOCIAL_FIELDS: {
   { key: 'github', label: 'GitHub', icon: <Github className="h-4 w-4" />, placeholder: 'https://github.com/your-org' },
   { key: 'discord', label: 'Discord', icon: <Hash className="h-4 w-4" />, placeholder: 'https://discord.gg/invite-code' },
   { key: 'linkedin', label: 'LinkedIn', icon: <Linkedin className="h-4 w-4" />, placeholder: 'https://linkedin.com/company/your-org' },
-  { key: 'website', label: 'Website', icon: <Globe className="h-4 w-4" />, placeholder: 'https://yourorganization.com' },
 ];
 
 const ROLE_OPTIONS: { value: TeamMember['role']; label: string; icon: React.ReactNode }[] = [
@@ -303,6 +306,8 @@ export function OrganizationDashboard({
   activeOrgId,
   isSaving,
   saveSuccess,
+  isLoading = false,
+  error = null,
   onProfileChange,
   onSocialChange,
   onAddMember,
@@ -311,6 +316,7 @@ export function OrganizationDashboard({
   onSwitchOrg,
   onCreateNew,
   onSave,
+  onClearError,
 }: OrganizationDashboardProps) {
   const [showInvite, setShowInvite] = useState(false);
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
@@ -452,6 +458,33 @@ export function OrganizationDashboard({
 
       {/* ── Content ── */}
       <main className="mx-auto max-w-[1200px] px-6 py-8">
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 px-4 py-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-error" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-error">Error</p>
+              <p className="mt-0.5 text-sm text-error/90">{error}</p>
+            </div>
+            {onClearError && (
+              <button
+                onClick={onClearError}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-error transition-colors hover:bg-error/10"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="mb-6 flex items-center justify-center gap-3 rounded-2xl border border-border bg-bg-card px-4 py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-brand" />
+            <p className="text-sm text-text-secondary">Loading organization data...</p>
+          </div>
+        )}
+
         <div className="grid gap-6 lg:grid-cols-3">
           {/* ── Left Column ── */}
           <div className="space-y-6 lg:col-span-2">
