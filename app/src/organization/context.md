@@ -111,7 +111,7 @@ The central business-logic hook. All state lives here; UI components are pure.
 
 All mutation handlers are scoped to `activeOrgId` — they only modify the organization that's currently active.
 
-**API integration note:** `handleSave` currently uses a mock `setTimeout`. When the backend is ready, replace the body with an actual API call. All org mutations already update `organizations[]` in-place, so persisting can be done in `handleSave` by sending the active org's profile to the server.
+**API integration:** ✅ **Fully integrated with backend** as of 2026-02-06. All handlers make real API calls via the centralized `organizationApi` service. Uses the centralized API client (`app/src/shared/lib/api/client.ts`) with automatic JWT token injection. See [auth-integration-fix.md](../../../Docs/auth-integration-fix.md) for details.
 
 ### `components/OrganizationForm.tsx`
 
@@ -226,10 +226,40 @@ The app supports **light theme only** (dark theme has been removed from `globals
 
 ---
 
+## API Integration (✅ Completed 2026-02-06)
+
+All organization operations now communicate with the backend via the centralized API client:
+
+**API Service:** `app/src/shared/lib/api/organizationApi.ts`
+**Endpoints:** Defined in `app/src/shared/lib/api/endpoints.ts`
+**HTTP Client:** `app/src/shared/lib/api/client.ts` (with automatic JWT token injection)
+
+**Integrated Endpoints:**
+- ✅ `POST /organizations` - Create organization
+- ✅ `GET /organizations/me` - Get user's organizations
+- ✅ `GET /organizations/:id` - Get organization details
+- ✅ `PATCH /organizations/:id/profile` - Update profile (logo, tagline, about)
+- ✅ `PATCH /organizations/:id/social-links` - Update social links
+- ✅ `GET /organizations/:id/members` - List team members
+- ✅ `POST /organizations/:id/members/invite` - Invite member
+- ✅ `PATCH /organizations/:id/members/:memberId/role` - Update member role
+- ✅ `DELETE /organizations/:id/members/:memberId` - Remove member
+
+**Authentication:**
+- Token storage: `sessionStorage.getItem('accessToken')` or `globalThis.__accessToken__`
+- Auto-injected as: `Authorization: Bearer <token>`
+- See [auth-integration-fix.md](../../../Docs/auth-integration-fix.md) for token setup
+
+**Data Transformation:**
+- Backend → Frontend: ADMIN→Admin, ACTIVE→Active, _id→id
+- Frontend → Backend: Automatic role/status conversion in API layer
+
+---
+
 ## What's Next (Not Yet Implemented)
 
 - **Hackathon Creation** — The "Create Hackathon" CTA in the dashboard sidebar is currently a disabled placeholder. The full hackathon creation flow (basic details, tracks, details, administrators, analytics, registration, judging & results) is specified in `Docs/organization-flow.md` but not yet built.
-- **API Integration** — All state is currently client-side only (in-memory via React state). The `handleSave` function is a mock. Backend endpoints need to be wired for persistence.
-- **Authentication** — No auth guard exists yet. The dashboard should eventually be behind login and the current user's email should replace the `'you@example.com'` placeholder.
-- **Logo Upload** — The logo upload area is a visual placeholder. File upload and image cropping need implementation.
-- **Persistent Storage** — Organizations are lost on page refresh. Either localStorage or backend persistence should be added.
+- **Logo Upload** — The logo upload area is a visual placeholder. File upload and image cropping need implementation (currently accepts URL strings only).
+- **Email Invitations** — Member invitations are created in the backend but invitation emails are not yet sent.
+- **Token Refresh** — JWT token refresh mechanism not yet implemented (tokens will expire).
+- **Error Recovery** — More sophisticated error recovery and retry logic for failed API calls.

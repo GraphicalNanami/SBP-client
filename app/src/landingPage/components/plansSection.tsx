@@ -3,8 +3,8 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
  
  const PlansSection = () => {
    return (
-     <section className="py-24">
-       <div className="container-main">
+     <section className="py-24 bg-[#FCF9EA] backdrop-blur-sm">
+       <div className="container-main min-h-[100vh]  ">
          {/* Heading */}
          <div className="text-center mb-6">
            <h2 className="heading-section">
@@ -45,7 +45,7 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
  
  const PlanCard = ({ title, description }: PlanCardProps) => {
    return (
-     <div className="group bg-card border border-border rounded-3xl p-6 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:bg-black transition-all duration-300 flex flex-col justify-between min-h-[320px]">
+     <div className="group bg-card border border-border rounded-3xl p-6 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:bg-black hover:text-white transition-all duration-300 flex flex-col justify-between min-h-[320px]">
        <div className="flex items-start justify-between">
          <h3 className="text-2xl font-semibold text-foreground">{title}</h3>
          <button className="w-10 h-10 rounded-full border border-border flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-all duration-200">

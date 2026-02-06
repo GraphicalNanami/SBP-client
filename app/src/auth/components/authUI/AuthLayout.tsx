@@ -8,9 +8,9 @@ const AuthLayout = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen max-h-screen overflow-hidden p-8">
       {/* Left Side - Image with Overlay */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden rounded-3xl mr-8">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -40,10 +40,10 @@ const AuthLayout = () => {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center overflow-y-auto">
+        <div className="w-full max-w-md px-6 py-8 lg:px-12 lg:py-12">
           {/* Logo */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-6">
             <div className="inline-flex items-center justify-center p-3">
               <img src='/images.png' alt="Logo" />
             </div>
