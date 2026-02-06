@@ -255,15 +255,15 @@ export default function RegionDetailPage() {
                 >
                   {/* Event Image */}
                   <div className="relative h-48 bg-gradient-to-br from-[#E6FF80]/20 to-blue-500/20">
-                    {event.image && (
+                    {event.coverImage && (
                       <Image
-                        src={event.image}
+                        src={event.coverImage}
                         alt={event.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     )}
-                    {event.status === 'Featured' && (
+                    {event.featured && (
                       <div className="absolute top-4 right-4 bg-[#E6FF80] px-3 py-1 rounded-full">
                         <span className="text-xs font-semibold text-[#1A1A1A]">Featured</span>
                       </div>
@@ -282,13 +282,13 @@ export default function RegionDetailPage() {
                       <span>
                         {(() => {
                           try {
-                            const date = new Date(event.date);
+                            const date = new Date(event.startDate);
                             if (isNaN(date.getTime())) {
-                              return event.date;
+                              return event.startDate;
                             }
                             return format(date, 'MMM dd, yyyy');
                           } catch {
-                            return event.date;
+                            return event.startDate;
                           }
                         })()}
                       </span>

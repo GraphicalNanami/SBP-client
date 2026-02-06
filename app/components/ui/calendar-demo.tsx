@@ -7,8 +7,8 @@ import { Separator } from "@radix-ui/react-separator"
 
 import { cn } from "@/src/shared/utils/cn"
 
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button"
+import { Calendar } from "./calendar"
+import { Button } from "./button"
 
 const presets = [
   {

@@ -18,6 +18,7 @@ export interface EventOrganizer {
   name: string;
   avatar?: string;
   twitter?: string;
+  discord?: string;
 }
 
 export interface EventAttendee {

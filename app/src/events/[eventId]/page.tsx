@@ -75,9 +75,9 @@ export default function EventDetailPage() {
           <div className="lg:col-span-5 space-y-6">
             {/* Event Banner */}
             <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#E6FF80]/20 to-blue-500/20">
-              {event.image ? (
+              {event.coverImage ? (
                 <Image
-                  src={event.image}
+                  src={event.coverImage}
                   alt={event.title}
                   fill
                   className="object-cover"

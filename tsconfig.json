@@ -21,7 +21,7 @@
     ],
     "paths": {
       "@/*": ["./app/*"],
-      "@/components/*": ["./components/*"],
+      "@/components/*": ["./app/components/*"],
       "@/lib/utils": ["./app/src/shared/utils/cn"],
       "@/hooks/*": ["./app/src/shared/hooks/*"]
     }

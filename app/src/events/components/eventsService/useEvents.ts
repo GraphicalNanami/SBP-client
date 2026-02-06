@@ -27,7 +27,7 @@ export const useEvents = () => {
       const matchesRegion = filters.region === 'All' || event.region === filters.region;
       
       // Category and Time filters could be more complex, but simplified for now
-      const matchesCategory = filters.category === 'All' || event.tags.includes(filters.category.toLowerCase());
+      const matchesCategory = filters.category === 'All' || event.tags.some(tag => tag.toLowerCase() === filters.category.toLowerCase());
       
       return matchesSearch && matchesType && matchesLocation && matchesCategory && matchesRegion;
     });
