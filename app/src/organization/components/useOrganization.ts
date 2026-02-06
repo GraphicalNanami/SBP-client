@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { organizationApi } from '@/src/services/api/organizationApi';
+import { organizationApi } from '../../../../src/services/api/organizationApi';
 import type {
   OrganizationCreatePayload,
   OrganizationProfile,

@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Onest } from "next/font/google";
+import { Onest, Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "./src/auth/context/AuthContext";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
 
 const onest = Onest({
   variable: "--font-onest",

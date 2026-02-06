@@ -3,19 +3,9 @@
  * Handles all organization-related API calls and data transformations
  */
 
+import { TeamMemberRole, BackendOrganization, BackendOrganizationMember, OrganizationProfile, TeamMember, OrganizationCreatePayload, CreateOrganizationResponse, UserOrganizationsResponse, OrganizationDetailsResponse, SocialLinks } from '@/src/organization/types/organization.types';
 import api from './apiClient';
-import type {
-  OrganizationCreatePayload,
-  OrganizationProfile,
-  TeamMember,
-  TeamMemberRole,
-  SocialLinks,
-  CreateOrganizationResponse,
-  UserOrganizationsResponse,
-  OrganizationDetailsResponse,
-  BackendOrganization,
-  BackendOrganizationMember,
-} from '@/src/features/organization/types/organization.types';
+
 
 // ============================================
 // Data Transformation Utilities
