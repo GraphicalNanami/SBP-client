@@ -215,15 +215,9 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
         // Update URL to the new ID (in a real app, you'd use router.replace)
         window.history.replaceState(null, '', `/hackathon/manage/${created.id}`);
       } else {
-        // Update existing hackathon
-        const updated = await hackathonApi.updateGeneral(hackathon.id, {
-          name: hackathon.general.name,
-          prizePool: hackathon.general.prizePool,
-          prizeAsset: hackathon.general.prizeAsset,
-          tags: hackathon.general.tags,
-          adminContact: hackathon.general.adminContact,
-          posterUrl: hackathon.general.poster || undefined,
-        });
+        // Update existing hackathon using comprehensive update endpoint
+        // This sends all hackathon data including tracks, prizes, custom questions, etc.
+        const updated = await hackathonApi.updateHackathon(hackathon.id, hackathon);
         setHackathon(updated);
       }
 

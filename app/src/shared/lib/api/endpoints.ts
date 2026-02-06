@@ -9,6 +9,9 @@ export const ENDPOINTS = {
     REFRESH: '/auth/refresh',
     LOGOUT: '/auth/logout',
   },
+  USERS: {
+    SEARCH: '/users/search',
+  },
   PROFILE: {
     ME: '/profile/me',
     UPDATE_PERSONAL_INFO: '/profile/personal-info',
@@ -54,6 +57,7 @@ export const ENDPOINTS = {
     CREATE: '/hackathons',
     BY_ID: (id: string) => `/hackathons/${id}`,
     BY_ORG: (orgId: string) => `/hackathons/organization/${orgId}`,
+    UPDATE: (id: string) => `/hackathons/${id}`, // Comprehensive update endpoint
     UPDATE_GENERAL: (id: string) => `/hackathons/${id}/general`,
     UPDATE_SUBMISSION_REQUIREMENTS: (id: string) => `/hackathons/${id}/submission-requirements`,
     SUBMIT_FOR_REVIEW: (id: string) => `/hackathons/${id}/submit-for-review`,

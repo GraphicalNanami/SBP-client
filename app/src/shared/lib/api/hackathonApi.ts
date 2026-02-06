@@ -17,6 +17,7 @@ import type {
   BackendWinner,
   CreateHackathonPayload,
   UpdateHackathonGeneralPayload,
+  UpdateHackathonPayload,
   UpdateSubmissionRequirementsPayload,
   TrackPayload,
   CustomQuestionPayload,
@@ -32,6 +33,7 @@ import type {
   BackendHackathonCategory,
   BackendHackathonVisibility,
   BackendHackathonStatus,
+  BackendQuestionType,
 } from '@/src/hackathon/types/backend.types';
 import type {
   Hackathon,
@@ -223,6 +225,85 @@ function transformToCreatePayload(
   };
 }
 
+/**
+ * Transform frontend hackathon to backend update payload
+ * Only includes fields that are present in the hackathon object
+ */
+function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload {
+  const payload: UpdateHackathonPayload = {};
+
+  // Basic Information
+  if (hackathon.general.name) payload.name = hackathon.general.name;
+  if (hackathon.general.category) {
+    payload.category = transformCategoryToBackend(hackathon.general.category);
+  }
+  payload.visibility = transformVisibilityToBackend(hackathon.general.visibility);
+  if (hackathon.general.poster) payload.posterUrl = hackathon.general.poster;
+  if (hackathon.general.prizePool) payload.prizePool = hackathon.general.prizePool;
+  if (hackathon.general.prizeAsset) payload.prizeAsset = hackathon.general.prizeAsset;
+  if (hackathon.general.tags) payload.tags = hackathon.general.tags;
+  if (hackathon.description) payload.description = hackathon.description;
+  if (hackathon.general.venue) {
+    payload.venue = hackathon.general.venue === 'Online' ? 'Online' : hackathon.general.venueLocation;
+  }
+  if (hackathon.general.adminContact) payload.adminContact = hackathon.general.adminContact;
+
+  // Timeline
+  if (hackathon.general.startTime) payload.startTime = new Date(hackathon.general.startTime);
+  if (hackathon.general.preRegEndTime) {
+    payload.preRegistrationEndTime = new Date(hackathon.general.preRegEndTime);
+  }
+  if (hackathon.general.submissionDeadline) {
+    payload.submissionDeadline = new Date(hackathon.general.submissionDeadline);
+  }
+
+  // Tracks - Transform to backend format
+  if (hackathon.tracks && hackathon.tracks.length > 0) {
+    payload.tracks = hackathon.tracks.map((track) => ({
+      _id: track.id.startsWith('track-') ? undefined : track.id, // Exclude temp IDs
+      name: track.name,
+      description: track.description,
+      order: track.order,
+      isActive: true,
+    }));
+  }
+
+  // Prizes - Transform to backend format
+  if (hackathon.prizes && hackathon.prizes.length > 0) {
+    payload.prizes = hackathon.prizes.map((prize) => ({
+      _id: prize.id.startsWith('prize-') ? undefined : prize.id, // Exclude temp IDs
+      name: prize.name,
+      trackId: prize.trackId || undefined,
+      placements: prize.placements.map((p) => ({
+        placement: parseInt(p.label.match(/\d+/)?.[0] || '1'),
+        amount: p.amount,
+      })),
+      isActive: true,
+    }));
+  }
+
+  // Custom Questions - Transform to backend format
+  if (hackathon.general.customQuestions && hackathon.general.customQuestions.length > 0) {
+    payload.customRegistrationQuestions = hackathon.general.customQuestions.map((q, index) => ({
+      _id: q.id.startsWith('question-') ? undefined : q.id, // Exclude temp IDs
+      questionText: q.label,
+      questionType: q.type.toUpperCase() as BackendQuestionType,
+      options: q.options,
+      isRequired: q.required,
+      order: index,
+    }));
+  }
+
+  // Submission Requirements
+  if (hackathon.general.submissionRequirements) {
+    payload.submissionRequirements = {
+      customInstructions: hackathon.general.submissionRequirements,
+    };
+  }
+
+  return payload;
+}
+
 // ============================================
 // Hackathon API Service
 // ============================================
@@ -297,6 +378,19 @@ export const hackathonApi = {
       ENDPOINTS.HACKATHONS.BY_ORG(orgId)
     );
     return backends.map(transformHackathon);
+  },
+
+  /**
+   * Update hackathon (comprehensive update with all fields)
+   * Uses the single PATCH /hackathons/:id endpoint
+   */
+  async updateHackathon(id: string, hackathon: Hackathon): Promise<Hackathon> {
+    const payload = transformToUpdatePayload(hackathon);
+    const backend = await apiClient.patch<BackendHackathon>(
+      ENDPOINTS.HACKATHONS.UPDATE(id),
+      payload
+    );
+    return transformHackathon(backend);
   },
 
   /**

@@ -291,6 +291,23 @@ Backend enforces valid state transitions:
 
 ## Recent Changes
 
+### February 6, 2026 - Comprehensive Update Endpoint Integration
+- ✨ **Implemented comprehensive hackathon update functionality**:
+  - Added `UpdateHackathonPayload` type to `backend.types.ts` with all updateable fields
+  - Added `UPDATE` endpoint to `endpoints.ts` pointing to `PATCH /hackathons/:id`
+  - Created `transformToUpdatePayload()` function to convert frontend Hackathon to backend payload
+  - Added `updateHackathon()` method to `hackathonApi` for comprehensive updates
+  - Updated `handleSave()` in `useHackathon` to use the new comprehensive update method
+- 🔄 **Save button now updates all hackathon data** including:
+  - Basic information (name, category, visibility, poster, prize pool, tags, etc.)
+  - Timeline (start time, pre-registration end, submission deadline)
+  - Tracks (creates new tracks, updates existing ones by _id)
+  - Prizes (creates new prizes, updates existing ones by _id)
+  - Custom registration questions (creates new, updates existing by _id)
+  - Submission requirements (custom instructions)
+- **Data Flow**: User edits → Click Save → `handleSave()` → `updateHackathon()` → `transformToUpdatePayload()` → PATCH `/hackathons/:id` → Response transformed back → UI updated
+- **Backward Compatibility**: `updateGeneral()` method retained for targeted updates if needed
+
 ### February 6, 2026 - Organization Context & Backend Response Fix
 - 🐛 **Fixed organization context flow** for hackathon creation:
   - Updated "Host a Hackathon" link in OrganizationDashboard to pass `orgId` query parameter

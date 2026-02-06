@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { apiClient } from '@/src/shared/lib/api/client';
+import { ENDPOINTS } from '@/src/shared/lib/api/endpoints';
 import {
   Save,
   Check,
@@ -168,6 +170,14 @@ function RoleSelect({
 }
 
 /* ── Invite Modal ── */
+interface UserSearchResult {
+  uuid: string;
+  email: string;
+  name: string;
+  avatar: string | null;
+  role: string;
+}
+
 function InviteModal({
   onClose,
   onInvite,
@@ -175,20 +185,77 @@ function InviteModal({
   onClose: () => void;
   onInvite: (email: string, role: TeamMember['role']) => void;
 }) {
+  const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<TeamMember['role']>('Viewer');
   const [error, setError] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Search users with debounce
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query.trim() || query.length < 2) {
+      setSearchResults([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const results = await apiClient.get<UserSearchResult[]>(
+          `${ENDPOINTS.USERS.SEARCH}?query=${encodeURIComponent(query)}&limit=5`
+        );
+        setSearchResults(results);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error('Failed to search users:', err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [query]);
+
+  const handleSelectUser = (user: UserSearchResult) => {
+    setSelectedUser(user);
+    setEmail(user.email);
+    setQuery(user.email);
+    setShowSuggestions(false);
+    if (error) setError('');
+  };
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSelectedUser(null);
+    if (error) setError('');
+  };
 
   const handleInvite = () => {
-    if (!email.trim()) {
+    const emailToInvite = email || query.trim();
+    
+    if (!emailToInvite) {
       setError('Email is required');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToInvite)) {
       setError('Enter a valid email address');
       return;
     }
-    onInvite(email.trim(), role);
+    onInvite(emailToInvite, role);
     onClose();
   };
 
@@ -223,23 +290,101 @@ function InviteModal({
           </p>
         </div>
 
-        {/* Email */}
+        {/* Email with Search */}
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium text-text-secondary">Email address</label>
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (error) setError('');
-              }}
-              placeholder="member@example.com"
-              className="h-[46px] w-full rounded-full border border-border bg-bg-input pl-11 pr-5 text-sm text-text transition-all placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
-              autoFocus
-            />
-          </div>
+          <label className="mb-2 block text-sm font-medium text-text-secondary">
+            {selectedUser ? 'Selected User' : 'Search by email or name'}
+          </label>
+          
+          {selectedUser ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-bg-muted p-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand">
+                {selectedUser.avatar ? (
+                  <img src={selectedUser.avatar} alt={selectedUser.name} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-sm font-semibold text-brand-fg">
+                    {selectedUser.name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-text">{selectedUser.name}</p>
+                <p className="truncate text-xs text-text-muted">{selectedUser.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedUser(null);
+                  setQuery('');
+                  setEmail('');
+                }}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-hover hover:text-text"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                onFocus={() => query && setShowSuggestions(true)}
+                placeholder="member@example.com or John Doe"
+                className="h-[46px] w-full rounded-full border border-border bg-bg-input pl-11 pr-5 text-sm text-text transition-all placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
+                autoFocus
+              />
+              
+              {/* Suggestions Dropdown */}
+              {showSuggestions && query.length >= 2 && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowSuggestions(false)} />
+                  <div
+                    className="absolute left-0 right-0 top-full z-40 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-border bg-bg-card py-2"
+                    style={{ boxShadow: 'var(--shadow-lg)' }}
+                  >
+                    {isSearching ? (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map((user) => (
+                        <button
+                          key={user.uuid}
+                          type="button"
+                          onClick={() => handleSelectUser(user)}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-bg-hover"
+                        >
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand">
+                            {user.avatar ? (
+                              <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <span className="text-sm font-semibold text-brand-fg">
+                                {user.name.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-text">{user.name}</p>
+                            <p className="truncate text-xs text-text-muted">{user.email}</p>
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-bg-muted">
+                          <AlertCircle className="h-6 w-6 text-text-muted" />
+                        </div>
+                        <p className="text-sm font-medium text-text">User not found</p>
+                        <p className="mt-1 text-xs text-text-muted">No users match &quot;{query}&quot;</p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           {error && <p className="mt-1.5 pl-5 text-xs text-error">{error}</p>}
         </div>
 

@@ -370,6 +370,65 @@ export interface UpdateSubmissionRequirementsPayload {
 }
 
 /**
+ * Comprehensive Update Hackathon Payload
+ * Supports partial updates - all fields are optional
+ * Used by PATCH /hackathons/:id endpoint
+ */
+export interface UpdateHackathonPayload {
+  // Basic Information
+  name?: string;
+  category?: BackendHackathonCategory;
+  visibility?: BackendHackathonVisibility;
+  posterUrl?: string;
+  prizePool?: number;
+  prizeAsset?: string;
+  tags?: string[];
+  description?: string;
+  overview?: string;
+  rules?: string;
+  schedule?: string;
+  resources?: string;
+  faq?: string;
+  venue?: string;
+  adminContact?: string;
+
+  // Timeline
+  startTime?: Date | string;
+  preRegistrationEndTime?: Date | string;
+  submissionDeadline?: Date | string;
+  judgingDeadline?: Date | string;
+
+  // Nested Documents - include _id to update, omit to create
+  tracks?: Array<{
+    _id?: string;
+    name: string;
+    description: string;
+    order?: number;
+    isActive?: boolean;
+  }>;
+
+  prizes?: Array<{
+    _id?: string;
+    name: string;
+    trackId?: string;
+    placements: BackendPlacement[];
+    isActive?: boolean;
+  }>;
+
+  customRegistrationQuestions?: Array<{
+    _id?: string;
+    questionText: string;
+    questionType: BackendQuestionType;
+    options?: string[];
+    isRequired: boolean;
+    order?: number;
+  }>;
+
+  // Submission Requirements
+  submissionRequirements?: UpdateSubmissionRequirementsPayload;
+}
+
+/**
  * Create/Update Track Payload
  */
 export interface TrackPayload {
