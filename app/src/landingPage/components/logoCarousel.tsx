@@ -91,7 +91,7 @@ const LogoCarousel = () => {
     <section className="py-10 overflow-hidden bg-[#FCFCFC]">
       <div className="container-main mb-8">
         <p className="text-center text-[#4D4D4D] text-sm font-medium tracking-wide uppercase">
-          Ecosystem Topics
+          Ecosystem
         </p>
       </div>
       
