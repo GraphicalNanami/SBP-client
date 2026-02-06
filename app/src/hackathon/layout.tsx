@@ -1,6 +1,6 @@
 import Navbar from "@/src/landingPage/components/Navbar";
 
-export default function DashboardLayout({
+export default function HackathonLayout({
   children,
 }: {
   children: React.ReactNode;

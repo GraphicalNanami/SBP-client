@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Onest, Inter } from "next/font/google";
+import { Onest, Inter, Jersey_10 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./src/auth/context/AuthContext";
 
@@ -15,6 +15,12 @@ const onest = Onest({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const jersey10 = Jersey_10({
+  variable: "--font-jersey",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export const metadata: Metadata = {
   title: "Stellar – Hackathons & Events Platform",
   description:
@@ -28,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" style={{ colorScheme: 'light' }} data-theme="light">
-      <body className={`${inter.variable} ${onest.variable} antialiased font-sans`}>
+      <body className={`${inter.variable} ${onest.variable} ${jersey10.variable} antialiased font-sans`}>
         <AuthProvider>
           {children}
         </AuthProvider>

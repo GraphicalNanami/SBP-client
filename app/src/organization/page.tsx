@@ -14,6 +14,9 @@ export default function OrganizationPage() {
     saveSuccess,
     isLoading,
     error,
+    organizationHackathons,
+    isLoadingHackathons,
+    hackathonsError,
     handleCreate,
     handleSwitchOrg,
     handleStartCreateNew,
@@ -24,6 +27,7 @@ export default function OrganizationPage() {
     handleUpdateMemberRole,
     handleSave,
     clearError,
+    refreshHackathons,
   } = useOrganization();
 
   if (step === 'create') {
@@ -45,6 +49,9 @@ export default function OrganizationPage() {
       saveSuccess={saveSuccess}
       isLoading={isLoading}
       error={error}
+      organizationHackathons={organizationHackathons}
+      isLoadingHackathons={isLoadingHackathons}
+      hackathonsError={hackathonsError}
       onProfileChange={handleProfileChange}
       onSocialChange={handleSocialChange}
       onAddMember={handleAddMember}
@@ -54,6 +61,7 @@ export default function OrganizationPage() {
       onCreateNew={handleStartCreateNew}
       onSave={handleSave}
       onClearError={clearError}
+      onRefreshHackathons={refreshHackathons}
     />
   );
 }

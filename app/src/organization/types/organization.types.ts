@@ -61,7 +61,7 @@ export type OrganizationStep = 'create' | 'dashboard';
 // ============================================
 
 export interface BackendOrganization {
-  _id: string;
+  uuid: string;
   name: string;
   slug: string;
   website: string;
@@ -84,18 +84,28 @@ export interface BackendOrganization {
 }
 
 export interface BackendOrganizationMember {
-  _id: string;
+  uuid: string;
   organizationId: string;
-  userId: string;
+  userId: string | {
+    uuid: string;
+    email: string;
+    name: string;
+    avatarUrl?: string;
+  };
   role: 'ADMIN' | 'EDITOR' | 'VIEWER';
   status: 'PENDING' | 'ACTIVE' | 'REMOVED';
-  invitedBy: string;
+  invitedBy: string | {
+    uuid: string;
+    email: string;
+    name: string;
+  };
   invitedAt: string;
   joinedAt?: string;
   createdAt: string;
   updatedAt: string;
+  // Deprecated: Backend now populates userId directly instead of separate user field
   user?: {
-    _id: string;
+    uuid: string;
     email: string;
     name: string;
     avatarUrl?: string;
