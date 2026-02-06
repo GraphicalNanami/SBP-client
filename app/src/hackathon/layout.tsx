@@ -6,9 +6,9 @@ export default function HackathonLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main>{children}</main>
+      <main className="flex-grow">{children}</main>
     </div>
   );
 }

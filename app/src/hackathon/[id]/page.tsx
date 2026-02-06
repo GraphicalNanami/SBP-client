@@ -1,42 +1,45 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  ArrowLeft,
   Calendar,
   MapPin,
   Trophy,
   Users,
-  FolderOpen,
   Globe,
   ExternalLink,
   Rocket,
   BookOpen,
   Code,
   Wallet,
+  Flag,
 } from 'lucide-react';
 import { MOCK_HACKATHONS } from '../components/mockData';
 
 /* ── Status badge colors ── */
-const statusStyles: Record<string, string> = {
-  Upcoming: 'bg-blue-50 text-blue-700 border-blue-200',
-  Ongoing: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  Ended: 'bg-gray-100 text-gray-500 border-gray-200',
+const statusStyles: Record<string, { bg: string; dot: string; text: string }> = {
+  Upcoming: { bg: 'bg-blue-50 border-blue-200', dot: 'bg-blue-500', text: 'text-blue-700' },
+  Ongoing: { bg: 'bg-green-50 border-green-200', dot: 'bg-green-500', text: 'text-green-700' },
+  Ended: { bg: 'bg-gray-100 border-gray-200', dot: 'bg-gray-400', text: 'text-gray-500' },
 };
 
-/* ── Poster gradient palettes ── */
-const posterGradients = [
-  'from-violet-600 to-indigo-700',
-  'from-sky-600 to-cyan-700',
-  'from-emerald-600 to-teal-700',
-  'from-amber-500 to-orange-600',
-  'from-rose-500 to-pink-600',
-  'from-fuchsia-600 to-purple-700',
-];
+/* ── Tag colors ── */
+const getTagColor = (tag: string) => {
+  const colors = [
+    'bg-red-100 text-red-700 border-red-200',
+    'bg-blue-100 text-blue-700 border-blue-200',
+    'bg-green-100 text-green-700 border-green-200',
+    'bg-purple-100 text-purple-700 border-purple-200',
+    'bg-orange-100 text-orange-700 border-orange-200',
+    'bg-indigo-100 text-indigo-700 border-indigo-200',
+  ];
+  return colors[tag.charCodeAt(0) % colors.length];
+};
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
+    weekday: 'long',
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -49,135 +52,222 @@ function formatPrize(amount: number) {
 
 export default function HackathonDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const hackathon = MOCK_HACKATHONS.find((h) => h.id === id);
 
   if (!hackathon) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="mb-2 text-lg font-semibold text-[var(--text)]">Hackathon not found</p>
-          <Link href="/hackathon" className="text-sm text-[var(--text-muted)] underline">
-            ← Back to listings
-          </Link>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Hackathon Not Found</h1>
+          <button
+            onClick={() => router.push('/hackathon')}
+            className="text-[#1A1A1A] hover:underline"
+          >
+            Back to Hackathons
+          </button>
         </div>
       </div>
     );
   }
 
-  const gradient = posterGradients[hackathon.name.charCodeAt(0) % posterGradients.length];
+  const statusConfig = statusStyles[hackathon.status] || statusStyles.Upcoming;
+  const isActive = hackathon.status !== 'Ended';
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      {/* ── Nav ── */}
-      <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-          <Link
-            href="/hackathon"
-            className="flex items-center gap-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text)]"
+    <div className="min-h-screen bg-[#FCFCFC]">
+      {/* Header with back button */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E5E5E5]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <button
+            onClick={() => router.push('/hackathon')}
+            className="flex items-center gap-2 text-white bg-black px-3 py-1 rounded-xl cursor-pointer hover:bg-black/80 transition-colors text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Hackathons
-          </Link>
-          {hackathon.status !== 'Ended' && (
-            <button className="flex h-10 items-center gap-2 rounded-full bg-[var(--brand)] px-5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90 active:scale-[0.97]">
-              <Rocket className="h-4 w-4" />
-              Join Hackathon
-            </button>
-          )}
+            Back
+          </button>
         </div>
-      </nav>
+      </header>
 
-      {/* ── Hero ── */}
-      <div className={`bg-gradient-to-br ${gradient}`}>
-        <div className="mx-auto max-w-[1200px] px-6 py-16 md:py-20">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-sm font-bold text-white backdrop-blur-sm">
-              {hackathon.organizationName.charAt(0)}
+      {/* Main Content — 5/7 Column Layout matching events detail */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+
+          {/* ── Left Column — Banner, Organizer, Builders, Tags ── */}
+          <div className="lg:col-span-5 space-y-6">
+            {/* Hackathon Banner */}
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20">
+              {hackathon.poster ? (
+                <img
+                  src={hackathon.poster}
+                  alt={hackathon.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-600 to-indigo-700">
+                  <span className="text-4xl font-bold text-white/20">{hackathon.name}</span>
+                </div>
+              )}
             </div>
-            <span className="text-sm font-medium text-white/80">{hackathon.organizationName}</span>
+
+            {/* Organized By */}
+            <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
+              <h3 className="text-sm font-semibold text-[#4D4D4D] mb-4">Organized By</h3>
+              <div className="flex items-center gap-3">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                  {hackathon.organizationLogo ? (
+                    <img
+                      src={hackathon.organizationLogo}
+                      alt={hackathon.organizationName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg font-bold text-[#4D4D4D]">
+                      {hackathon.organizationName.charAt(0)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-[#1A1A1A]">{hackathon.organizationName}</p>
+                  <p className="text-xs text-[#4D4D4D]">Verified Organization</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Builders Section */}
+            {hackathon.builderCount > 0 && (
+              <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
+                <h3 className="text-sm font-semibold text-[#1A1A1A] mb-4">
+                  {hackathon.builderCount} Builders
+                </h3>
+                <div className="flex -space-x-2 mb-4">
+                  {Array.from({ length: Math.min(hackathon.builderCount, 8) }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="relative w-10 h-10 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center"
+                    >
+                      <span className="text-[10px] font-semibold text-[#4D4D4D]">
+                        {String.fromCharCode(65 + i)}
+                      </span>
+                    </div>
+                  ))}
+                  {hackathon.builderCount > 8 && (
+                    <div className="relative w-10 h-10 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
+                      <span className="text-xs font-semibold text-[#4D4D4D]">
+                        +{hackathon.builderCount - 8}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tags & Actions */}
+            <div className="space-y-4">
+              {hackathon.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {hackathon.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${getTagColor(tag)}`}
+                    >
+                      #{tag.replace(/\s+/g, '')}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center gap-4 text-xs text-[#4D4D4D]">
+                <button className="hover:text-[#1A1A1A] transition-colors">
+                  Contact the Host
+                </button>
+                <button className="hover:text-[#1A1A1A] transition-colors flex items-center gap-1">
+                  <Flag className="w-3 h-3" />
+                  Report Hackathon
+                </button>
+              </div>
+            </div>
           </div>
 
-          <h1
-            className="mb-4 text-3xl font-bold text-white md:text-5xl"
-            style={{ letterSpacing: '-0.04em', lineHeight: '1.1', fontFamily: 'var(--font-onest)' }}
-          >
-            {hackathon.name}
-          </h1>
-          <p className="mb-6 max-w-xl text-base text-white/70 md:text-lg">{hackathon.tagline}</p>
+          {/* ── Right Column — Title, Status, Prize, Timeline, Venue, CTA, About ── */}
+          <div className="lg:col-span-7 space-y-8">
+            {/* Title and Status */}
+            <div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-[#1A1A1A] mb-4 -tracking-tight leading-tight">
+                {hackathon.name}
+              </h1>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <span
-              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusStyles[hackathon.status]}`}
+              <div className={`inline-flex items-center gap-2 px-4 py-2 border rounded-lg ${statusConfig.bg}`}>
+                <div className={`w-2 h-2 rounded-full ${statusConfig.dot}`} />
+                <span className={`text-sm font-semibold ${statusConfig.text}`}>
+                  {hackathon.status === 'Upcoming' ? 'Registration Open' : hackathon.status === 'Ongoing' ? 'Ongoing' : 'Ended'}
+                </span>
+              </div>
+            </div>
+
+            {/* Prize Pool */}
+            <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <Trophy className="w-6 h-6 text-[#4D4D4D]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#1A1A1A] mb-1">Prize Pool</p>
+                  <p className="text-2xl font-bold text-[#1A1A1A]">
+                    {formatPrize(hackathon.prizePool)} {hackathon.prizeAsset}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <Calendar className="w-6 h-6 text-[#4D4D4D]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#1A1A1A] mb-1">
+                    {formatDate(hackathon.startTime)}
+                  </p>
+                  <p className="text-sm text-[#4D4D4D]">
+                    Deadline: {formatDate(hackathon.submissionDeadline)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Venue */}
+            <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <MapPin className="w-6 h-6 text-[#4D4D4D]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#1A1A1A] mb-1">{hackathon.venue}</p>
+                  <p className="text-sm text-[#4D4D4D]">
+                    {hackathon.venue === 'Online' ? 'Virtual event — join from anywhere' : hackathon.venue}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Join Button */}
+            <button
+              disabled={!isActive}
+              className={`w-full py-4 px-6 rounded-xl text-base font-semibold transition-all ${
+                !isActive
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-[#8B4513] text-white hover:bg-[#6F3410] shadow-sm hover:shadow-md'
+              }`}
             >
-              {hackathon.status}
-            </span>
-            {hackathon.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+              {!isActive ? 'Hackathon Ended' : 'Join Hackathon'}
+            </button>
 
-      {/* ── Key Info Bar ── */}
-      <div className="border-b border-[var(--border)] bg-white">
-        <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-6 px-6 py-6 sm:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-              <Trophy className="h-3.5 w-3.5" />
-              Prize Pool
-            </div>
-            <p className="mt-1 text-lg font-semibold text-[var(--text)]">
-              {formatPrize(hackathon.prizePool)} {hackathon.prizeAsset}
-            </p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-              <Calendar className="h-3.5 w-3.5" />
-              Timeline
-            </div>
-            <p className="mt-1 text-sm font-medium text-[var(--text)]">
-              {formatDate(hackathon.startTime)}
-            </p>
-            <p className="text-xs text-[var(--text-muted)]">
-              Deadline: {formatDate(hackathon.submissionDeadline)}
-            </p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-              <MapPin className="h-3.5 w-3.5" />
-              Venue
-            </div>
-            <p className="mt-1 text-sm font-medium text-[var(--text)]">{hackathon.venue}</p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-              <Users className="h-3.5 w-3.5" />
-              Builders
-            </div>
-            <p className="mt-1 text-lg font-semibold text-[var(--text)]">
-              {hackathon.builderCount > 0 ? hackathon.builderCount : '—'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Content ── */}
-      <main className="mx-auto max-w-[1200px] px-6 py-10">
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left column */}
-          <div className="space-y-8 lg:col-span-2">
-            {/* Description */}
-            <section className="rounded-2xl border border-[var(--border)] bg-white p-6">
-              <h2 className="mb-4 text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
-                About this Hackathon
-              </h2>
-              <div className="prose prose-sm max-w-none text-[var(--text-secondary)] leading-relaxed">
+            {/* About */}
+            <div className="bg-white rounded-xl border border-[#E5E5E5] p-8">
+              <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">About this Hackathon</h2>
+              <div className="prose prose-sm max-w-none text-[#4D4D4D] leading-relaxed space-y-4">
                 <p>{hackathon.tagline}</p>
                 <p>
                   This hackathon brings together builders from across the Stellar ecosystem to create
@@ -185,146 +275,66 @@ export default function HackathonDetailPage() {
                   you&apos;re a seasoned Stellar developer or just getting started with Soroban, this
                   is your chance to build something impactful.
                 </p>
-                <h3 className="text-[var(--text)]">Rules & Eligibility</h3>
+
+                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Prizes</h3>
+                <div className="space-y-2 not-prose">
+                  {[
+                    { place: '1st Place', pct: 50 },
+                    { place: '2nd Place', pct: 30 },
+                    { place: '3rd Place', pct: 20 },
+                  ].map((p) => (
+                    <div
+                      key={p.place}
+                      className="flex items-center justify-between rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-5 py-3.5"
+                    >
+                      <span className="text-sm font-medium text-[#1A1A1A]">{p.place}</span>
+                      <span className="text-sm font-semibold text-[#1A1A1A]">
+                        {formatPrize(Math.round(hackathon.prizePool * (p.pct / 100)))} {hackathon.prizeAsset}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Rules &amp; Eligibility</h3>
                 <ul>
                   <li>Open to all developers worldwide</li>
                   <li>Projects must be built on Stellar or Soroban</li>
                   <li>Teams of 1–5 members</li>
                   <li>All code must be original work created during the hackathon period</li>
                 </ul>
-                <h3 className="text-[var(--text)]">Schedule</h3>
+
+                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Schedule</h3>
                 <ul>
-                  <li>
-                    <strong>Kickoff:</strong> {formatDate(hackathon.startTime)}
-                  </li>
-                  <li>
-                    <strong>Submission Deadline:</strong> {formatDate(hackathon.submissionDeadline)}
-                  </li>
-                  <li>
-                    <strong>Judging Period:</strong> 2 weeks after deadline
-                  </li>
-                  <li>
-                    <strong>Winners Announced:</strong> 3 weeks after deadline
-                  </li>
+                  <li><strong>Kickoff:</strong> {formatDate(hackathon.startTime)}</li>
+                  <li><strong>Submission Deadline:</strong> {formatDate(hackathon.submissionDeadline)}</li>
+                  <li><strong>Judging Period:</strong> 2 weeks after deadline</li>
+                  <li><strong>Winners Announced:</strong> 3 weeks after deadline</li>
                 </ul>
-              </div>
-            </section>
 
-            {/* Prizes */}
-            <section className="rounded-2xl border border-[var(--border)] bg-white p-6">
-              <h2 className="mb-4 text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
-                Prizes
-              </h2>
-              <div className="space-y-3">
-                {[
-                  { place: '1st Place', pct: 50 },
-                  { place: '2nd Place', pct: 30 },
-                  { place: '3rd Place', pct: 20 },
-                ].map((p) => (
-                  <div
-                    key={p.place}
-                    className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg-muted)] px-5 py-3.5"
-                  >
-                    <span className="text-sm font-medium text-[var(--text)]">{p.place}</span>
-                    <span className="text-sm font-semibold text-[var(--text)]">
-                      {formatPrize(Math.round(hackathon.prizePool * (p.pct / 100)))} {hackathon.prizeAsset}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Tracks */}
-            <section className="rounded-2xl border border-[var(--border)] bg-white p-6">
-              <h2 className="mb-4 text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
-                Tracks
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {['Best Soroban dApp', 'Innovation Track', 'Community Impact'].map((track, i) => (
-                  <div
-                    key={track}
-                    className="rounded-xl border border-[var(--border)] bg-[var(--bg-muted)] p-4"
-                  >
-                    <h3 className="mb-1 text-sm font-semibold text-[var(--text)]">{track}</h3>
-                    <p className="text-xs text-[var(--text-muted)]">
-                      Build innovative {hackathon.category.toLowerCase()} solutions that push the
-                      boundaries of what&apos;s possible on Stellar.
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          {/* Right column */}
-          <div className="space-y-6">
-            {/* Organizer */}
-            <div className="rounded-2xl border border-[var(--border)] bg-white p-6">
-              <h3 className="mb-4 text-sm font-semibold text-[var(--text)]">Organizer</h3>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--bg-muted)] text-sm font-bold text-[var(--text-secondary)]">
-                  {hackathon.organizationName.charAt(0)}
+                <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Build Resources</h3>
+                <div className="not-prose space-y-2">
+                  {[
+                    { label: 'Soroban Documentation', icon: <BookOpen className="h-4 w-4" />, href: '#' },
+                    { label: 'Stellar Laboratory', icon: <Code className="h-4 w-4" />, href: '#' },
+                    { label: 'Horizon API Reference', icon: <Globe className="h-4 w-4" />, href: '#' },
+                    { label: 'Freighter Wallet', icon: <Wallet className="h-4 w-4" />, href: '#' },
+                  ].map((res) => (
+                    <a
+                      key={res.label}
+                      href={res.href}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#4D4D4D] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
+                    >
+                      <span className="text-[#999]">{res.icon}</span>
+                      {res.label}
+                      <ExternalLink className="ml-auto h-3 w-3 text-[#999]" />
+                    </a>
+                  ))}
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-[var(--text)]">{hackathon.organizationName}</p>
-                  <p className="text-xs text-[var(--text-muted)]">Verified Organization</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Build Resources */}
-            <div className="rounded-2xl border border-[var(--border)] bg-white p-6">
-              <h3 className="mb-4 text-sm font-semibold text-[var(--text)]">Build Resources</h3>
-              <div className="space-y-2">
-                {[
-                  { label: 'Soroban Documentation', icon: <BookOpen className="h-4 w-4" />, href: '#' },
-                  { label: 'Stellar Laboratory', icon: <Code className="h-4 w-4" />, href: '#' },
-                  { label: 'Horizon API Reference', icon: <Globe className="h-4 w-4" />, href: '#' },
-                  { label: 'Freighter Wallet', icon: <Wallet className="h-4 w-4" />, href: '#' },
-                ].map((res) => (
-                  <a
-                    key={res.label}
-                    href={res.href}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"
-                  >
-                    <span className="text-[var(--text-muted)]">{res.icon}</span>
-                    {res.label}
-                    <ExternalLink className="ml-auto h-3 w-3 text-[var(--text-muted)]" />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Category */}
-            <div className="rounded-2xl border border-[var(--border)] bg-white p-6">
-              <h3 className="mb-3 text-sm font-semibold text-[var(--text)]">Category</h3>
-              <span className="inline-block rounded-full bg-[var(--bg-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                {hackathon.category}
-              </span>
-
-              <h3 className="mb-3 mt-5 text-sm font-semibold text-[var(--text)]">Tags</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {hackathon.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs text-[var(--text-muted)]"
-                  >
-                    {tag}
-                  </span>
-                ))}
               </div>
             </div>
           </div>
         </div>
       </main>
-
-      {/* ── Footer ── */}
-      <footer className="border-t border-[var(--border)] bg-white">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-6 text-xs text-[var(--text-muted)]">
-          <span>© {new Date().getFullYear()} Stellar Builder Platform</span>
-          <span>Terms · Privacy</span>
-        </div>
-      </footer>
     </div>
   );
 }

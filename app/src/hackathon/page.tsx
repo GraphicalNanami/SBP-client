@@ -11,6 +11,7 @@ import {
   BookOpen,
   Loader2,
   AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 import HackathonCard from './components/HackathonCard';
 import {
@@ -20,6 +21,8 @@ import {
   type HackathonCardData,
 } from './components/mockData';
 import { hackathonApi, transformHackathonToCard } from '@/src/shared/lib/api/hackathonApi';
+import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
+import Footer from '@/src/landingPage/components/Footer';
 
 export default function HackathonListingsPage() {
   const [search, setSearch] = useState('');
@@ -48,10 +51,9 @@ export default function HackathonListingsPage() {
 
         const response = await hackathonApi.listPublicHackathons({
           filter,
-          limit: 100, // Fetch all for client-side filtering
+          limit: 100,
         });
 
-        // Transform backend data to card format
         const transformed = response.hackathons.map(transformHackathonToCard);
         setHackathons(transformed);
       } catch (err) {
@@ -63,7 +65,7 @@ export default function HackathonListingsPage() {
     }
 
     fetchHackathons();
-  }, [status]); // Refetch when status filter changes
+  }, [status]);
 
   /* ── Filtered & sorted data ── */
   const filtered = useMemo(() => {
@@ -109,26 +111,50 @@ export default function HackathonListingsPage() {
     }
 
     return list;
-  }, [search, category, status, sort]);
+  }, [search, category, status, sort, hackathons]);
 
   const activeFilterCount = [category !== 'All', status !== 'All'].filter(Boolean).length;
 
+  /* ── Bento grid split ── */
+  const [featuredHackathon, secondHackathon, thirdHackathon, ...remainingHackathons] = filtered;
+
   return (
-    <div className="min-h-screen">
-      {/* ── Hero ── */}
-      <section className="border-b border-border bg-white">
-        <div className="container-main py-16 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl tracking-tight">
-            Stellar Hackathons
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* ── Hero with wavy background text ── */}
+      <section className="relative py-20 md:py-24 overflow-hidden">
+        {/* Wavy Background Text */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03] select-none">
+          <div className="absolute top-20 left-10 text-9xl font-bold text-foreground transform -rotate-12">Hack</div>
+          <div className="absolute top-60 right-20 text-8xl font-bold text-foreground transform rotate-6">Build</div>
+          <div className="absolute bottom-40 left-1/4 text-7xl font-bold text-foreground transform -rotate-6">Ship</div>
+        </div>
+
+        <div className="container-main relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 mb-8">
+            <Sparkles className="w-4 h-4 text-accent-foreground" />
+            <span className="text-sm font-medium text-accent-foreground">
+              Hackathons &bull; Build on Stellar &bull; Win prizes
+            </span>
+          </div>
+
+          <h1
+            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-foreground"
+            style={{ fontFamily: 'var(--font-onest)' }}
+          >
+            Discover <UnderlineHighlight>Amazing</UnderlineHighlight>
+            <br />
+            <CircleHighlight>Hackathons</CircleHighlight>
           </h1>
-          <p className="mx-auto max-w-lg text-base text-muted-foreground md:text-lg leading-relaxed">
-            Discover hackathons, build on Soroban & Stellar, and compete for prizes with builders worldwide.
+
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Discover hackathons, build on Soroban &amp; Stellar, and compete for prizes with builders
+            worldwide.
           </p>
         </div>
       </section>
 
-      {/* ── Search & Filters ── */}
-      <div className="sticky top-16 z-40 border-b border-border bg-white/90 backdrop-blur-md">
+      {/* ── Search & Filters (sticky) ── */}
+      <div className="sticky top-[72px] z-40 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container-main py-4">
           <div className="flex items-center gap-3">
             {/* Search */}
@@ -185,7 +211,7 @@ export default function HackathonListingsPage() {
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
 
-            {/* Host/Guide Toggle */}
+            {/* Host / Guide toggle */}
             <div className="hidden lg:flex items-center gap-0.5 rounded-full border border-border bg-white p-1">
               <Link
                 href="/organization"
@@ -264,71 +290,100 @@ export default function HackathonListingsPage() {
         </div>
       </div>
 
-      {/* ── Grid ── */}
-      <main className="container-main py-10">
-        {/* Loading state */}
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">Loading hackathons...</p>
-          </div>
-        )}
-
-        {/* Error state */}
-        {error && !isLoading && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/50 bg-destructive/5 py-20 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-              <AlertCircle className="h-6 w-6 text-destructive" />
+      {/* ── Main Content ── */}
+      <main className="flex-grow">
+        <div className="container-main py-12">
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+              <p className="text-sm text-muted-foreground">Loading hackathons...</p>
             </div>
-            <p className="text-base font-medium text-foreground">Failed to load hackathons</p>
-            <p className="mt-1 text-sm text-muted-foreground max-w-md">
-              {error}
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 rounded-full bg-foreground px-6 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-all"
-            >
-              Try again
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* Success state */}
-        {!isLoading && !error && (
-          <>
-            {/* Result count */}
-            <p className="mb-6 text-sm text-muted-foreground">
-              {filtered.length} hackathon{filtered.length !== 1 ? 's' : ''} found
-            </p>
-
-            {filtered.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered.map((h) => (
-                  <HackathonCard key={h.id} hackathon={h} />
-                ))}
+          {/* Error state */}
+          {error && !isLoading && (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/50 bg-destructive/5 py-20 text-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                <AlertCircle className="h-6 w-6 text-destructive" />
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-                  <Search className="h-6 w-6 text-muted-foreground" />
+              <p className="text-base font-medium text-foreground">Failed to load hackathons</p>
+              <p className="mt-1 text-sm text-muted-foreground max-w-md">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 rounded-full bg-foreground px-6 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-all"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {/* Success state — Bento Grid */}
+          {!isLoading && !error && (
+            <>
+              <p className="mb-6 text-sm text-muted-foreground">
+                {filtered.length} hackathon{filtered.length !== 1 ? 's' : ''} found
+              </p>
+
+              {filtered.length > 0 ? (
+                <div className="space-y-12">
+                  {/* Main 2-Column Bento Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* Left: Large Featured Card */}
+                    {featuredHackathon && (
+                      <HackathonCard hackathon={featuredHackathon} featured />
+                    )}
+
+                    {/* Right: 2 Stacked Cards */}
+                    <div className="grid grid-rows-2 gap-5">
+                      {secondHackathon && (
+                        <HackathonCard hackathon={secondHackathon} />
+                      )}
+                      {thirdHackathon && (
+                        <HackathonCard hackathon={thirdHackathon} />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Remaining Events in Regular Grid */}
+                  {remainingHackathons.length > 0 && (
+                    <div>
+                      <h3 className="text-2xl font-bold text-foreground mb-6">More Hackathons</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {remainingHackathons.map((h) => (
+                          <HackathonCard key={h.id} hackathon={h} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <p className="text-base font-medium text-foreground">No hackathons found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Try adjusting your search or filters.
-                </p>
-              </div>
-            )}
-          </>
-        )}
+              ) : (
+                <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border py-32 text-center">
+                  <div className="w-20 h-20 rounded-full bg-secondary border border-border flex items-center justify-center mb-6">
+                    <span className="text-4xl">🔍</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">No hackathons found</h3>
+                  <p className="text-muted-foreground max-w-sm">
+                    Try adjusting your search or filters to find what you&apos;re looking for.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSearch('');
+                      setCategory('All');
+                      setStatus('All');
+                    }}
+                    className="mt-8 px-6 py-2.5 rounded-xl border border-border text-foreground hover:bg-secondary transition-all"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-border bg-white">
-        <div className="container-main flex items-center justify-between py-6 text-xs text-muted-foreground">
-          <span>© {new Date().getFullYear()} Stellar Builder Platform</span>
-          <span>Terms · Privacy</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

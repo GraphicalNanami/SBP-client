@@ -80,8 +80,7 @@ interface HackathonDashboardProps {
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-[var(--border)] bg-white p-6 ${className}`}
-      style={{ boxShadow: 'var(--shadow)' }}
+      className={`rounded-xl border border-[#E5E5E5] bg-white p-6 ${className}`}
     >
       {children}
     </div>
@@ -90,7 +89,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-5 text-[15px] font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+    <h2 className="mb-5 text-[15px] font-semibold text-[#1A1A1A] tracking-tight" style={{ fontFamily: 'var(--font-onest)' }}>
       {children}
     </h2>
   );
@@ -98,20 +97,20 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function Label({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
   return (
-    <label htmlFor={htmlFor} className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+    <label htmlFor={htmlFor} className="mb-2 block text-sm font-medium text-[#4D4D4D]">
       {children}
     </label>
   );
 }
 
 const inputClass =
-  'h-[46px] w-full rounded-full border border-[var(--border)] bg-white px-5 text-sm text-[var(--text)] transition-all placeholder:text-[var(--text-muted)] hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/10';
+  'h-[46px] w-full rounded-full border border-[#E5E5E5] bg-white px-5 text-sm text-[#1A1A1A] transition-all placeholder:text-[#4D4D4D] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10';
 
 const textareaClass =
-  'w-full resize-none rounded-2xl border border-[var(--border)] bg-white px-5 py-3.5 text-sm text-[var(--text)] transition-all placeholder:text-[var(--text-muted)] hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/10';
+  'w-full resize-none rounded-2xl border border-[#E5E5E5] bg-white px-5 py-3.5 text-sm text-[#1A1A1A] transition-all placeholder:text-[#4D4D4D] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10';
 
 const selectClass =
-  'h-[46px] w-full appearance-none rounded-full border border-[var(--border)] bg-white px-5 pr-10 text-sm text-[var(--text)] transition-all hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/10';
+  'h-[46px] w-full appearance-none rounded-full border border-[#E5E5E5] bg-white px-5 pr-10 text-sm text-[#1A1A1A] transition-all hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10';
 
 /* ── Status badge ── */
 const statusStyles: Record<string, string> = {
@@ -223,10 +222,10 @@ export default function HackathonDashboard({
   // Show loading state
   if (isLoading) {
     return (
-      <div className="aurora-bg min-h-screen flex items-center justify-center">
+      <div className="bg-[#FCFCFC] min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[var(--brand)]" />
-          <p className="text-sm text-[var(--text-muted)]">Loading hackathon...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#1A1A1A]" />
+          <p className="text-sm text-[#4D4D4D]">Loading hackathon...</p>
         </div>
       </div>
     );
@@ -235,16 +234,16 @@ export default function HackathonDashboard({
   // Show error state (only for fatal errors, not validation errors)
   if (error && !validationError) {
     return (
-      <div className="aurora-bg min-h-screen flex items-center justify-center">
+      <div className="bg-[#FCFCFC] min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 mx-auto">
             <X className="h-6 w-6 text-red-600" />
           </div>
-          <h2 className="text-lg font-semibold text-[var(--text)] mb-2">Failed to Load Hackathon</h2>
-          <p className="text-sm text-[var(--text-secondary)] mb-6">{error}</p>
+          <h2 className="text-lg font-semibold text-[#1A1A1A] mb-2">Failed to Load Hackathon</h2>
+          <p className="text-sm text-[#4D4D4D] mb-6">{error}</p>
           <Link
             href="/organization"
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1A1A1A] px-5 py-2.5 text-sm font-medium text-white transition-all hover:opacity-90"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Organization
@@ -257,34 +256,34 @@ export default function HackathonDashboard({
   // Safety check: ensure hackathon.general exists
   if (!hackathon.general) {
     return (
-      <div className="aurora-bg min-h-screen flex items-center justify-center">
+      <div className="bg-[#FCFCFC] min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[var(--brand)]" />
-          <p className="text-sm text-[var(--text-muted)]">Initializing hackathon...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#1A1A1A]" />
+          <p className="text-sm text-[#4D4D4D]">Initializing hackathon...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="aurora-bg min-h-screen">
+    <div className="bg-[#FCFCFC] min-h-screen">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b border-[#E5E5E5] bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
           {/* Left */}
           <div className="flex items-center gap-4">
             <Link
               href="/organization"
-              className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--text)]"
+              className="flex items-center gap-1.5 text-sm text-[#4D4D4D] transition-colors hover:text-[#1A1A1A]"
             >
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Organization</span>
             </Link>
-            <div className="h-5 w-px bg-[var(--border)]" />
+            <div className="h-5 w-px bg-[#E5E5E5]" />
             <div>
               <h1
-                className="text-sm font-semibold text-[var(--text)]"
-                style={{ letterSpacing: '-0.02em' }}
+                className="text-sm font-semibold text-[#1A1A1A] tracking-tight"
+                style={{ fontFamily: 'var(--font-onest)' }}
               >
                 {hackathon.general.name || (isNew ? 'New Hackathon' : 'Untitled')}
               </h1>
@@ -304,7 +303,7 @@ export default function HackathonDashboard({
             <Link
               href={`/hackathon/preview/${hackathon.id}`}
               target="_blank"
-              className="flex h-9 items-center gap-2 rounded-full border border-[var(--border)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)] active:scale-[0.97]"
+              className="flex h-9 items-center gap-2 rounded-full border border-[#E5E5E5] px-4 text-sm font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5] active:scale-[0.97]"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Preview</span>
@@ -316,7 +315,7 @@ export default function HackathonDashboard({
               className={`flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-all active:scale-[0.97] disabled:opacity-50 ${
                 saveSuccess
                   ? 'bg-emerald-600 text-white'
-                  : 'border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
+                  : 'border border-[#E5E5E5] text-[#4D4D4D] hover:bg-[#F5F5F5]'
               }`}
             >
               {isSaving ? (
@@ -332,7 +331,7 @@ export default function HackathonDashboard({
             <button
               onClick={handleSubmitForReview}
               disabled={!canPublish || isSaving}
-              className="flex h-9 items-center gap-2 rounded-full bg-[var(--brand)] px-5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-9 items-center gap-2 rounded-full bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Send className="h-3.5 w-3.5" />
               Submit for Review
@@ -365,17 +364,17 @@ export default function HackathonDashboard({
       )}
 
       {/* ── Tabs ── */}
-      <div className="border-b border-[var(--border)] bg-white/60 backdrop-blur-sm">
+      <div className="border-b border-[#E5E5E5] bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-[1200px] px-6">
           <div className="flex gap-1 overflow-x-auto py-1 scrollbar-none">
             {TABS.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex shrink-0 items-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-all ${
+                className={`flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2.5 text-sm font-medium transition-all ${
                   activeTab === tab.key
-                    ? 'bg-[var(--brand)] text-[var(--brand-fg)]'
-                    : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text)]'
+                    ? 'bg-[#1A1A1A] text-white'
+                    : 'text-[#4D4D4D] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]'
                 }`}
               >
                 {tab.icon}
@@ -460,10 +459,10 @@ function GeneralTab({
   // Helper to get error styling for inputs
   const getInputClass = (fieldName: string) => {
     const hasError = fieldErrors[fieldName];
-    return `h-[46px] w-full rounded-full border px-5 text-sm transition-all placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 ${
+    return `h-[46px] w-full rounded-full border px-5 text-sm transition-all placeholder:text-[#4D4D4D] focus:outline-none focus:ring-2 ${
       hasError
         ? 'border-red-500 bg-red-50 text-red-900 focus:border-red-600 focus:ring-red-500/10'
-        : 'border-[var(--border)] bg-[var(--bg-input)] text-[var(--text)] hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:ring-[var(--brand)]/10'
+        : 'border-[#E5E5E5] bg-white text-[#1A1A1A] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:ring-[#1A1A1A]/10'
     }`;
   };
 
@@ -508,7 +507,7 @@ function GeneralTab({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4D4D4D]" />
               </div>
             </div>
             <div>
@@ -521,8 +520,8 @@ function GeneralTab({
                     onClick={() => updateGeneral('visibility', v)}
                     className={`flex h-[46px] flex-1 items-center justify-center gap-2 rounded-full border text-sm font-medium transition-all ${
                       g.visibility === v
-                        ? 'border-[var(--brand)] bg-[var(--brand)] text-[var(--brand-fg)]'
-                        : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]'
+                        ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
+                        : 'border-[#E5E5E5] text-[#4D4D4D] hover:border-[#E5E5E5]'
                     }`}
                   >
                     {v === 'Public' ? <Globe className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -549,15 +548,15 @@ function GeneralTab({
               className={`flex h-32 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed transition-colors ${
                 posterError || fieldErrors.poster
                   ? 'border-red-500 bg-red-50 hover:border-red-600'
-                  : 'border-[var(--border)] bg-[var(--bg-muted)] hover:border-[var(--border-hover)]'
+                  : 'border-[#E5E5E5] bg-[#F5F5F5] hover:border-[#E5E5E5]'
               }`}
             >
               {g.poster ? (
                 <img src={g.poster} alt="Poster" className="h-full w-full rounded-2xl object-cover" />
               ) : (
                 <div className="text-center">
-                  <ImageIcon className={`mx-auto mb-2 h-6 w-6 ${posterError || fieldErrors.poster ? 'text-red-500' : 'text-[var(--text-muted)]'}`} />
-                  <p className={`text-xs ${posterError || fieldErrors.poster ? 'text-red-600' : 'text-[var(--text-muted)]'}`}>
+                  <ImageIcon className={`mx-auto mb-2 h-6 w-6 ${posterError || fieldErrors.poster ? 'text-red-500' : 'text-[#4D4D4D]'}`} />
+                  <p className={`text-xs ${posterError || fieldErrors.poster ? 'text-red-600' : 'text-[#4D4D4D]'}`}>
                     Click to upload poster (recommended 1200×630, max 2MB)
                   </p>
                 </div>
@@ -602,7 +601,7 @@ function GeneralTab({
                   <option value="XLM">XLM</option>
                   <option value="Custom">Custom Stellar Asset</option>
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4D4D4D]" />
               </div>
             </div>
           </div>
@@ -622,7 +621,7 @@ function GeneralTab({
               <button
                 type="button"
                 onClick={handleAddTag}
-                className="flex h-[46px] shrink-0 items-center gap-1.5 rounded-full border border-[var(--border)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+                className="flex h-[46px] shrink-0 items-center gap-1.5 rounded-full border border-[#E5E5E5] px-4 text-sm font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
               >
                 <Plus className="h-4 w-4" />
                 Add
@@ -633,14 +632,14 @@ function GeneralTab({
                 {g.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--bg-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]"
+                    className="flex items-center gap-1.5 rounded-full border border-[#E5E5E5] bg-[#F5F5F5] px-3 py-1 text-xs font-medium text-[#4D4D4D]"
                   >
                     <Tag className="h-3 w-3" />
                     {tag}
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="ml-0.5 text-[var(--text-muted)] hover:text-[var(--error)]"
+                      className="ml-0.5 text-[#4D4D4D] hover:text-red-500"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -671,7 +670,7 @@ function GeneralTab({
                   {fieldErrors.startTime}
                 </p>
               ) : (
-                <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+                <p className="mt-1.5 pl-5 text-xs text-[#4D4D4D]">Time will be stored in UTC</p>
               )}
             </div>
             <div>
@@ -691,7 +690,7 @@ function GeneralTab({
                   {fieldErrors.submissionDeadline}
                 </p>
               ) : (
-                <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+                <p className="mt-1.5 pl-5 text-xs text-[#4D4D4D]">Time will be stored in UTC</p>
               )}
             </div>
           </div>
@@ -713,7 +712,7 @@ function GeneralTab({
                 {fieldErrors.preRegEndTime}
               </p>
             ) : (
-              <p className="mt-1.5 pl-5 text-xs text-[var(--text-muted)]">Time will be stored in UTC</p>
+              <p className="mt-1.5 pl-5 text-xs text-[#4D4D4D]">Time will be stored in UTC</p>
             )}
           </div>
 
@@ -728,8 +727,8 @@ function GeneralTab({
                     onClick={() => updateGeneral('venue', v === 'In-Person' ? 'In-Person' : 'Online')}
                     className={`flex h-[46px] flex-1 items-center justify-center gap-2 rounded-full border text-sm font-medium transition-all ${
                       g.venue === v
-                        ? 'border-[var(--brand)] bg-[var(--brand)] text-[var(--brand-fg)]'
-                        : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]'
+                        ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
+                        : 'border-[#E5E5E5] text-[#4D4D4D] hover:border-[#E5E5E5]'
                     }`}
                   >
                     {v === 'Online' ? <Globe className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
@@ -804,16 +803,16 @@ function GeneralTab({
               { label: 'Tracks', value: `${hackathon.tracks.length}` },
               { label: 'Admins', value: `${hackathon.admins.length}` },
             ].map((item, idx) => (
-              <div key={item.label} className={idx > 0 ? 'border-t border-[var(--border)] pt-4' : ''}>
-                <p className="text-[var(--text-muted)]">{item.label}</p>
-                <p className="mt-0.5 font-medium text-[var(--text)]">{item.value || '—'}</p>
+              <div key={item.label} className={idx > 0 ? 'border-t border-[#E5E5E5] pt-4' : ''}>
+                <p className="text-[#4D4D4D]">{item.label}</p>
+                <p className="mt-0.5 font-medium text-[#1A1A1A]">{item.value || '—'}</p>
               </div>
             ))}
           </div>
         </Card>
 
-        <Card className="border-[var(--brand)]/20 bg-[var(--bg-muted)]">
-          <h3 className="mb-2 text-sm font-semibold text-[var(--text)]">Publish Checklist</h3>
+        <Card className="border-[#E5E5E5] bg-[#F5F5F5]">
+          <h3 className="mb-2 text-sm font-semibold text-[#1A1A1A]">Publish Checklist</h3>
           <div className="space-y-2 text-xs">
             {[
               { ok: !!g.name.trim(), text: 'Hackathon name' },
@@ -827,12 +826,12 @@ function GeneralTab({
               <div key={item.text} className="flex items-center gap-2">
                 <div
                   className={`flex h-4 w-4 items-center justify-center rounded-full ${
-                    item.ok ? 'bg-emerald-500' : 'border border-[var(--border)] bg-white'
+                    item.ok ? 'bg-emerald-500' : 'border border-[#E5E5E5] bg-white'
                   }`}
                 >
                   {item.ok && <Check className="h-2.5 w-2.5 text-white" />}
                 </div>
-                <span className={item.ok ? 'text-[var(--text)]' : 'text-[var(--text-muted)]'}>{item.text}</span>
+                <span className={item.ok ? 'text-[#1A1A1A]' : 'text-[#4D4D4D]'}>{item.text}</span>
               </div>
             ))}
           </div>
@@ -860,16 +859,16 @@ function TracksTab({
     <div className="mx-auto max-w-[800px] space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+          <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
             Tracks
           </h2>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
+          <p className="mt-1 text-sm text-[#4D4D4D]">
             Define thematic categories for the hackathon. Builders choose a track when submitting.
           </p>
         </div>
         <button
           onClick={addTrack}
-          className="flex h-9 items-center gap-2 rounded-full bg-[var(--brand)] px-4 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90 active:scale-[0.97]"
+          className="flex h-9 items-center gap-2 rounded-full bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97]"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Track
@@ -877,13 +876,13 @@ function TracksTab({
       </div>
 
       {tracks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border)] bg-white py-16 text-center">
-          <Layers className="mb-3 h-8 w-8 text-[var(--text-muted)]" />
-          <p className="text-sm font-medium text-[var(--text)]">No tracks yet</p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">Add at least one track before publishing.</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#E5E5E5] bg-white py-16 text-center">
+          <Layers className="mb-3 h-8 w-8 text-[#4D4D4D]" />
+          <p className="text-sm font-medium text-[#1A1A1A]">No tracks yet</p>
+          <p className="mt-1 text-xs text-[#4D4D4D]">Add at least one track before publishing.</p>
           <button
             onClick={addTrack}
-            className="mt-4 flex h-9 items-center gap-2 rounded-full border border-[var(--border)] px-4 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+            className="mt-4 flex h-9 items-center gap-2 rounded-full border border-[#E5E5E5] px-4 text-xs font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
           >
             <Plus className="h-3.5 w-3.5" />
             Add your first track
@@ -894,7 +893,7 @@ function TracksTab({
           {tracks.map((track, idx) => (
             <Card key={track.id || `track-${idx}`}>
               <div className="flex items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-muted)] text-xs font-semibold text-[var(--text-muted)]">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F5F5F5] text-xs font-semibold text-[#4D4D4D]">
                   {idx + 1}
                 </div>
                 <div className="flex-1 space-y-3">
@@ -915,7 +914,7 @@ function TracksTab({
                 </div>
                 <button
                   onClick={() => removeTrack(track.id)}
-                  className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-red-50 hover:text-red-500"
+                  className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#4D4D4D] transition-colors hover:bg-red-50 hover:text-red-500"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -944,18 +943,18 @@ function DescriptionTab({
     <div className="mx-auto max-w-[800px] space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+          <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
             Description
           </h2>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
+          <p className="mt-1 text-sm text-[#4D4D4D]">
             Write the full hackathon description visible on the public detail page.
           </p>
         </div>
-        <div className="flex gap-1.5 rounded-full border border-[var(--border)] p-0.5">
+        <div className="flex gap-1.5 rounded-full border border-[#E5E5E5] p-0.5">
           <button
             onClick={() => setPreview(false)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-              !preview ? 'bg-[var(--brand)] text-[var(--brand-fg)]' : 'text-[var(--text-muted)]'
+              !preview ? 'bg-[#1A1A1A] text-white' : 'text-[#4D4D4D]'
             }`}
           >
             Edit
@@ -963,7 +962,7 @@ function DescriptionTab({
           <button
             onClick={() => setPreview(true)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-              preview ? 'bg-[var(--brand)] text-[var(--brand-fg)]' : 'text-[var(--text-muted)]'
+              preview ? 'bg-[#1A1A1A] text-white' : 'text-[#4D4D4D]'
             }`}
           >
             Preview
@@ -973,13 +972,13 @@ function DescriptionTab({
 
       <Card>
         {preview ? (
-          <div className="prose prose-sm max-w-none text-[var(--text-secondary)]">
+          <div className="prose prose-sm max-w-none text-[#4D4D4D]">
             {description ? (
               description.split('\n').map((line, i) => (
                 <p key={i}>{line || <br />}</p>
               ))
             ) : (
-              <p className="text-[var(--text-muted)] italic">No description yet. Switch to Edit to start writing.</p>
+              <p className="text-[#4D4D4D] italic">No description yet. Switch to Edit to start writing.</p>
             )}
           </div>
         ) : (
@@ -991,7 +990,7 @@ function DescriptionTab({
               rows={20}
               className={`${textareaClass} font-mono text-[13px]`}
             />
-            <p className="mt-2 text-xs text-[var(--text-muted)]">
+            <p className="mt-2 text-xs text-[#4D4D4D]">
               Markdown formatting supported. Rich text editor coming soon.
             </p>
           </>
@@ -1104,16 +1103,16 @@ function TeamTab({
     <div className="mx-auto max-w-[800px] space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+          <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
             Team & Access
           </h2>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
+          <p className="mt-1 text-sm text-[#4D4D4D]">
             Manage who can edit and manage this hackathon.
           </p>
         </div>
         <button
           onClick={() => setShowInvite(true)}
-          className="flex h-9 items-center gap-2 rounded-full bg-[var(--brand)] px-4 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90"
+          className="flex h-9 items-center gap-2 rounded-full bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-all hover:opacity-90"
         >
           <Plus className="h-3.5 w-3.5" />
           Invite Admin
@@ -1128,19 +1127,19 @@ function TeamTab({
               <Label>{selectedUser ? 'Selected User' : 'Search by email or name'}</Label>
               
               {selectedUser ? (
-                <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-muted)] p-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--brand)]">
+                <div className="flex items-center gap-3 rounded-2xl border border-[#E5E5E5] bg-[#F5F5F5] p-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#1A1A1A]">
                     {selectedUser.avatar ? (
                       <img src={selectedUser.avatar} alt={selectedUser.name} className="h-full w-full object-cover" />
                     ) : (
-                      <span className="text-sm font-semibold text-[var(--brand-fg)]">
+                      <span className="text-sm font-semibold text-white">
                         {selectedUser.name.charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-[var(--text)]">{selectedUser.name}</p>
-                    <p className="truncate text-xs text-[var(--text-muted)]">{selectedUser.email}</p>
+                    <p className="truncate text-sm font-medium text-[#1A1A1A]">{selectedUser.name}</p>
+                    <p className="truncate text-xs text-[#4D4D4D]">{selectedUser.email}</p>
                   </div>
                   <button
                     type="button"
@@ -1149,21 +1148,21 @@ function TeamTab({
                       setQuery('');
                       setEmail('');
                     }}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[#4D4D4D] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4D4D4D]" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => handleQueryChange(e.target.value)}
                     onFocus={() => query && setShowSuggestions(true)}
                     placeholder="admin@example.com or John Doe"
-                    className="h-[46px] w-full rounded-full border border-[var(--border)] bg-[var(--bg-input)] pl-11 pr-5 text-sm text-[var(--text)] transition-all placeholder:text-[var(--text-muted)] hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/10"
+                    className="h-[46px] w-full rounded-full border border-[#E5E5E5] bg-white pl-11 pr-5 text-sm text-[#1A1A1A] transition-all placeholder:text-[#4D4D4D] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
                     autoFocus
                   />
                   
@@ -1172,12 +1171,12 @@ function TeamTab({
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setShowSuggestions(false)} />
                       <div
-                        className="absolute left-0 right-0 top-full z-20 mt-2 max-h-[240px] overflow-y-auto rounded-2xl border border-[var(--border)] bg-white py-2"
-                        style={{ boxShadow: 'var(--shadow-lg)' }}
+                        className="absolute left-0 right-0 top-full z-20 mt-2 max-h-[240px] overflow-y-auto rounded-2xl border border-[#E5E5E5] bg-white py-2"
+                        
                       >
                         {isSearching ? (
                           <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-5 w-5 animate-spin text-[var(--text-muted)]" />
+                            <Loader2 className="h-5 w-5 animate-spin text-[#4D4D4D]" />
                           </div>
                         ) : searchResults.length > 0 ? (
                           searchResults.map((user) => (
@@ -1185,27 +1184,27 @@ function TeamTab({
                               key={user.uuid}
                               type="button"
                               onClick={() => handleSelectUser(user)}
-                              className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[var(--bg-hover)]"
+                              className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F5F5F5]"
                             >
-                              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--brand)]">
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#1A1A1A]">
                                 {user.avatar ? (
                                   <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
                                 ) : (
-                                  <span className="text-xs font-semibold text-[var(--brand-fg)]">
+                                  <span className="text-xs font-semibold text-white">
                                     {user.name.charAt(0).toUpperCase()}
                                   </span>
                                 )}
                               </div>
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium text-[var(--text)]">{user.name}</p>
-                                <p className="truncate text-xs text-[var(--text-muted)]">{user.email}</p>
+                                <p className="truncate text-sm font-medium text-[#1A1A1A]">{user.name}</p>
+                                <p className="truncate text-xs text-[#4D4D4D]">{user.email}</p>
                               </div>
                             </button>
                           ))
                         ) : (
                           <div className="px-4 py-6 text-center">
-                            <p className="text-sm text-[var(--text-muted)]">No users found</p>
-                            <p className="mt-1 text-xs text-[var(--text-muted)]">
+                            <p className="text-sm text-[#4D4D4D]">No users found</p>
+                            <p className="mt-1 text-xs text-[#4D4D4D]">
                               You can still invite by email
                             </p>
                           </div>
@@ -1215,7 +1214,7 @@ function TeamTab({
                   )}
                 </div>
               )}
-              {error && <p className="mt-1 pl-5 text-xs text-[var(--error)]">{error}</p>}
+              {error && <p className="mt-1 pl-5 text-xs text-red-500">{error}</p>}
             </div>
             <div className="w-48">
               <Label>Permission</Label>
@@ -1228,19 +1227,19 @@ function TeamTab({
                   <option value="Full Access">Full Access</option>
                   <option value="Limited Access">Limited Access</option>
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4D4D4D]" />
               </div>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowInvite(false)}
-                className="flex h-[46px] items-center rounded-full border border-[var(--border)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+                className="flex h-[46px] items-center rounded-full border border-[#E5E5E5] px-4 text-sm font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleInvite}
-                className="flex h-[46px] items-center gap-2 rounded-full bg-[var(--brand)] px-5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90"
+                className="flex h-[46px] items-center gap-2 rounded-full bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-all hover:opacity-90"
               >
                 <Mail className="h-3.5 w-3.5" />
                 Send
@@ -1258,29 +1257,29 @@ function TeamTab({
             <div
               key={admin.id}
               className={`flex items-center justify-between py-3 ${
-                idx < admins.length - 1 ? 'border-b border-[var(--border)]' : ''
+                idx < admins.length - 1 ? 'border-b border-[#E5E5E5]' : ''
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-muted)] text-xs font-semibold text-[var(--text-secondary)]">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F5F5] text-xs font-semibold text-[#4D4D4D]">
                   {admin.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-[var(--text)]">
+                  <p className="text-sm font-medium text-[#1A1A1A]">
                     {admin.name}
-                    {isCreator && <span className="ml-2 text-[10px] text-[var(--text-muted)]">(creator)</span>}
+                    {isCreator && <span className="ml-2 text-[10px] text-[#4D4D4D]">(creator)</span>}
                   </p>
-                  <p className="text-xs text-[var(--text-muted)]">{admin.email}</p>
+                  <p className="text-xs text-[#4D4D4D]">{admin.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="rounded-full bg-[var(--bg-muted)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
+                <span className="rounded-full bg-[#F5F5F5] px-2.5 py-0.5 text-xs font-medium text-[#4D4D4D]">
                   {admin.permission}
                 </span>
                 {!isCreator && (
                   <button
                     onClick={() => removeAdmin(admin.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-red-50 hover:text-red-500"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4D4D4D] transition-colors hover:bg-red-50 hover:text-red-500"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -1310,19 +1309,19 @@ function InsightsTab({ status }: { status: string }) {
   return (
     <div className="mx-auto max-w-[800px] space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+        <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
           Insights
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
+        <p className="mt-1 text-sm text-[#4D4D4D]">
           Engagement and participation metrics for your hackathon.
         </p>
       </div>
 
       {status === 'Draft' && (
-        <div className="rounded-2xl border border-dashed border-[var(--border)] bg-white px-6 py-10 text-center">
-          <BarChart3 className="mx-auto mb-3 h-8 w-8 text-[var(--text-muted)]" />
-          <p className="text-sm font-medium text-[var(--text)]">Analytics available after publishing</p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
+        <div className="rounded-2xl border border-dashed border-[#E5E5E5] bg-white px-6 py-10 text-center">
+          <BarChart3 className="mx-auto mb-3 h-8 w-8 text-[#4D4D4D]" />
+          <p className="text-sm font-medium text-[#1A1A1A]">Analytics available after publishing</p>
+          <p className="mt-1 text-xs text-[#4D4D4D]">
             Data will start accumulating once the hackathon is live.
           </p>
         </div>
@@ -1331,8 +1330,8 @@ function InsightsTab({ status }: { status: string }) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {metrics.map((m) => (
           <Card key={m.label}>
-            <p className="text-xs text-[var(--text-muted)]">{m.label}</p>
-            <p className="mt-2 text-2xl font-bold text-[var(--text)]">{m.value}</p>
+            <p className="text-xs text-[#4D4D4D]">{m.label}</p>
+            <p className="mt-2 text-2xl font-bold text-[#1A1A1A]">{m.value}</p>
           </Card>
         ))}
       </div>
@@ -1348,16 +1347,16 @@ function ParticipantsTab({ hackathon }: { hackathon: Hackathon }) {
     <div className="mx-auto max-w-[900px] space-y-8">
       {/* Builders */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+        <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
           Builders
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">Registered participants for this hackathon.</p>
+        <p className="mt-1 text-sm text-[#4D4D4D]">Registered participants for this hackathon.</p>
       </div>
       <Card>
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <UserCheck className="mb-3 h-8 w-8 text-[var(--text-muted)]" />
-          <p className="text-sm font-medium text-[var(--text)]">No registrations yet</p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
+          <UserCheck className="mb-3 h-8 w-8 text-[#4D4D4D]" />
+          <p className="text-sm font-medium text-[#1A1A1A]">No registrations yet</p>
+          <p className="mt-1 text-xs text-[#4D4D4D]">
             Builders will appear here once they register for the hackathon.
           </p>
         </div>
@@ -1365,16 +1364,16 @@ function ParticipantsTab({ hackathon }: { hackathon: Hackathon }) {
 
       {/* Projects */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+        <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
           Projects
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">Submitted work from participating teams.</p>
+        <p className="mt-1 text-sm text-[#4D4D4D]">Submitted work from participating teams.</p>
       </div>
       <Card>
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <FolderOpen className="mb-3 h-8 w-8 text-[var(--text-muted)]" />
-          <p className="text-sm font-medium text-[var(--text)]">No submissions yet</p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
+          <FolderOpen className="mb-3 h-8 w-8 text-[#4D4D4D]" />
+          <p className="text-sm font-medium text-[#1A1A1A]">No submissions yet</p>
+          <p className="mt-1 text-xs text-[#4D4D4D]">
             Projects will appear here after the submission deadline opens.
           </p>
         </div>
@@ -1455,10 +1454,10 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
     <div className="mx-auto max-w-[900px] space-y-8">
       {/* Prize Setting */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+        <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
           Prize Settings
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
+        <p className="mt-1 text-sm text-[#4D4D4D]">
           Define prizes, assign them to tracks, and set placements.
         </p>
       </div>
@@ -1468,7 +1467,7 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
         <Card>
           <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-[var(--text)]">Add New Prize</h3>
+              <h3 className="text-sm font-semibold text-[#1A1A1A]">Add New Prize</h3>
               <button
                 onClick={() => {
                   setShowAddPrize(false);
@@ -1477,7 +1476,7 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                   setPrizeDescription('');
                   setErrors({});
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)]"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4D4D4D] transition-colors hover:bg-[#F5F5F5]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1505,7 +1504,7 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
             {/* Track Selection */}
             <div>
               <Label>Track Selection</Label>
-              <p className="mb-3 text-xs text-[var(--text-muted)]">
+              <p className="mb-3 text-xs text-[#4D4D4D]">
                 Choose one or more tracks eligible for this prize
               </p>
               <div className="space-y-2">
@@ -1516,21 +1515,21 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                         key={track.id}
                         type="button"
                         onClick={() => handleTrackToggle(track.id)}
-                        className="flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-left transition-all hover:bg-[var(--bg-hover)]"
+                        className="flex w-full items-center gap-3 rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-left transition-all hover:bg-[#F5F5F5]"
                       >
                         <div
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                             selectedTracks.includes(track.id)
-                              ? 'border-[var(--brand)] bg-[var(--brand)]'
-                              : 'border-[var(--border)]'
+                              ? 'border-foreground bg-[#1A1A1A]'
+                              : 'border-[#E5E5E5]'
                           }`}
                         >
                           {selectedTracks.includes(track.id) && <Check className="h-3.5 w-3.5 text-white" />}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-[var(--text)]">{track.name || 'Untitled Track'}</p>
+                          <p className="text-sm font-medium text-[#1A1A1A]">{track.name || 'Untitled Track'}</p>
                           {track.description && (
-                            <p className="mt-0.5 text-xs text-[var(--text-muted)] line-clamp-1">{track.description}</p>
+                            <p className="mt-0.5 text-xs text-[#4D4D4D] line-clamp-1">{track.description}</p>
                           )}
                         </div>
                       </button>
@@ -1544,15 +1543,15 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                           setSelectedTracks(hackathon.tracks.map((t) => t.id));
                         }
                       }}
-                      className="text-xs text-[var(--brand)] hover:underline"
+                      className="text-xs text-[#1A1A1A] hover:underline"
                     >
                       {selectedTracks.length === hackathon.tracks.length ? 'Deselect All' : 'Select All'}
                     </button>
                   </>
                 ) : (
-                  <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-muted)] px-4 py-6 text-center">
-                    <Layers className="mx-auto mb-2 h-6 w-6 text-[var(--text-muted)]" />
-                    <p className="text-xs text-[var(--text-muted)]">No tracks available. Add tracks first in the Tracks tab.</p>
+                  <div className="rounded-xl border border-dashed border-[#E5E5E5] bg-[#F5F5F5] px-4 py-6 text-center">
+                    <Layers className="mx-auto mb-2 h-6 w-6 text-[#4D4D4D]" />
+                    <p className="text-xs text-[#4D4D4D]">No tracks available. Add tracks first in the Tracks tab.</p>
                   </div>
                 )}
               </div>
@@ -1587,13 +1586,13 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                   setPrizeDescription('');
                   setErrors({});
                 }}
-                className="flex h-10 items-center rounded-full border border-[var(--border)] px-5 text-sm font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+                className="flex h-10 items-center rounded-full border border-[#E5E5E5] px-5 text-sm font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddPrize}
-                className="flex h-10 items-center gap-2 rounded-full bg-[var(--brand)] px-5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90 active:scale-[0.97]"
+                className="flex h-10 items-center gap-2 rounded-full bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97]"
               >
                 <Plus className="h-4 w-4" />
                 Add Prize
@@ -1607,14 +1606,14 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
       {!showAddPrize && (
         <Card>
           <div className="flex flex-col items-center justify-center py-10 text-center">
-            <Trophy className="mb-3 h-8 w-8 text-[var(--text-muted)]" />
-            <p className="text-sm font-medium text-[var(--text)]">No prizes configured</p>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
+            <Trophy className="mb-3 h-8 w-8 text-[#4D4D4D]" />
+            <p className="text-sm font-medium text-[#1A1A1A]">No prizes configured</p>
+            <p className="mt-1 text-xs text-[#4D4D4D]">
               Add prize categories and placement tiers for this hackathon.
             </p>
             <button
               onClick={() => setShowAddPrize(true)}
-              className="mt-4 flex h-9 items-center gap-2 rounded-full border border-[var(--border)] px-4 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+              className="mt-4 flex h-9 items-center gap-2 rounded-full border border-[#E5E5E5] px-4 text-xs font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
             >
               <Plus className="h-3.5 w-3.5" />
               Add Prize
@@ -1625,10 +1624,10 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
 
       {/* Judges */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+        <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
           Judges
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
+        <p className="mt-1 text-sm text-[#4D4D4D]">
           Invite judges and assign them to tracks.
         </p>
       </div>
@@ -1638,7 +1637,7 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
         <Card>
           <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-[var(--text)]">Invite Judge</h3>
+              <h3 className="text-sm font-semibold text-[#1A1A1A]">Invite Judge</h3>
               <button
                 onClick={() => {
                   setShowInviteJudge(false);
@@ -1647,7 +1646,7 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                   setJudgeTracks([]);
                   setJudgeErrors({});
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)]"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4D4D4D] transition-colors hover:bg-[#F5F5F5]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1694,7 +1693,7 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
             {/* Track Assignment */}
             <div>
               <Label>Assign to Tracks</Label>
-              <p className="mb-3 text-xs text-[var(--text-muted)]">
+              <p className="mb-3 text-xs text-[#4D4D4D]">
                 Choose which tracks this judge will evaluate
               </p>
               <div className="space-y-2">
@@ -1705,21 +1704,21 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                         key={track.id}
                         type="button"
                         onClick={() => handleJudgeTrackToggle(track.id)}
-                        className="flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-left transition-all hover:bg-[var(--bg-hover)]"
+                        className="flex w-full items-center gap-3 rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-left transition-all hover:bg-[#F5F5F5]"
                       >
                         <div
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                             judgeTracks.includes(track.id)
-                              ? 'border-[var(--brand)] bg-[var(--brand)]'
-                              : 'border-[var(--border)]'
+                              ? 'border-foreground bg-[#1A1A1A]'
+                              : 'border-[#E5E5E5]'
                           }`}
                         >
                           {judgeTracks.includes(track.id) && <Check className="h-3.5 w-3.5 text-white" />}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-[var(--text)]">{track.name || 'Untitled Track'}</p>
+                          <p className="text-sm font-medium text-[#1A1A1A]">{track.name || 'Untitled Track'}</p>
                           {track.description && (
-                            <p className="mt-0.5 text-xs text-[var(--text-muted)] line-clamp-1">{track.description}</p>
+                            <p className="mt-0.5 text-xs text-[#4D4D4D] line-clamp-1">{track.description}</p>
                           )}
                         </div>
                       </button>
@@ -1733,15 +1732,15 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                           setJudgeTracks(hackathon.tracks.map((t) => t.id));
                         }
                       }}
-                      className="text-xs text-[var(--brand)] hover:underline"
+                      className="text-xs text-[#1A1A1A] hover:underline"
                     >
                       {judgeTracks.length === hackathon.tracks.length ? 'Deselect All' : 'Select All'}
                     </button>
                   </>
                 ) : (
-                  <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-muted)] px-4 py-6 text-center">
-                    <Layers className="mx-auto mb-2 h-6 w-6 text-[var(--text-muted)]" />
-                    <p className="text-xs text-[var(--text-muted)]">No tracks available. Add tracks first in the Tracks tab.</p>
+                  <div className="rounded-xl border border-dashed border-[#E5E5E5] bg-[#F5F5F5] px-4 py-6 text-center">
+                    <Layers className="mx-auto mb-2 h-6 w-6 text-[#4D4D4D]" />
+                    <p className="text-xs text-[#4D4D4D]">No tracks available. Add tracks first in the Tracks tab.</p>
                   </div>
                 )}
               </div>
@@ -1757,13 +1756,13 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
                   setJudgeTracks([]);
                   setJudgeErrors({});
                 }}
-                className="flex h-10 items-center rounded-full border border-[var(--border)] px-5 text-sm font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+                className="flex h-10 items-center rounded-full border border-[#E5E5E5] px-5 text-sm font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleInviteJudge}
-                className="flex h-10 items-center gap-2 rounded-full bg-[var(--brand)] px-5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90 active:scale-[0.97]"
+                className="flex h-10 items-center gap-2 rounded-full bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97]"
               >
                 <Mail className="h-4 w-4" />
                 Send Invite
@@ -1777,14 +1776,14 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
       {!showInviteJudge && (
         <Card>
           <div className="flex flex-col items-center justify-center py-10 text-center">
-            <Users className="mb-3 h-8 w-8 text-[var(--text-muted)]" />
-            <p className="text-sm font-medium text-[var(--text)]">No judges invited</p>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
+            <Users className="mb-3 h-8 w-8 text-[#4D4D4D]" />
+            <p className="text-sm font-medium text-[#1A1A1A]">No judges invited</p>
+            <p className="mt-1 text-xs text-[#4D4D4D]">
               Add judges to evaluate submissions.
             </p>
             <button
               onClick={() => setShowInviteJudge(true)}
-              className="mt-4 flex h-9 items-center gap-2 rounded-full border border-[var(--border)] px-4 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)]"
+              className="mt-4 flex h-9 items-center gap-2 rounded-full border border-[#E5E5E5] px-4 text-xs font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
             >
               <Plus className="h-3.5 w-3.5" />
               Invite Judge
@@ -1795,18 +1794,18 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
 
       {/* Winner Assignment */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--text)]" style={{ letterSpacing: '-0.02em' }}>
+        <h2 className="text-lg font-semibold text-[#1A1A1A]" style={{ letterSpacing: '-0.02em' }}>
           Winner Assignment & Distribution
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
+        <p className="mt-1 text-sm text-[#4D4D4D]">
           Assign winners after judging and manage prize distribution.
         </p>
       </div>
       <Card>
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <HelpCircle className="mb-3 h-8 w-8 text-[var(--text-muted)]" />
-          <p className="text-sm font-medium text-[var(--text)]">Available after judging</p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
+          <HelpCircle className="mb-3 h-8 w-8 text-[#4D4D4D]" />
+          <p className="text-sm font-medium text-[#1A1A1A]">Available after judging</p>
+          <p className="mt-1 text-xs text-[#4D4D4D]">
             Winner assignment and prize distribution will be unlocked once the hackathon ends and judging begins.
           </p>
         </div>

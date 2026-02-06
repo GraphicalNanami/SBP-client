@@ -38,26 +38,26 @@ export function OrganizationForm({ onSubmit, isLoading = false, error = null }: 
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4 py-16">
+    <div className="flex min-h-screen items-center justify-center bg-[#FCFCFC] px-4 py-16">
       <div className="w-full max-w-[440px]">
         {/* Heading */}
         <h1
-          className="mb-3 text-center text-[28px] font-bold text-text"
+          className="mb-3 text-center text-[28px] font-bold text-[#1A1A1A]"
           style={{ letterSpacing: '-0.04em', lineHeight: '1.15' }}
         >
           Create your Organization
         </h1>
-        <p className="mb-8 text-center text-[15px] leading-relaxed text-text-secondary">
+        <p className="mb-8 text-center text-[15px] leading-relaxed text-[#4D4D4D]">
           Set up your organization profile to start creating hackathons on the Stellar platform.
         </p>
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 px-4 py-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-error" />
+          <div className="mb-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-error">Error</p>
-              <p className="mt-0.5 text-sm text-error/90">{error}</p>
+              <p className="text-sm font-medium text-red-600">Error</p>
+              <p className="mt-0.5 text-sm text-red-500">{error}</p>
             </div>
           </div>
         )}
@@ -74,9 +74,9 @@ export function OrganizationForm({ onSubmit, isLoading = false, error = null }: 
                 if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
               }}
               placeholder="Organization Name"
-              className="h-[52px] w-full rounded-full border border-border bg-bg-card px-5 text-[15px] text-text transition-all duration-200 placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
+              className="h-[52px] w-full rounded-full border border-[#E5E5E5] bg-white px-5 text-[15px] text-[#1A1A1A] transition-all duration-200 placeholder:text-[#4D4D4D] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
             />
-            {errors.name && <p className="mt-1.5 pl-5 text-xs text-error">{errors.name}</p>}
+            {errors.name && <p className="mt-1.5 pl-5 text-xs text-red-600">{errors.name}</p>}
           </div>
 
           {/* Website URL */}
@@ -89,9 +89,9 @@ export function OrganizationForm({ onSubmit, isLoading = false, error = null }: 
                 if (errors.website) setErrors((prev) => ({ ...prev, website: '' }));
               }}
               placeholder="Website URL"
-              className="h-[52px] w-full rounded-full border border-border bg-bg-card px-5 text-[15px] text-text transition-all duration-200 placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
+              className="h-[52px] w-full rounded-full border border-[#E5E5E5] bg-white px-5 text-[15px] text-[#1A1A1A] transition-all duration-200 placeholder:text-[#4D4D4D] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
             />
-            {errors.website && <p className="mt-1.5 pl-5 text-xs text-error">{errors.website}</p>}
+            {errors.website && <p className="mt-1.5 pl-5 text-xs text-red-600">{errors.website}</p>}
           </div>
 
           {/* Terms & Conditions */}
@@ -107,18 +107,18 @@ export function OrganizationForm({ onSubmit, isLoading = false, error = null }: 
               <div
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${
                   termsAccepted
-                    ? 'border-brand bg-brand'
-                    : 'border-border group-hover:border-border-hover'
+                    ? 'border-[#1A1A1A] bg-[#1A1A1A]'
+                    : 'border-[#E5E5E5] group-hover:border-[#E5E5E5]'
                 }`}
               >
-                {termsAccepted && <Check className="h-3.5 w-3.5 text-brand-fg" />}
+                {termsAccepted && <Check className="h-3.5 w-3.5 text-white" />}
               </div>
-              <span className="text-sm leading-snug text-text-secondary">
+              <span className="text-sm leading-snug text-[#4D4D4D]">
                 I agree to Stellar&apos;s{' '}
-                <span className="font-medium text-text underline underline-offset-2">Terms &amp; Conditions</span>
+                <span className="font-medium text-[#1A1A1A] underline underline-offset-2">Terms &amp; Conditions</span>
               </span>
             </button>
-            {errors.terms && <p className="mt-1.5 ml-8 text-xs text-error">{errors.terms}</p>}
+            {errors.terms && <p className="mt-1.5 ml-8 text-xs text-red-600">{errors.terms}</p>}
           </div>
 
           {/* Submit */}
@@ -126,7 +126,7 @@ export function OrganizationForm({ onSubmit, isLoading = false, error = null }: 
             <button
               type="submit"
               disabled={isLoading}
-              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-brand-fg transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#1A1A1A] text-[15px] font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? (
                 <>
@@ -144,13 +144,13 @@ export function OrganizationForm({ onSubmit, isLoading = false, error = null }: 
         </form>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs leading-relaxed text-text-muted">
+        <p className="mt-8 text-center text-xs leading-relaxed text-[#4D4D4D]">
           By continuing, you agree to our{' '}
-          <a href="#" className="font-medium text-text-secondary underline underline-offset-2 hover:text-text">
+          <a href="#" className="font-medium text-[#1A1A1A] underline underline-offset-2 hover:text-[#1A1A1A]">
             Terms of Service
           </a>{' '}
           and{' '}
-          <a href="#" className="font-medium text-text-secondary underline underline-offset-2 hover:text-text">
+          <a href="#" className="font-medium text-[#1A1A1A] underline underline-offset-2 hover:text-[#1A1A1A]">
             Privacy Policy
           </a>
         </p>
