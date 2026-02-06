@@ -27,6 +27,7 @@ class ApiClient {
     // Build headers object
     const headers: Record<string, string> = {
       ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      'ngrok-skip-browser-warning': 'true', // Bypass ngrok browser warning
     };
 
     // Only set Content-Type for non-FormData requests
