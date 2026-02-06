@@ -241,7 +241,7 @@ export function transformHackathonToCard(backend: BackendHackathon): {
   }
 
   return {
-    id: backend.uuid,
+    id: backend.slug, // Use slug for URL routing (not uuid)
     name: backend.name,
     tagline: backend.description || backend.overview || '',
     category: transformCategory(backend.category),

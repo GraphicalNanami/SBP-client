@@ -57,7 +57,6 @@ function formatPrize(amount: number) {
 export default function HackathonDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
 
   const [hackathon, setHackathon] = useState<HackathonCardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,11 +64,17 @@ export default function HackathonDetailPage() {
 
   useEffect(() => {
     async function fetchHackathon() {
+      // Get ID from params - handle both string and array cases
+      const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
       // Safety check: ensure we have a valid ID
       if (!id || id === '[id]' || id.includes('[') || id.includes(']')) {
-        console.error('Invalid hackathon ID:', id);
-        setError('Invalid hackathon ID');
-        setIsLoading(false);
+        console.error('Invalid hackathon ID:', id, 'params:', params);
+        // Don't set error yet - params might not be ready
+        if (id && id !== '[id]') {
+          setError('Invalid hackathon ID');
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -126,7 +131,7 @@ export default function HackathonDetailPage() {
     }
 
     fetchHackathon();
-  }, [id]);
+  }, [params]);
 
   // Loading state
   if (isLoading) {
