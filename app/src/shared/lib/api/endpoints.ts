@@ -122,4 +122,9 @@ export const ENDPOINTS = {
     UPDATE_SUBMISSION: (id: string) => `/participant/submissions/${id}`,
     DELETE_SUBMISSION: (id: string) => `/participant/submissions/${id}`,
   },
+  EVENTS_INDEXER: {
+    STATS: '/events-indexer/stats',
+    RECENT_POSTS: '/events-indexer/posts/recent',
+    MATCH_TOPIC: (topic: string) => `/events-indexer/topics/${encodeURIComponent(topic)}/match`,
+  },
 } as const;

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { MOCK_EVENTS } from '../eventsService/mockData';
 
@@ -15,7 +16,7 @@ const cities = [
   { 
     name: 'Mumbai', 
     region: 'India',
-    image: 'https://images.unsplash.com/photo-1567157419364-82fa19f0f2e3?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=80',
     eventCount: MOCK_EVENTS.filter(e => e.region === 'India').length,
     description: 'India\'s blockchain capital'
   },
@@ -43,14 +44,14 @@ const cities = [
   { 
     name: 'Mexico City', 
     region: 'Mexico',
-    image: 'https://images.unsplash.com/photo-1518659084888-d9fa51d84790?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1512813195386-6cf811ad3542?auto=format&fit=crop&q=80',
     eventCount: MOCK_EVENTS.filter(e => e.region === 'Mexico').length,
     description: 'Growing Stellar community'
   },
   { 
     name: 'Santiago', 
     region: 'Chile',
-    image: 'https://images.unsplash.com/photo-1555881490-48c7d8e9d7c1?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5b?auto=format&fit=crop&q=80',
     eventCount: MOCK_EVENTS.filter(e => e.region === 'Chile').length,
     description: 'Chilean blockchain innovation'
   },
@@ -106,10 +107,14 @@ export const PopularCitiesSection = () => {
               >
                 {/* City Image with Wavy Bottom */}
                 <div className="relative h-64 rounded-3xl overflow-hidden">
-                  <img 
+                  <Image 
                     src={city.image} 
                     alt={city.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA9AB//2Q=="
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   

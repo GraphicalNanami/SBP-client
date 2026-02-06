@@ -37,6 +37,10 @@ export const EventCard = ({ event, onClick, featured = false }: EventCardProps) 
             alt={event.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-700"
+            priority={featured}
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA9AB//2Q=="
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
         </div>
@@ -90,31 +94,47 @@ export const EventCard = ({ event, onClick, featured = false }: EventCardProps) 
   return (
     <div 
       onClick={() => onClick(event)}
-      className={`group rounded-3xl ${getTypeColor(event.type)} p-6 flex flex-col justify-between min-h-[400px] hover:shadow-lg transition-all duration-300 cursor-pointer`}
+      className={`group rounded-3xl ${getTypeColor(event.type)} overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer`}
     >
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-xs font-medium">
-            {event.type}
-          </span>
-          {event.cost === 'Free' && (
-            <span className="text-xs font-semibold text-foreground/60">FREE</span>
-          )}
-        </div>
-        <h4 className="text-lg font-semibold text-foreground leading-snug line-clamp-2">
-          {event.title}
-        </h4>
+      {/* Small Image Header */}
+      <div className="relative h-32 w-full">
+        <Image
+          src={event.coverImage}
+          alt={event.title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA9AB//2Q=="
+        />
       </div>
-      
-      <div className="flex items-center justify-between mt-4">
-        <div className="text-sm text-foreground/70">
-          <span>{format(startDate, 'MMM d')}</span>
-          <span className="mx-2">·</span>
-          <span>{event.attendeeCount} attending</span>
+
+      {/* Content Section */}
+      <div className="p-6 flex flex-col justify-between min-h-[268px]">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-xs font-medium">
+              {event.type}
+            </span>
+            {event.cost === 'Free' && (
+              <span className="text-xs font-semibold text-foreground/60">FREE</span>
+            )}
+          </div>
+          <h4 className="text-lg font-semibold text-foreground leading-snug line-clamp-2">
+            {event.title}
+          </h4>
         </div>
-        <button className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <ArrowRight className="w-4 h-4" />
-        </button>
+        
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-foreground/70">
+            <span>{format(startDate, 'MMM d')}</span>
+            <span className="mx-2">·</span>
+            <span>{event.attendeeCount} attending</span>
+          </div>
+          <button className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

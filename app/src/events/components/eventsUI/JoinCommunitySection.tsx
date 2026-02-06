@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ArrowRight, Sparkles, Users } from 'lucide-react';
 import { BackgroundHighlight } from '@/src/shared/components/ui/highlightText';
 
@@ -23,17 +24,25 @@ export const JoinCommunitySection = () => {
             <div className="relative h-[400px] hidden md:block">
               {/* Abstract blob shapes with images */}
               <div className="absolute top-0 left-0 w-64 h-64 rounded-[40%_60%_70%_30%/60%_30%_70%_40%] overflow-hidden shadow-xl rotate-6 hover:rotate-12 transition-transform duration-500">
-                <img 
+                <Image 
                   src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80" 
                   alt="Community" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="256px"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA9AB//2Q=="
                 />
               </div>
               <div className="absolute bottom-0 right-0 w-56 h-56 rounded-[60%_40%_30%_70%/40%_60%_70%_30%] overflow-hidden shadow-xl -rotate-6 hover:-rotate-12 transition-transform duration-500">
-                <img 
+                <Image 
                   src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80" 
                   alt="Event" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="224px"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA9AB//2Q=="
                 />
               </div>
               

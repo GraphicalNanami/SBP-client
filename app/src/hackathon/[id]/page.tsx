@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -14,8 +15,11 @@ import {
   Code,
   Wallet,
   Flag,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
-import { MOCK_HACKATHONS } from '../components/mockData';
+import { hackathonApi, transformHackathonToCard } from '@/src/shared/lib/api/hackathonApi';
+import type { HackathonCardData } from '../components/mockData';
 
 /* ── Status badge colors ── */
 const statusStyles: Record<string, { bg: string; dot: string; text: string }> = {
@@ -54,13 +58,76 @@ export default function HackathonDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const hackathon = MOCK_HACKATHONS.find((h) => h.id === id);
 
-  if (!hackathon) {
+  const [hackathon, setHackathon] = useState<HackathonCardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchHackathon() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Fetch hackathon by ID from backend
+        const response = await hackathonApi.getPublicHackathon(id);
+
+        // Transform to card data format
+        const cardData = transformHackathonToCard({
+          uuid: response.id,
+          name: response.general.name,
+          description: response.description,
+          overview: response.description,
+          category: response.general.category as any,
+          visibility: response.general.visibility as any,
+          posterUrl: response.general.poster,
+          prizePool: response.general.prizePool,
+          prizeAsset: response.general.prizeAsset,
+          tags: response.general.tags,
+          startTime: response.general.startTime,
+          submissionDeadline: response.general.submissionDeadline,
+          venue: response.general.venue === 'Online' ? 'Online' : response.general.venueLocation,
+          status: response.status as any,
+          organizationId: response.organizationId,
+          createdAt: response.createdAt,
+          updatedAt: response.updatedAt,
+        } as any);
+
+        setHackathon(cardData);
+      } catch (err) {
+        console.error('Failed to fetch hackathon:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load hackathon');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchHackathon();
+  }, [id]);
+
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Hackathon Not Found</h1>
+          <Loader2 className="h-8 w-8 animate-spin text-[#4D4D4D] mx-auto mb-4" />
+          <p className="text-sm text-[#4D4D4D]">Loading hackathon...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !hackathon) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 mx-auto">
+            <AlertCircle className="h-6 w-6 text-red-500" />
+          </div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            {error || 'Hackathon Not Found'}
+          </h1>
           <button
             onClick={() => router.push('/hackathon')}
             className="text-[#1A1A1A] hover:underline"
