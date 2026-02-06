@@ -135,14 +135,15 @@ export function useOrganization() {
         setStep('dashboard');
 
         return completeOrg;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to create organization:', err);
+        const error = err as { status?: number; message?: string };
         const errorMessage =
-          err.status === 409
+          error.status === 409
             ? 'Organization name already exists'
-            : err.status === 400
+            : error.status === 400
             ? 'Invalid organization data. Please check all fields.'
-            : err.message || 'Failed to create organization';
+            : error.message || 'Failed to create organization';
         setError(errorMessage);
         throw new Error(errorMessage);
       } finally {
@@ -237,16 +238,17 @@ export function useOrganization() {
         );
 
         return newMember;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to invite member:', err);
+        const error = err as { status?: number; message?: string };
         const errorMessage =
-          err.status === 404
+          error.status === 404
             ? 'User with this email not found'
-            : err.status === 409
+            : error.status === 409
             ? 'User is already a member of this organization'
-            : err.status === 403
+            : error.status === 403
             ? 'You do not have permission to invite members'
-            : err.message || 'Failed to invite member';
+            : error.message || 'Failed to invite member';
         setError(errorMessage);
         throw new Error(errorMessage);
       }
@@ -274,12 +276,13 @@ export function useOrganization() {
         );
       } catch (err: any) {
         console.error('Failed to remove member:', err);
+        const error = err as { status?: number; message?: string };
         const errorMessage =
-          err.status === 403
+          error.status === 403
             ? 'You do not have permission to remove members'
-            : err.status === 400
+            : error.status === 400
             ? 'Cannot remove the last admin'
-            : err.message || 'Failed to remove member';
+            : error.message || 'Failed to remove member';
         setError(errorMessage);
         throw new Error(errorMessage);
       }
@@ -314,14 +317,15 @@ export function useOrganization() {
               : org
           )
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to update member role:', err);
+        const error = err as { status?: number; message?: string };
         const errorMessage =
-          err.status === 403
+          error.status === 403
             ? 'You do not have permission to change member roles'
-            : err.status === 400
+            : error.status === 400
             ? 'Cannot change role: must have at least one admin'
-            : err.message || 'Failed to update member role';
+            : error.message || 'Failed to update member role';
         setError(errorMessage);
         throw new Error(errorMessage);
       }
@@ -360,12 +364,13 @@ export function useOrganization() {
       // Show success message
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to save organization:', err);
+      const error = err as { status?: number; message?: string };
       const errorMessage =
-        err.status === 403
+        error.status === 403
           ? 'You do not have permission to update this organization'
-          : err.message || 'Failed to save changes';
+          : error.message || 'Failed to save changes';
       setError(errorMessage);
     } finally {
       setIsSaving(false);

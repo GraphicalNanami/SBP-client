@@ -7,9 +7,7 @@ import { CircleHighlight, UnderlineHighlight } from "@/src/shared/components/ui/
 import Image from "next/image";
 
 const Hero = () => {
-  const navigateToAuth = () => {
-    window.location.href = "/src/auth";
-  };
+  
 
   return (
     <section className="relative py-20 md:py-24 overflow-hidden">

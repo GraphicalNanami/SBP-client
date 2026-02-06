@@ -208,7 +208,7 @@ export default function RegionsPage() {
                 Ready to Join a Chapter?
               </h2>
               <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-                Be part of a global community that's transforming the world of finance. Connect with passionate builders, learn from experts, and contribute to the Stellar ecosystem.
+                Be part of a global community that&apos;s transforming the world of finance. Connect with passionate builders, learn from experts, and contribute to the Stellar ecosystem.
               </p>
               
               <button

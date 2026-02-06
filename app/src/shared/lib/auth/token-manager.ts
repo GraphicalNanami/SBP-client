@@ -19,7 +19,7 @@ class TokenManager {
     try {
       this.accessToken = sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
       // Also set global variable for API client
-      (globalThis as any).__accessToken__ = this.accessToken;
+      (globalThis as { __accessToken__?: string | null }).__accessToken__ = this.accessToken;
     } catch (error) {
       console.warn('Failed to load tokens from storage:', error);
     }
@@ -50,7 +50,7 @@ class TokenManager {
     if (typeof window === 'undefined') return;
     
     this.accessToken = token;
-    (globalThis as any).__accessToken__ = token;
+    (globalThis as { __accessToken__?: string | null }).__accessToken__ = token;
     
     try {
       sessionStorage.setItem(this.ACCESS_TOKEN_KEY, token);
@@ -90,7 +90,7 @@ class TokenManager {
    */
   clearTokens(): void {
     this.accessToken = null;
-    (globalThis as any).__accessToken__ = null;
+    (globalThis as { __accessToken__?: string | null }).__accessToken__ = null;
     
     if (typeof window === 'undefined') return;
     

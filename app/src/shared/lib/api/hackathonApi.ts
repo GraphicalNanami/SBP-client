@@ -793,22 +793,22 @@ export const hackathonApi = {
   /**
    * Get hackathon insights
    */
-  async getInsights(hackathonId: string): Promise<any> {
-    return apiClient.get<any>(ENDPOINTS.HACKATHONS.INSIGHTS(hackathonId));
+  async getInsights(hackathonId: string): Promise<Record<string, unknown>> {
+    return apiClient.get<Record<string, unknown>>(ENDPOINTS.HACKATHONS.INSIGHTS(hackathonId));
   },
 
   /**
    * Get daily trends
    */
-  async getDailyTrends(hackathonId: string): Promise<any> {
-    return apiClient.get<any>(ENDPOINTS.HACKATHONS.DAILY_TRENDS(hackathonId));
+  async getDailyTrends(hackathonId: string): Promise<Record<string, unknown>> {
+    return apiClient.get<Record<string, unknown>>(ENDPOINTS.HACKATHONS.DAILY_TRENDS(hackathonId));
   },
 
   /**
    * Get traffic sources
    */
-  async getTrafficSources(hackathonId: string): Promise<any> {
-    return apiClient.get<any>(ENDPOINTS.HACKATHONS.TRAFFIC_SOURCES(hackathonId));
+  async getTrafficSources(hackathonId: string): Promise<Record<string, unknown>> {
+    return apiClient.get<Record<string, unknown>>(ENDPOINTS.HACKATHONS.TRAFFIC_SOURCES(hackathonId));
   },
 
   // ========================================

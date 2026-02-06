@@ -117,7 +117,7 @@ export default function BuildsPage() {
               </form>
               {isSubscribed && (
                 <p className="mt-3 text-sm text-accent-foreground animate-fade-in">
-                  Thanks! We'll notify you when Builds launches.
+                  Thanks! We&apos;ll notify you when Builds launches.
                 </p>
               )}
             </div>

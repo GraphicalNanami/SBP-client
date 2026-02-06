@@ -232,7 +232,7 @@ export interface BackendRegistration {
   selectedTrackId?: string;
   customAnswers: Array<{
     questionId: string;
-    answer: any;
+    answer: unknown;
   }>;
   status: BackendRegistrationStatus;
   registeredAt: Date;

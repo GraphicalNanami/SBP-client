@@ -333,7 +333,7 @@ export default function RegionDetailPage() {
               Ready to Join the Movement?
             </h2>
             <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-              Be part of a community that's transforming the world of finance. Together, we can build a stronger and more prosperous future for everyone in {region.name}.
+              Be part of a community that&apos;s transforming the world of finance. Together, we can build a stronger and more prosperous future for everyone in {region.name}.
             </p>
             
             <div className="flex flex-wrap gap-4 justify-center">

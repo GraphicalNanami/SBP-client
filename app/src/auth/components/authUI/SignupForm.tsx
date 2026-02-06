@@ -32,7 +32,7 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
     try {
       await signup(email, password, fullName);
       router.push('/'); // Redirect to home page on success
-    } catch (err) {
+    } catch {
       // Error handled in context
     }
   };
