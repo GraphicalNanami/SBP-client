@@ -77,8 +77,22 @@ function FeaturedHackathonCard({ hackathon }: { hackathon: HackathonCardData }) 
       href={`/src/hackathon/${hackathon.id}`}
       className="group relative overflow-hidden rounded-3xl min-h-[400px] lg:min-h-[520px] cursor-pointer flex"
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10" />
+      {/* Background: poster image if available, otherwise gradient */}
+      {hackathon.poster ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${hackathon.poster})` }}
+          />
+          {/* Darker overlay for better text readability with images */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+        </>
+      ) : (
+        <>
+          <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10" />
+        </>
+      )}
 
       <div className="relative z-10 h-full p-8 flex flex-col justify-between text-white flex-1">
         <div>
@@ -131,40 +145,59 @@ function FeaturedHackathonCard({ hackathon }: { hackathon: HackathonCardData }) 
 }
 
 /* ═══════════════════════════════════════════════════════
-   Regular Card — pastel compact card for stacked / grid
+   Regular Card — compact card with optional poster thumbnail
    ═══════════════════════════════════════════════════════ */
 function RegularHackathonCard({ hackathon }: { hackathon: HackathonCardData }) {
   return (
     <Link
       href={`/src/hackathon/${hackathon.id}`}
-      className={`group rounded-3xl ${getCategoryColor(hackathon.category)} p-6 flex flex-col justify-between min-h-[240px] hover:shadow-lg transition-all duration-300 cursor-pointer`}
+      className="group rounded-3xl overflow-hidden bg-white border border-[#E5E5E5] hover:shadow-lg transition-all duration-300 cursor-pointer"
     >
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-xs font-medium">
-            {hackathon.category}
-          </span>
-          <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusStyles[hackathon.status]}`}>
-            {hackathon.status}
-          </span>
+      {/* Poster thumbnail at top if available */}
+      {hackathon.poster && (
+        <div className="relative w-full h-32 bg-gray-100">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${hackathon.poster})` }}
+          />
+          <div className="absolute top-3 right-3">
+            <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${statusStyles[hackathon.status]}`}>
+              {hackathon.status}
+            </span>
+          </div>
         </div>
-        <h4 className="text-lg font-semibold text-foreground leading-snug line-clamp-2">
-          {hackathon.name}
-        </h4>
-        <p className="mt-1 text-sm text-foreground/60 line-clamp-1">
-          {hackathon.tagline}
-        </p>
-      </div>
+      )}
 
-      <div className="flex items-center justify-between mt-4">
-        <div className="text-sm text-foreground/70">
-          <span>{formatDate(hackathon.startTime)}</span>
-          <span className="mx-2">·</span>
-          <span>{formatPrize(hackathon.prizePool)} {hackathon.prizeAsset}</span>
+      <div className={`p-6 flex flex-col justify-between min-h-[180px] ${!hackathon.poster ? getCategoryColor(hackathon.category) : ''}`}>
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-xs font-medium">
+              {hackathon.category}
+            </span>
+            {!hackathon.poster && (
+              <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusStyles[hackathon.status]}`}>
+                {hackathon.status}
+              </span>
+            )}
+          </div>
+          <h4 className="text-lg font-semibold text-foreground leading-snug line-clamp-2">
+            {hackathon.name}
+          </h4>
+          <p className="mt-1 text-sm text-foreground/60 line-clamp-1">
+            {hackathon.tagline}
+          </p>
         </div>
-        <span className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <ArrowRight className="w-4 h-4" />
-        </span>
+
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-foreground/70">
+            <span>{formatDate(hackathon.startTime)}</span>
+            <span className="mx-2">·</span>
+            <span>{formatPrize(hackathon.prizePool)} {hackathon.prizeAsset}</span>
+          </div>
+          <span className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <ArrowRight className="w-4 h-4" />
+          </span>
+        </div>
       </div>
     </Link>
   );

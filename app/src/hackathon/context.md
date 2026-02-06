@@ -443,3 +443,23 @@ Backend enforces valid state transitions:
 - **Graceful Fallbacks**: Shows calculated prize breakdown if no structured prizes exist in API
 - **Organization Info**: Using placeholder "Stellar Community" until organization data endpoint is integrated
 
+### February 7, 2026 - Poster Image Integration for Hackathon Cards
+- ✅ **Updated HackathonCard component to display poster images from API**:
+  - **Featured Cards**: Use `posterUrl` as full background image when available
+    - Applies darker overlay (from-black/70 via-black/40 to-black/20) for better text readability
+    - Falls back to gradient background if no poster exists
+    - Maintains white text on all backgrounds
+  - **Regular Cards**: Display poster as thumbnail at top of card when available
+    - Shows 128px height thumbnail with poster as background
+    - Status badge overlays on top-right of poster
+    - Falls back to pastel category colors if no poster exists
+    - Card content (title, tagline, meta) remains below thumbnail
+- **API Integration**:
+  - Backend sends `posterUrl` field in hackathon response
+  - Frontend transforms to `poster` field via `transformHackathon()` function
+  - Cards check `hackathon.poster` and conditionally render image backgrounds
+- **Visual Improvements**:
+  - Featured cards now show actual hackathon branding via poster images
+  - Regular cards have consistent thumbnail + content layout
+  - Better visual hierarchy with real imagery vs solid colors
+
