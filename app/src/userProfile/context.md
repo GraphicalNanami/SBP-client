@@ -92,42 +92,117 @@ userProfile/
 │   ├── userProfileUI/         # Pure UI components (presentation only)
 │   │   ├── SettingsLayout.tsx
 │   │   ├── ProfileDropdown.tsx
-│   │   └── PersonalInfoForm.tsx
+│   │   ├── PersonalInfoForm.tsx
+│   │   ├── ExperienceForm.tsx
+│   │   ├── WalletCard.tsx
+│   │   └── WalletsManager.tsx
 │   └── userProfileService/    # Business logic, hooks, API calls
 │       ├── profile-service.ts
-│       └── useProfile.ts
-├── types/
-│   └── profile.types.ts       # SocialLinks, UserProfile, ProfileMeResponse
+│       ├── experience-service.ts
+│       ├── wallet-service.ts
+│       ├── freighter-service.ts
+│       ├── useProfile.ts
+│       ├── useExperience.ts
+### Profile Endpoints
+- **GET /profile/me** → Returns `{ user, profile, experience, wallets }` with complete user data
+- **PATCH /profile/personal-info** → Updates firstName, lastName, gender, city, country, website
+- **POST /profile/upload-picture** → Uploads profile picture (FormData, max 5MB)
+
+### Experience Endpoints
+- **GET /experience/me** → Returns user's experience data
+- **PUT /experience** → Replaces entire experience record
+- **PATCH /experience** → Partially updates experience (add/remove tags)
+
+### Wallet Endpoints
+- **GET /wallets** → Returns all wallets for current user
+- **POST /wallets** → Adds new wallet, returns wallet + challenge for verification
+- **PATCH /wallets/:id** → Updates wallet nickname
+- **DELETE /wallets/:id** → Removes wallet
+- **POST /wallets/:id/verify** → Verifies wallet ownership via signature
+- **POST /wallets/:id/set-primary** → Sets wallet as primary, unsets others
+
+  ├── profile.types.ts       # UserProfile, UpdatePersonalInfoPayload, ProfileMeResponse
+│   ├── experience.types.ts    # Experience, UpdateExperiencePayload, predefined lists
+│   └── wallet.types.ts        # Wallet, AddWalletPayload, VerifyWalletPayload
 ├── context.md
 └── page.tsx
 ```
 
 ## API Integration
-- **GET /profile/me** → Returns `{ user, profile }` with user data + profile (bio, stellarAddress, socialLinks)
-- **PUT /profile/me** → Updates profile with `UpdateProfilePayload`
-- Uses shared `apiClient` and `ENDPOINTS` from `@/src/shared/lib/api/`
+
+### Profile Endpoints
+- **GET /profile/me** → Returns `{ user, profile, experience, wallets }` with complete user data
+- **PATCH /profile/personal-info** → Updates firstName, lastName, gender, city, country, website
+- **POST /profile/upload-picture** → Uploads profile picture (FormData, max 5MB, JPEG/PNG/WebP)
+
+### Experience Endpoints
+- **GET /experience/me** → Returns user's experience data (roles, years, skill level, languages, tools)
+- **PUT /experience** → Replaces entire experience record with new data
+- **PATCH /experience** → Partially updates experience (useful for add/remove tags)
+
+### Wallet Endpoints
+- **GET /wallets** → Returns all wallets for current user with verification status
+- **POST /wallets** → Adds new wallet, returns wallet + challenge for signature verification
+- **PATCH /wallets/:id** → Updates wallet nickname
+- **DELETE /wallets/:id** → Removes wallet (cannot delete primary without setting another first)
+- **POST /wallets/:id/verify** → Verifies wallet ownership via Freighter signature
+- **POST /wallets/:id/set-primary** → Sets wallet as primary, automatically unsets others
+
+### Service Layer
+- Uses shared `apiClient` from `@/src/shared/lib/api/client.ts`
+- API endpoints defined in `@/src/shared/lib/api/endpoints.ts`
+- Bearer token authentication automatically injected
+- FormData support for file uploads (profile pictures)
+- Error handling with `handleApiError` utility
+
 
 ## Recent Changes
-**2026-02-06**
+**2026-02-06 (Latest Update - Backend Integration Complete)**
+- ✅ **Complete Backend Integration Implemented**
+- ✅ Updated profile types to include firstName, lastName, gender, city, country, website, profilePictureUrl
+- ✅ Created `experience.types.ts` with Experience interface, predefined roles/languages/tools (max 10 roles, 20 languages, 30 tools)
+- ✅ Created `wallet.types.ts` with Wallet interface, verification payloads, challenge structure
+- ✅ Updated API endpoints in `endpoints.ts` to support profile, experience, and wallet operations
+- ✅ Enhanced `apiClient` to support FormData uploads for profile pictures (auto-detects FormData vs JSON)
+- ✅ Implemented `profile-service.ts` with personal info update and picture upload (5MB limit, JPEG/PNG/WebP)
+- ✅ Implemented `experience-service.ts` with full CRUD operations (PUT for full replace, PATCH for partial)
+- ✅ Implemented `wallet-service.ts` with add, verify, update, delete, set primary operations
+- ✅ Implemented `freighter-service.ts` for Stellar wallet integration (address validation, signature signing)
+- ✅ Created `useProfile` hook with personal info update, profile picture upload, optimistic updates
+- ✅ Created `useExperience` hook with tag management (add/remove roles, languages, tools)
+- ✅ Created `useWallets` hook with full wallet lifecycle (add, verify, delete, set primary, update nickname)
+- ✅ Built reusable `ChipInput` factory component for tag management with suggestions dropdown
+- ✅ Completely rebuilt `PersonalInfoForm` with file upload, gender selection, location fields
+- ✅ Built `ExperienceForm` with ChipInput integration for roles, languages, tools
+- ✅ Built `WalletCard` component for individual wallet display with edit/delete/set primary actions
+- ✅ Built `WalletsManager` component with Freighter integration, verification flow, empty state
+- ✅ Updated all settings pages to use new integrated components
+- ✅ Mobile-responsive design throughout all components (mobile-first approach)
+- ✅ Proper error handling with toast notifications
+- ✅ Form validation (file size, URL format, Stellar address validation)
+
+**Previous (2026-02-06)**
 - Created profile dropdown with avatar and menu
 - Integrated conditional rendering in Navbar
 - Planned settings pages: Personal Info, Social Accounts (GitHub, Twitter), Experience, Wallets
 - Added Freighter wallet integration plan
-- Implemented proper separation of concerns for Personal Info:
-  - Created `profile.types.ts` with `ProfileMeResponse`, `UserProfile`, `SocialLinks`, `UpdateProfilePayload`
-  - Created `profile-service.ts` (API service layer using `apiClient`)
-  - Created `useProfile` hook (data fetching + update logic)
-  - Created `PersonalInfoForm` (pure UI component, no business logic)
-  - Refactored `personal-info/page.tsx` to use hook + UI component pattern
-  - Added `avatar` field to shared `User` type
-  - Added `PROFILE.UPDATE` endpoint
+- Implemented proper separation of concerns for Personal Info
+- Added profile types and service layer
+- Added `avatar` field to shared `User` type
 
 ## Future Enhancements
-- Profile picture upload
-- GitHub and Twitter OAuth integration
-- Experience tags and skills management
-- Freighter wallet connection and verification
-- Wallet nickname and primary selection
-- Form validation and error handling
-- Auto-save functionality
-- Mobile responsive design
+- GitHub and Twitter OAuth integration (social accounts page)
+- Auto-save functionality with debounce on blur
+- Profile completeness indicator (progress bar)
+- Public profile pages (`/users/:id`)
+- Profile export (JSON/PDF)
+- Wallet transaction history viewer
+- Multi-wallet transaction signing
+- Email change with verification flow
+- Password change from settings
+- Profile picture cropping tool before upload
+- Drag-and-drop image upload
+- Experience search/filter by skills
+- Endorsements and recommendations
+- Activity timeline on profile
+

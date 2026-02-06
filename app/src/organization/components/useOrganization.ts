@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { organizationApi } from '@/src/shared/lib/api/organizationApi';
+import { hackathonApi } from '@/src/shared/lib/api/hackathonApi';
 import type {
   OrganizationCreatePayload,
   OrganizationProfile,
@@ -9,6 +10,7 @@ import type {
   SocialLinks,
   TeamMember,
 } from '../types/organization.types';
+import type { Hackathon } from '@/src/hackathon/types/hackathon.types';
 
 const EMPTY_SOCIAL_LINKS: SocialLinks = {
   x: '',
@@ -43,15 +45,32 @@ export function useOrganization() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* Hackathon management state */
+  const [organizationHackathons, setOrganizationHackathons] = useState<Hackathon[]>([]);
+  const [isLoadingHackathons, setIsLoadingHackathons] = useState(false);
+  const [hackathonsError, setHackathonsError] = useState<string | null>(null);
+
   /* Derived: current active org */
   const profile = useMemo(
     () => organizations.find((o) => o.id === activeOrgId) ?? createEmptyProfile('temp'),
     [organizations, activeOrgId]
   );
 
-  /* ── Load organizations on mount ── */
-  useEffect(() => {
-    loadOrganizations();
+  /* ── Fetch organization hackathons ── */
+  const fetchOrganizationHackathons = useCallback(async (orgId: string) => {
+    setIsLoadingHackathons(true);
+    setHackathonsError(null);
+
+    try {
+      const hackathons = await hackathonApi.getOrganizationHackathons(orgId);
+      setOrganizationHackathons(hackathons);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load hackathons';
+      console.error('Failed to fetch organization hackathons:', err);
+      setHackathonsError(errorMessage);
+    } finally {
+      setIsLoadingHackathons(false);
+    }
   }, []);
 
   /* ── Load user's organizations ── */
@@ -60,26 +79,42 @@ export function useOrganization() {
       setIsLoading(true);
       setError(null);
 
+      // Load organizations from API
       const orgs = await organizationApi.getUserOrganizations();
-      setOrganizations(orgs);
-
-      // If user has organizations, set first as active and go to dashboard
+      
+      // If user has organizations, fetch complete details for the first one (including members)
       if (orgs.length > 0) {
+        const firstOrgDetails = await organizationApi.getOrganization(orgs[0].id);
+        
+        // Replace the first org with complete details, keep others as is
+        const updatedOrgs = [firstOrgDetails, ...orgs.slice(1)];
+        setOrganizations(updatedOrgs);
+        
         setActiveOrgId(orgs[0].id);
         setStep('dashboard');
+        
+        // Fetch hackathons for the first organization
+        fetchOrganizationHackathons(orgs[0].id);
       } else {
         // No organizations, stay on create form
+        setOrganizations(orgs);
         setStep('create');
       }
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load organizations';
       console.error('Failed to load organizations:', err);
-      setError(err.message || 'Failed to load organizations');
+      setError(errorMessage);
       // If auth error, user might not be logged in - stay on create
       setStep('create');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchOrganizationHackathons]);
+
+  /* ── Load organizations on mount ── */
+  useEffect(() => {
+    loadOrganizations();
+  }, [loadOrganizations]);
 
   /* ── Create a new organization ── */
   const handleCreate = useCallback(
@@ -88,6 +123,7 @@ export function useOrganization() {
         setIsLoading(true);
         setError(null);
 
+        // Create organization via API
         const newOrg = await organizationApi.createOrganization(payload);
 
         // Fetch complete organization details to ensure all data is loaded
@@ -123,10 +159,10 @@ export function useOrganization() {
         setIsLoading(true);
         setError(null);
 
-        // Fetch fresh organization details
+        // Fetch organization details from API (including members)
         const orgDetails = await organizationApi.getOrganization(orgId);
 
-        // Update organization in list
+        // Update the organization in state with complete details
         setOrganizations((prev) =>
           prev.map((org) => (org.id === orgId ? orgDetails : org))
         );
@@ -134,14 +170,18 @@ export function useOrganization() {
         setActiveOrgId(orgId);
         setStep('dashboard');
         setSaveSuccess(false);
-      } catch (err: any) {
+
+        // Fetch hackathons for the switched organization
+        fetchOrganizationHackathons(orgId);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load organization details';
         console.error('Failed to switch organization:', err);
-        setError(err.message || 'Failed to load organization details');
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
     },
-    []
+    [fetchOrganizationHackathons]
   );
 
   /* ── Go to create form (from dashboard) ── */
@@ -184,6 +224,7 @@ export function useOrganization() {
       try {
         setError(null);
 
+        // Invite member via API (API handles role transformation)
         const newMember = await organizationApi.inviteMember(activeOrgId, email, role);
 
         // Update local state
@@ -220,6 +261,7 @@ export function useOrganization() {
       try {
         setError(null);
 
+        // Remove member via API
         await organizationApi.removeMember(activeOrgId, memberId);
 
         // Update local state
@@ -252,11 +294,12 @@ export function useOrganization() {
       try {
         setError(null);
 
-        const updatedMember = await organizationApi.updateMemberRole(
-          activeOrgId,
-          memberId,
-          role
-        );
+        // TODO: Re-enable API call when backend is ready
+        // const updatedMember = await organizationApi.updateMemberRole(
+        //   activeOrgId,
+        //   memberId,
+        //   role
+        // );
 
         // Update local state
         setOrganizations((prev) =>
@@ -265,7 +308,7 @@ export function useOrganization() {
               ? {
                   ...org,
                   teamMembers: org.teamMembers.map((m) =>
-                    m.id === memberId ? updatedMember : m
+                    m.id === memberId ? { ...m, role } : m
                   ),
                 }
               : org
@@ -298,22 +341,15 @@ export function useOrganization() {
       setSaveSuccess(false);
       setError(null);
 
-      // Save profile updates
+      // Update profile fields
       await organizationApi.updateProfile(activeOrgId, {
         logo: activeOrg.logo || undefined,
         tagline: activeOrg.tagline || undefined,
         about: activeOrg.about || undefined,
       });
 
-      // Save social links (filter out empty strings)
-      const socialLinks: SocialLinks = {};
-      if (activeOrg.socialLinks.x) socialLinks.x = activeOrg.socialLinks.x;
-      if (activeOrg.socialLinks.telegram) socialLinks.telegram = activeOrg.socialLinks.telegram;
-      if (activeOrg.socialLinks.github) socialLinks.github = activeOrg.socialLinks.github;
-      if (activeOrg.socialLinks.discord) socialLinks.discord = activeOrg.socialLinks.discord;
-      if (activeOrg.socialLinks.linkedin) socialLinks.linkedin = activeOrg.socialLinks.linkedin;
-
-      await organizationApi.updateSocialLinks(activeOrgId, socialLinks);
+      // Update social links
+      await organizationApi.updateSocialLinks(activeOrgId, activeOrg.socialLinks);
 
       // Refetch organization to sync with backend
       const updatedOrg = await organizationApi.getOrganization(activeOrgId);
@@ -341,6 +377,13 @@ export function useOrganization() {
     setError(null);
   }, []);
 
+  /* ── Refresh hackathons ── */
+  const refreshHackathons = useCallback(() => {
+    if (activeOrgId) {
+      fetchOrganizationHackathons(activeOrgId);
+    }
+  }, [activeOrgId, fetchOrganizationHackathons]);
+
   return {
     step,
     organizations,
@@ -350,6 +393,9 @@ export function useOrganization() {
     saveSuccess,
     isLoading,
     error,
+    organizationHackathons,
+    isLoadingHackathons,
+    hackathonsError,
     handleCreate,
     handleSwitchOrg,
     handleStartCreateNew,
@@ -360,5 +406,6 @@ export function useOrganization() {
     handleUpdateMemberRole,
     handleSave,
     clearError,
+    refreshHackathons,
   };
 }

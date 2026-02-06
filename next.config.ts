@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
         source: "/hackathons",
         destination: "/src/hackathons",
       },
+      {
+        source: "/hackathon/:path*",
+        destination: "/src/hackathon/:path*",
+      }
     ];
   },
 };

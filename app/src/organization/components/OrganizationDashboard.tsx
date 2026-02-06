@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import { apiClient } from '@/src/shared/lib/api/client';
+import { ENDPOINTS } from '@/src/shared/lib/api/endpoints';
 import {
   Save,
   Check,
@@ -27,6 +30,8 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import type { OrganizationProfile, SocialLinks, TeamMember } from '../types/organization.types';
+import type { Hackathon } from '@/src/hackathon/types/hackathon.types';
+import { ManagedHackathonsCard } from './organizationUI/ManagedHackathonsCard';
 
 interface OrganizationDashboardProps {
   profile: OrganizationProfile;
@@ -36,6 +41,9 @@ interface OrganizationDashboardProps {
   saveSuccess: boolean;
   isLoading?: boolean;
   error?: string | null;
+  organizationHackathons: Hackathon[];
+  isLoadingHackathons: boolean;
+  hackathonsError: string | null;
   onProfileChange: (field: keyof OrganizationProfile, value: string) => void;
   onSocialChange: (field: keyof SocialLinks, value: string) => void;
   onAddMember: (email: string, role: TeamMember['role']) => void;
@@ -45,7 +53,47 @@ interface OrganizationDashboardProps {
   onCreateNew: () => void;
   onSave: () => void;
   onClearError?: () => void;
+  onRefreshHackathons?: () => void;
 }
+
+const validateSocialLink = (key: keyof SocialLinks, value: string): string | null => {
+  if (!value) return null;
+
+  const patterns: Record<string, { regex: RegExp; error: string }> = {
+    x: {
+      regex: /^https?:\/\/(www\.)?(twitter|x)\.com\/[a-zA-Z0-9_]+\/?$/,
+      error: 'Enter a valid X/Twitter profile URL',
+    },
+    telegram: {
+      regex: /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/?$/,
+      error: 'Enter a valid Telegram URL (e.g., https://t.me/username)',
+    },
+    github: {
+      regex: /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/,
+      error: 'Enter a valid GitHub profile URL',
+    },
+    discord: {
+      regex: /^https?:\/\/(www\.)?discord\.(gg|com)\/(invite\/)?[a-zA-Z0-9_-]+\/?$/,
+      error: 'Enter a valid Discord invite URL',
+    },
+    linkedin: {
+      regex: /^https?:\/\/(www\.)?linkedin\.com\/(company|in)\/[a-zA-Z0-9_-]+\/?$/,
+      error: 'Enter a valid LinkedIn URL',
+    },
+  };
+
+  const pattern = patterns[key];
+  if (pattern && !pattern.regex.test(value)) {
+    return pattern.error;
+  }
+
+  try {
+    new URL(value);
+    return null;
+  } catch {
+    return 'Enter a valid URL';
+  }
+};
 
 const SOCIAL_FIELDS: {
   key: keyof SocialLinks;
@@ -92,9 +140,9 @@ const inputClass =
 /* ── Role Badge ── */
 function RoleBadge({ role }: { role: TeamMember['role'] }) {
   const styles: Record<TeamMember['role'], string> = {
-    Admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-    Editor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-    Viewer: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+    Admin: 'bg-purple-100 text-purple-700',
+    Editor: 'bg-blue-100 text-blue-700',
+    Viewer: 'bg-gray-100 text-gray-600',
   };
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[role]}`}>
@@ -161,6 +209,14 @@ function RoleSelect({
 }
 
 /* ── Invite Modal ── */
+interface UserSearchResult {
+  uuid: string;
+  email: string;
+  name: string;
+  avatar: string | null;
+  role: string;
+}
+
 function InviteModal({
   onClose,
   onInvite,
@@ -168,20 +224,77 @@ function InviteModal({
   onClose: () => void;
   onInvite: (email: string, role: TeamMember['role']) => void;
 }) {
+  const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<TeamMember['role']>('Viewer');
   const [error, setError] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Search users with debounce
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query.trim() || query.length < 2) {
+      setSearchResults([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const results = await apiClient.get<UserSearchResult[]>(
+          `${ENDPOINTS.USERS.SEARCH}?query=${encodeURIComponent(query)}&limit=5`
+        );
+        setSearchResults(results);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error('Failed to search users:', err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [query]);
+
+  const handleSelectUser = (user: UserSearchResult) => {
+    setSelectedUser(user);
+    setEmail(user.email);
+    setQuery(user.email);
+    setShowSuggestions(false);
+    if (error) setError('');
+  };
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSelectedUser(null);
+    if (error) setError('');
+  };
 
   const handleInvite = () => {
-    if (!email.trim()) {
+    const emailToInvite = email || query.trim();
+    
+    if (!emailToInvite) {
       setError('Email is required');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToInvite)) {
       setError('Enter a valid email address');
       return;
     }
-    onInvite(email.trim(), role);
+    onInvite(emailToInvite, role);
     onClose();
   };
 
@@ -216,23 +329,101 @@ function InviteModal({
           </p>
         </div>
 
-        {/* Email */}
+        {/* Email with Search */}
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium text-text-secondary">Email address</label>
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (error) setError('');
-              }}
-              placeholder="member@example.com"
-              className="h-[46px] w-full rounded-full border border-border bg-bg-input pl-11 pr-5 text-sm text-text transition-all placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
-              autoFocus
-            />
-          </div>
+          <label className="mb-2 block text-sm font-medium text-text-secondary">
+            {selectedUser ? 'Selected User' : 'Search by email or name'}
+          </label>
+          
+          {selectedUser ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-bg-muted p-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand">
+                {selectedUser.avatar ? (
+                  <img src={selectedUser.avatar} alt={selectedUser.name} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-sm font-semibold text-brand-fg">
+                    {selectedUser.name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-text">{selectedUser.name}</p>
+                <p className="truncate text-xs text-text-muted">{selectedUser.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedUser(null);
+                  setQuery('');
+                  setEmail('');
+                }}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-hover hover:text-text"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                onFocus={() => query && setShowSuggestions(true)}
+                placeholder="member@example.com or John Doe"
+                className="h-[46px] w-full rounded-full border border-border bg-bg-input pl-11 pr-5 text-sm text-text transition-all placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
+                autoFocus
+              />
+              
+              {/* Suggestions Dropdown */}
+              {showSuggestions && query.length >= 2 && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowSuggestions(false)} />
+                  <div
+                    className="absolute left-0 right-0 top-full z-40 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-border bg-bg-card py-2"
+                    style={{ boxShadow: 'var(--shadow-lg)' }}
+                  >
+                    {isSearching ? (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map((user) => (
+                        <button
+                          key={user.uuid}
+                          type="button"
+                          onClick={() => handleSelectUser(user)}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-bg-hover"
+                        >
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand">
+                            {user.avatar ? (
+                              <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <span className="text-sm font-semibold text-brand-fg">
+                                {user.name.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-text">{user.name}</p>
+                            <p className="truncate text-xs text-text-muted">{user.email}</p>
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-bg-muted">
+                          <AlertCircle className="h-6 w-6 text-text-muted" />
+                        </div>
+                        <p className="text-sm font-medium text-text">User not found</p>
+                        <p className="mt-1 text-xs text-text-muted">No users match &quot;{query}&quot;</p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           {error && <p className="mt-1.5 pl-5 text-xs text-error">{error}</p>}
         </div>
 
@@ -283,11 +474,11 @@ function InviteModal({
 function Avatar({ name }: { name: string }) {
   const initial = name.charAt(0).toUpperCase();
   const colors = [
-    'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300',
-    'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300',
-    'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300',
-    'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300',
-    'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300',
+    'bg-purple-100 text-purple-600',
+    'bg-blue-100 text-blue-600',
+    'bg-emerald-100 text-emerald-600',
+    'bg-amber-100 text-amber-600',
+    'bg-rose-100 text-rose-600',
   ];
   const color = colors[name.charCodeAt(0) % colors.length];
   return (
@@ -308,6 +499,9 @@ export function OrganizationDashboard({
   saveSuccess,
   isLoading = false,
   error = null,
+  organizationHackathons,
+  isLoadingHackathons,
+  hackathonsError,
   onProfileChange,
   onSocialChange,
   onAddMember,
@@ -317,9 +511,67 @@ export function OrganizationDashboard({
   onCreateNew,
   onSave,
   onClearError,
+  onRefreshHackathons,
 }: OrganizationDashboardProps) {
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showInvite, setShowInvite] = useState(false);
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSaveClick = () => {
+    const newErrors: Record<string, string> = {};
+    SOCIAL_FIELDS.forEach(({ key }) => {
+      const value = profile.socialLinks[key] || '';
+      const error = validateSocialLink(key, value);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      // Optional: scroll to first error or show a global error message
+      return;
+    }
+
+    setFieldErrors({});
+    onSave();
+  };
+
+  const handleSocialChange = (key: keyof SocialLinks, value: string) => {
+    onSocialChange(key, value);
+    // Real-time validation
+    const error = validateSocialLink(key, value);
+    setFieldErrors((prev) => ({ ...prev, [key]: error || '' }));
+  };
+
+  // Handle logo upload
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    // Convert to base64 or data URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      onProfileChange('logo', result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="min-h-screen bg-bg">
@@ -342,7 +594,7 @@ export function OrganizationDashboard({
                     <h1 className="text-sm font-semibold text-text" style={{ letterSpacing: '-0.02em' }}>
                       {profile.name || 'Organization'}
                     </h1>
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ">
                       Active
                     </span>
                   </div>
@@ -435,7 +687,7 @@ export function OrganizationDashboard({
 
             {/* Save */}
             <button
-              onClick={onSave}
+              onClick={handleSaveClick}
               disabled={isSaving}
               className={`flex h-10 items-center gap-2 rounded-full px-5 text-sm font-medium transition-all duration-200 active:scale-[0.97] disabled:opacity-50 ${
                 saveSuccess
@@ -494,7 +746,18 @@ export function OrganizationDashboard({
 
               {/* Logo upload */}
               <div className="mb-6 flex items-center gap-5">
-                <div className="flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-border bg-bg-muted transition-colors hover:border-border-hover">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  aria-label="Upload organization logo"
+                />
+                <div
+                  onClick={triggerFileInput}
+                  className="flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-border bg-bg-muted transition-colors hover:border-border-hover"
+                >
                   {profile.logo ? (
                     <img src={profile.logo} alt="Logo" className="h-full w-full rounded-2xl object-cover" />
                   ) : (
@@ -560,11 +823,16 @@ export function OrganizationDashboard({
                     </label>
                     <input
                       type="url"
-                      value={profile.socialLinks[key]}
-                      onChange={(e) => onSocialChange(key, e.target.value)}
+                      value={profile.socialLinks[key] || ''}
+                      onChange={(e) => handleSocialChange(key, e.target.value)}
                       placeholder={placeholder}
-                      className={inputClass}
+                      className={`${inputClass} ${fieldErrors[key] ? 'border-error focus:border-error focus:ring-error/10' : ''}`}
                     />
+                    {fieldErrors[key] && (
+                      <p className="mt-1.5 px-1 text-[11px] font-medium text-error">
+                        {fieldErrors[key]}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -664,7 +932,7 @@ export function OrganizationDashboard({
                           ) : (
                             <button
                               onClick={() => onRemoveMember(member.id)}
-                              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-red-50 hover:text-red-500"
                               title="Remove member"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -677,6 +945,15 @@ export function OrganizationDashboard({
                 </div>
               )}
             </Card>
+
+            {/* ── Managed Hackathons ── */}
+            <ManagedHackathonsCard
+              hackathons={organizationHackathons}
+              isLoading={isLoadingHackathons}
+              error={hackathonsError}
+              organizationId={activeOrgId || ''}
+              onRefresh={onRefreshHackathons}
+            />
           </div>
 
           {/* ── Right Column ── */}
@@ -709,17 +986,17 @@ export function OrganizationDashboard({
               <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-brand-fg/20 bg-brand-fg/10">
                 <Rocket className="h-5 w-5 text-brand-fg" />
               </div>
-              <h3 className="text-base font-semibold text-brand-fg">Create Hackathon</h3>
+              <h3 className="text-base font-semibold text-brand-fg">Host a Hackathon</h3>
               <p className="mt-1.5 text-sm text-brand-fg/60">
                 Launch a hackathon and bring builders together on Stellar.
               </p>
-              <button
-                disabled
-                className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand-fg text-sm font-semibold text-brand transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-80"
+              <Link
+                href={`/hackathon/manage/new?orgId=${activeOrgId}`}
+                className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand-fg text-sm font-semibold text-brand transition-all duration-200 hover:opacity-90 active:scale-[0.97]"
               >
-                Coming Soon
+                Create Hackathon
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
           </div>
         </div>

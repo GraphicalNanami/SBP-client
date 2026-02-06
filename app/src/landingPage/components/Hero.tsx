@@ -14,7 +14,7 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
   
   {/* Text Content - Center */}
   <div className="flex-1 text-center flex flex-col justify-center items-center pt-15 px-4">
-    <h1 className="text-bold text-7xl mb-6" style={{ fontFamily: 'var(--font-onest)' }}>
+    <h1 className="text-bold text-7xl mb-6" style={{ fontFamily: 'var(--font-jersey)' }}>
        Building the future
        <br />
        of Stellar
