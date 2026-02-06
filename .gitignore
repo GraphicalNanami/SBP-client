@@ -34,7 +34,7 @@ yarn-error.log*
 pnpm-lock.yaml
 ./pnpm-lock.yaml
 # env files (can opt-in for committing if needed)
-.env*
+.env
 
 # vercel
 .vercel
