@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "prod-files-secure.s3.us-west-2.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "**.ngrok-free.app", // Allow all ngrok domains
+      },
+      {
+        protocol: "https",
+        hostname: "**.ngrok.io", // Support older ngrok domains
+      },
     ],
   },
   async rewrites() {
