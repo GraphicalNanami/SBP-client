@@ -6,6 +6,7 @@ import { usePosts, useStats } from "./postsService/usePosts";
 import { PostsColumn } from "./postsUI/PostsColumn";
 import { matchTopic } from './postsService/posts-api';
 import { Check } from 'lucide-react';
+import Image from 'next/image';
 
 const TOPIC_TAGS = [
   'stellar',
@@ -78,8 +79,26 @@ const Posts = () => {
   const thirdColumn = displayPosts.slice(6, 9);
 
   return (
-    <section className="bg-background my-20 relative">
-      <div className="container z-10 mx-auto">
+    <section className="bg-background py-20 relative overflow-hidden">
+      {/* Decorative doodles */}
+      <div className="absolute top-20 left-10 w-32 h-32 opacity-10 pointer-events-none hidden lg:block">
+        <Image
+          src="/open-doodles/svg/MeditatingDoodle.svg"
+          alt=""
+          fill
+          className="object-contain"
+        />
+      </div>
+      <div className="absolute bottom-20 right-10 w-32 h-32 opacity-10 pointer-events-none hidden lg:block">
+        <Image
+          src="/open-doodles/svg/GroovyDoodle.svg"
+          alt=""
+          fill
+          className="object-contain"
+        />
+      </div>
+
+      <div className="container z-10 mx-auto relative">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -94,10 +113,10 @@ const Posts = () => {
             </div>
           </div>
 
-          <h2 className="text-5xl sm:text-6xl font-bold tracking-tighter mt-5 text-center">
+          <h2 className="text-5xl sm:text-6xl font-bold tracking-tighter mt-5 text-center" style={{ fontFamily: 'var(--font-jersey)' }}>
             What the Stellar Community is Saying
           </h2>
-          <p className="text-center text-xl mt-5 opacity-75">
+          <p className="text-center text-xl mt-5 opacity-75" style={{ fontFamily: 'var(--font-jersey)' }}>
             Real-time updates from Twitter and Reddit about Stellar events and discussions.
           </p>
           

@@ -16,7 +16,7 @@ const Navbar = () => {
           <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
             <span className="text-background text-xs font-bold">≡</span>
           </div>
-          <span className="text-xl font-semibold text-foreground">SBP</span>
+          <span className="text-md  ">SBP</span>
         </Link>
         
         {/* Navigation Links */}
@@ -24,6 +24,16 @@ const Navbar = () => {
           <Link href="/Events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</Link>
           <Link href="/src/hackathon" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Hackathons</Link>
           <Link href="/Builds" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Builds</Link>
+                    <span 
+                      className="text-sm text-muted-foreground cursor-not-allowed opacity-50 relative group"
+                      title="Coming Soon"
+                    >
+                      Swags
+                      <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-foreground text-background text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                        Coming Soon
+                      </span>
+                    </span>
+
         </div>
         
         {/* CTAs - Conditional Rendering */}
@@ -34,9 +44,10 @@ const Navbar = () => {
                 <ProfileDropdown />
               ) : (
                 <>
+                 
                   <Link href="/src/auth">
                     <button className="px-5 py-2.5 text-sm font-medium bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-all duration-200 flex items-center gap-2">
-                      sign up / sign in
+                    Sign In
                     </button>
                   </Link>
                 </>

@@ -22,7 +22,7 @@ const jersey10 = Jersey_10({
 });
 
 export const metadata: Metadata = {
-  title: "Stellar – Hackathons & Events Platform",
+  title: "Stellar Builder Platform",
   description:
     "Discover, organize, and participate in Stellar ecosystem hackathons and events.",
 };
