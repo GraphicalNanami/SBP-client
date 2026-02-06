@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { apiClient } from '@/src/shared/lib/api/client';
+import { ENDPOINTS } from '@/src/shared/lib/api/endpoints';
 import {
   ArrowLeft,
   Save,
@@ -33,6 +35,7 @@ import {
   HelpCircle,
   ExternalLink,
   AlertCircle,
+  Search,
 } from 'lucide-react';
 import type {
   Hackathon,
@@ -68,6 +71,7 @@ interface HackathonDashboardProps {
   addTag: (tag: string) => void;
   removeTag: (tag: string) => void;
   handleSave: () => void;
+  handleSubmitForReview: () => void;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -168,6 +172,7 @@ export default function HackathonDashboard({
   addTag,
   removeTag,
   handleSave,
+  handleSubmitForReview,
 }: HackathonDashboardProps) {
   const posterInputRef = useRef<HTMLInputElement>(null);
   const [posterError, setPosterError] = useState<string | null>(null);
@@ -249,6 +254,18 @@ export default function HackathonDashboard({
     );
   }
 
+  // Safety check: ensure hackathon.general exists
+  if (!hackathon.general) {
+    return (
+      <div className="aurora-bg min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[var(--brand)]" />
+          <p className="text-sm text-[var(--text-muted)]">Initializing hackathon...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="aurora-bg min-h-screen">
       {/* ── Header ── */}
@@ -313,7 +330,8 @@ export default function HackathonDashboard({
             </button>
 
             <button
-              disabled={!canPublish}
+              onClick={handleSubmitForReview}
+              disabled={!canPublish || isSaving}
               className="flex h-9 items-center gap-2 rounded-full bg-[var(--brand)] px-5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Send className="h-3.5 w-3.5" />
@@ -426,6 +444,11 @@ function GeneralTab({
 }) {
   const g = hackathon.general;
   const [tagInput, setTagInput] = useState('');
+
+  // Guard: ensure general is defined
+  if (!g) {
+    return null;
+  }
 
   const handleAddTag = () => {
     if (tagInput.trim()) {
@@ -978,6 +1001,15 @@ function DescriptionTab({
   );
 }
 
+/* ── User Search Result Type ── */
+interface UserSearchResult {
+  uuid: string;
+  email: string;
+  name: string;
+  avatar: string | null;
+  role: string;
+}
+
 /* ═══════════════════════════════════════════════════════
    TAB: Team & Access
    ═══════════════════════════════════════════════════════ */
@@ -991,21 +1023,80 @@ function TeamTab({
   removeAdmin: (adminId: string) => void;
 }) {
   const [showInvite, setShowInvite] = useState(false);
+  const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
   const [permission, setPermission] = useState<HackathonAdmin['permission']>('Full Access');
   const [error, setError] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Search users with debounce
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query.trim() || query.length < 2) {
+      setSearchResults([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const results = await apiClient.get<UserSearchResult[]>(
+          `${ENDPOINTS.USERS.SEARCH}?query=${encodeURIComponent(query)}&limit=5`
+        );
+        setSearchResults(results);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error('Failed to search users:', err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [query]);
+
+  const handleSelectUser = (user: UserSearchResult) => {
+    setSelectedUser(user);
+    setEmail(user.email);
+    setQuery(user.email);
+    setShowSuggestions(false);
+    if (error) setError('');
+  };
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSelectedUser(null);
+    if (error) setError('');
+  };
 
   const handleInvite = () => {
-    if (!email.trim()) {
+    const emailToInvite = email || query.trim();
+    
+    if (!emailToInvite) {
       setError('Email is required');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToInvite)) {
       setError('Enter a valid email');
       return;
     }
-    addAdmin(email.trim(), permission);
+    addAdmin(emailToInvite, permission);
     setEmail('');
+    setQuery('');
+    setSelectedUser(null);
     setShowInvite(false);
   };
 
@@ -1034,18 +1125,96 @@ function TeamTab({
         <Card>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
             <div className="flex-1">
-              <Label>Email</Label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) setError('');
-                }}
-                placeholder="admin@example.com"
-                className={inputClass}
-                autoFocus
-              />
+              <Label>{selectedUser ? 'Selected User' : 'Search by email or name'}</Label>
+              
+              {selectedUser ? (
+                <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-muted)] p-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--brand)]">
+                    {selectedUser.avatar ? (
+                      <img src={selectedUser.avatar} alt={selectedUser.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-sm font-semibold text-[var(--brand-fg)]">
+                        {selectedUser.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-[var(--text)]">{selectedUser.name}</p>
+                    <p className="truncate text-xs text-[var(--text-muted)]">{selectedUser.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedUser(null);
+                      setQuery('');
+                      setEmail('');
+                    }}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => handleQueryChange(e.target.value)}
+                    onFocus={() => query && setShowSuggestions(true)}
+                    placeholder="admin@example.com or John Doe"
+                    className="h-[46px] w-full rounded-full border border-[var(--border)] bg-[var(--bg-input)] pl-11 pr-5 text-sm text-[var(--text)] transition-all placeholder:text-[var(--text-muted)] hover:border-[var(--border-hover)] focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/10"
+                    autoFocus
+                  />
+                  
+                  {/* Suggestions Dropdown */}
+                  {showSuggestions && query.length >= 2 && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setShowSuggestions(false)} />
+                      <div
+                        className="absolute left-0 right-0 top-full z-20 mt-2 max-h-[240px] overflow-y-auto rounded-2xl border border-[var(--border)] bg-white py-2"
+                        style={{ boxShadow: 'var(--shadow-lg)' }}
+                      >
+                        {isSearching ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-5 w-5 animate-spin text-[var(--text-muted)]" />
+                          </div>
+                        ) : searchResults.length > 0 ? (
+                          searchResults.map((user) => (
+                            <button
+                              key={user.uuid}
+                              type="button"
+                              onClick={() => handleSelectUser(user)}
+                              className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[var(--bg-hover)]"
+                            >
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--brand)]">
+                                {user.avatar ? (
+                                  <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                                ) : (
+                                  <span className="text-xs font-semibold text-[var(--brand-fg)]">
+                                    {user.name.charAt(0).toUpperCase()}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium text-[var(--text)]">{user.name}</p>
+                                <p className="truncate text-xs text-[var(--text-muted)]">{user.email}</p>
+                              </div>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-6 text-center">
+                            <p className="text-sm text-[var(--text-muted)]">No users found</p>
+                            <p className="mt-1 text-xs text-[var(--text-muted)]">
+                              You can still invite by email
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
               {error && <p className="mt-1 pl-5 text-xs text-[var(--error)]">{error}</p>}
             </div>
             <div className="w-48">

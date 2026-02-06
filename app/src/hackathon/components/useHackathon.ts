@@ -199,6 +199,20 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
     }));
   }, []);
 
+  /* ── Publish validation ── */
+  const canPublish = useMemo(() => {
+    const g = hackathon.general;
+    return (
+      g.name.trim() !== '' &&
+      g.category !== '' &&
+      g.startTime !== '' &&
+      g.submissionDeadline !== '' &&
+      g.adminContact.trim() !== '' &&
+      g.prizePool > 0 &&
+      hackathon.tracks.length > 0
+    );
+  }, [hackathon]);
+
   /* ── Save to backend ── */
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -229,16 +243,16 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err: any) {
       console.error('Failed to save hackathon:', err);
-      
+
       // Check if this is a validation error (400 status) or file too large (413 status)
       if (err.status === 400 || err.status === 413) {
         // This is a validation error - don't break the page
         setValidationError(err.message || 'Please fix the validation errors');
-        
+
         // Map common error messages to field names
         const errorMessage = err.message || '';
         const errors: Record<string, string> = {};
-        
+
         if (errorMessage.includes('Start time')) {
           errors.startTime = errorMessage;
         }
@@ -264,9 +278,9 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
         if (errorMessage.toLowerCase().includes('too large') || errorMessage.toLowerCase().includes('entity too large')) {
           errors.poster = 'Image file is too large. Please upload an image under 2MB.';
         }
-        
+
         setFieldErrors(errors);
-        
+
         // Auto-clear validation error after 5 seconds
         setTimeout(() => {
           setValidationError(null);
@@ -281,19 +295,45 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
     }
   }, [hackathon, isNew]);
 
-  /* ── Publish validation ── */
-  const canPublish = useMemo(() => {
-    const g = hackathon.general;
-    return (
-      g.name.trim() !== '' &&
-      g.category !== '' &&
-      g.startTime !== '' &&
-      g.submissionDeadline !== '' &&
-      g.adminContact.trim() !== '' &&
-      g.prizePool > 0 &&
-      hackathon.tracks.length > 0
-    );
-  }, [hackathon]);
+  /* ── Submit for review ── */
+  const handleSubmitForReview = useCallback(async () => {
+    // Must save before submitting
+    if (isNew) {
+      setValidationError('Please save the hackathon before submitting for review');
+      setTimeout(() => setValidationError(null), 5000);
+      return;
+    }
+
+    // Validate required fields
+    if (!canPublish) {
+      setValidationError('Please complete all required fields before submitting for review');
+      setTimeout(() => setValidationError(null), 5000);
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    setValidationError(null);
+
+    try {
+      const updated = await hackathonApi.submitForReview(hackathon.id);
+      setHackathon(updated);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    } catch (err: any) {
+      console.error('Failed to submit hackathon for review:', err);
+
+      // Check if this is a validation error
+      if (err.status === 400 || err.status === 403) {
+        setValidationError(err.message || 'Failed to submit hackathon for review');
+        setTimeout(() => setValidationError(null), 5000);
+      } else {
+        setError(err.message || 'Failed to submit hackathon for review');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  }, [hackathon.id, isNew, canPublish]);
 
   return {
     hackathon,
@@ -317,5 +357,6 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
     addTag,
     removeTag,
     handleSave,
+    handleSubmitForReview,
   };
 }

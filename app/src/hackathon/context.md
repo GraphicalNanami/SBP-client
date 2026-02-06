@@ -171,7 +171,8 @@ Central business-logic hook. All state lives here; UI components are pure.
 | `addAdmin(email, permission)` | Add a new admin |
 | `removeAdmin(id)` | Remove an admin |
 | `addTag(tag)` / `removeTag(tag)` | Manage general.tags array |
-| `handleSave()` | Mock save (800ms delay + success feedback) |
+| `handleSave()` | Save hackathon (create if new, update if existing) |
+| `handleSubmitForReview()` | Submit hackathon for platform admin review |
 
 ### `types/hackathon.types.ts`
 
@@ -290,6 +291,22 @@ Backend enforces valid state transitions:
 ---
 
 ## Recent Changes
+
+### February 6, 2026 - Submit for Review Integration
+- ✅ **Integrated Submit for Review functionality**:
+  - Added `handleSubmitForReview()` method to `useHackathon` hook
+  - Connected "Submit for Review" button in dashboard header to API endpoint
+  - Button validates required fields before submitting (calls `canPublish`)
+  - Shows validation errors if hackathon is new or fields are incomplete
+  - Calls `POST /hackathons/:id/submit-for-review` endpoint
+  - Updates hackathon status to `UNDER_REVIEW` on success
+  - Button disabled when saving or when required fields are incomplete
+- **Status Flow**:
+  - `DRAFT` → `UNDER_REVIEW` (when organizer clicks "Submit for Review")
+  - `REJECTED` → `UNDER_REVIEW` (when organizer resubmits after fixing issues)
+- **Validation**: Must save hackathon first, complete all required fields, and have at least one track
+- **Error Handling**: Shows validation errors for 400/403 responses, fatal errors for network/server issues
+- **Data Flow**: User clicks Submit → `handleSubmitForReview()` → `hackathonApi.submitForReview()` → API updates status → UI shows success feedback
 
 ### February 6, 2026 - UUID Migration
 - 🔄 **Migrated from MongoDB ObjectId (_id) to UUID (uuid)**:
