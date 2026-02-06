@@ -30,6 +30,8 @@ import type {
   UpdateDistributionPayload,
   ListHackathonsQuery,
   PaginatedHackathonsResponse,
+  PublicHackathonsQuery,
+  PublicHackathonsResponse,
   BackendHackathonCategory,
   BackendHackathonVisibility,
   BackendHackathonStatus,
@@ -202,6 +204,65 @@ function transformHackathon(backend: BackendHackathon): Hackathon {
 }
 
 /**
+ * Transform backend hackathon to card data format
+ * Used for listing/grid views
+ */
+export function transformHackathonToCard(backend: BackendHackathon): {
+  id: string;
+  name: string;
+  tagline: string;
+  category: string;
+  status: 'Upcoming' | 'Ongoing' | 'Ended';
+  poster: string;
+  prizePool: number;
+  prizeAsset: string;
+  startTime: string;
+  submissionDeadline: string;
+  tags: string[];
+  venue: string;
+  organizationName: string;
+  organizationLogo: string;
+  builderCount: number;
+  projectCount: number;
+} {
+  // Determine status based on dates
+  // Dates from API are already ISO strings, convert to Date for comparison
+  const now = new Date();
+  const startTime = new Date(backend.startTime);
+  const submissionDeadline = new Date(backend.submissionDeadline);
+
+  let status: 'Upcoming' | 'Ongoing' | 'Ended';
+  if (backend.status === 'ENDED' || backend.status === 'CANCELLED' || submissionDeadline < now) {
+    status = 'Ended';
+  } else if (startTime > now) {
+    status = 'Upcoming';
+  } else {
+    status = 'Ongoing';
+  }
+
+  return {
+    id: backend.uuid,
+    name: backend.name,
+    tagline: backend.description || backend.overview || '',
+    category: transformCategory(backend.category),
+    status,
+    poster: backend.posterUrl || '',
+    // Handle prizePool as either string or number
+    prizePool: typeof backend.prizePool === 'string' ? parseFloat(backend.prizePool) || 0 : backend.prizePool,
+    prizeAsset: backend.prizeAsset,
+    // Dates are already ISO strings from the API
+    startTime: typeof backend.startTime === 'string' ? backend.startTime : new Date(backend.startTime).toISOString(),
+    submissionDeadline: typeof backend.submissionDeadline === 'string' ? backend.submissionDeadline : new Date(backend.submissionDeadline).toISOString(),
+    tags: backend.tags || [],
+    venue: backend.venue,
+    organizationName: '', // Will need to be fetched separately or included in response
+    organizationLogo: '',
+    builderCount: backend.analytics?.registrationCount || backend.analyticsTracking?.registrationCount || 0,
+    projectCount: backend.analytics?.submissionCount || backend.analyticsTracking?.submissionCount || 0,
+  };
+}
+
+/**
  * Transform frontend hackathon general to backend create payload
  */
 function transformToCreatePayload(
@@ -315,22 +376,19 @@ export const hackathonApi = {
 
   /**
    * List public hackathons with filters
+   * Uses /hackathons/public/list endpoint
    */
-  async listPublicHackathons(query?: ListHackathonsQuery): Promise<PaginatedHackathonsResponse> {
+  async listPublicHackathons(query?: PublicHackathonsQuery): Promise<PublicHackathonsResponse> {
     const params = new URLSearchParams();
-    if (query?.search) params.append('search', query.search);
-    if (query?.category) params.append('category', query.category);
-    if (query?.status) params.append('status', query.status);
-    if (query?.tags) query.tags.forEach((tag) => params.append('tags', tag));
-    if (query?.sortBy) params.append('sortBy', query.sortBy);
-    if (query?.page) params.append('page', query.page.toString());
+    if (query?.filter) params.append('filter', query.filter);
     if (query?.limit) params.append('limit', query.limit.toString());
+    if (query?.offset !== undefined) params.append('offset', query.offset.toString());
 
     const endpoint = params.toString()
       ? `${ENDPOINTS.HACKATHONS.PUBLIC_LIST}?${params.toString()}`
       : ENDPOINTS.HACKATHONS.PUBLIC_LIST;
 
-    return apiClient.get<PaginatedHackathonsResponse>(endpoint);
+    return apiClient.get<PublicHackathonsResponse>(endpoint);
   },
 
   /**
