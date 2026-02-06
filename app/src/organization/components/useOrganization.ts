@@ -7,7 +7,7 @@ import type {
   OrganizationStep,
   SocialLinks,
   TeamMember,
-} from '../../types/organization.types';
+} from '../types/organization.types';
 
 const EMPTY_SOCIAL_LINKS: SocialLinks = {
   x: '',

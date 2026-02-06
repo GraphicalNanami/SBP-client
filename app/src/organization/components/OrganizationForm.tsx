@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
-import type { OrganizationCreatePayload } from '../../types/organization.types';
+import type { OrganizationCreatePayload } from '../types/organization.types';
 
 interface OrganizationFormProps {
   onSubmit: (payload: OrganizationCreatePayload) => void;

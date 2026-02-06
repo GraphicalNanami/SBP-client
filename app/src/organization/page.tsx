@@ -1,8 +1,8 @@
 'use client';
 
-import { OrganizationForm } from '@/src/features/organization/components/organizationUI/OrganizationForm';
-import { OrganizationDashboard } from '@/src/features/organization/components/organizationUI/OrganizationDashboard';
-import { useOrganization } from '@/src/features/organization/components/organizationService/useOrganization';
+import { OrganizationForm } from './components/OrganizationForm';
+import { OrganizationDashboard } from './components/OrganizationDashboard';
+import { useOrganization } from './components/useOrganization';
 
 export default function OrganizationPage() {
   const {
@@ -14,6 +14,7 @@ export default function OrganizationPage() {
     saveSuccess,
     handleCreate,
     handleSwitchOrg,
+    handleStartCreateNew,
     handleProfileChange,
     handleSocialChange,
     handleAddMember,
@@ -39,7 +40,7 @@ export default function OrganizationPage() {
       onRemoveMember={handleRemoveMember}
       onUpdateMemberRole={handleUpdateMemberRole}
       onSwitchOrg={handleSwitchOrg}
-      onCreate={handleCreate}
+      onCreateNew={handleStartCreateNew}
       onSave={handleSave}
     />
   );

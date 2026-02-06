@@ -25,7 +25,7 @@ import {
   X,
   Mail,
 } from 'lucide-react';
-import type { OrganizationCreatePayload, OrganizationProfile, SocialLinks, TeamMember } from '../../types/organization.types';
+import type { OrganizationProfile, SocialLinks, TeamMember } from '../types/organization.types';
 
 interface OrganizationDashboardProps {
   profile: OrganizationProfile;
@@ -39,7 +39,7 @@ interface OrganizationDashboardProps {
   onRemoveMember: (memberId: string) => void;
   onUpdateMemberRole: (memberId: string, role: TeamMember['role']) => void;
   onSwitchOrg: (orgId: string) => void;
-  onCreate: (payload: OrganizationCreatePayload) => void;
+  onCreateNew: () => void;
   onSave: () => void;
 }
 
@@ -276,157 +276,6 @@ function InviteModal({
   );
 }
 
-/* ── Create Organization Modal ── */
-function CreateOrgModal({
-  onClose,
-  onCreate,
-}: {
-  onClose: () => void;
-  onCreate: (payload: OrganizationCreatePayload) => void;
-}) {
-  const [name, setName] = useState('');
-  const [website, setWebsite] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = 'Organization name is required';
-    if (!website.trim()) {
-      newErrors.website = 'Website URL is required';
-    } else if (!/^https?:\/\/.+\..+/.test(website.trim())) {
-      newErrors.website = 'Enter a valid URL (e.g. https://example.com)';
-    }
-    if (!termsAccepted) newErrors.terms = 'You must agree to the Terms & Conditions';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      onCreate({ name: name.trim(), website: website.trim(), termsAccepted });
-      onClose();
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-
-      {/* Modal */}
-      <div
-        className="relative w-full max-w-[420px] rounded-2xl border border-border bg-bg-card p-6"
-        style={{ boxShadow: 'var(--shadow-lg)' }}
-      >
-        {/* Close */}
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-hover hover:text-text"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        {/* Heading */}
-        <h3
-          className="mb-2 text-center text-xl font-bold text-text"
-          style={{ letterSpacing: '-0.04em', lineHeight: '1.15' }}
-        >
-          Create your Organization
-        </h3>
-        <p className="mb-6 text-center text-sm leading-relaxed text-text-secondary">
-          Set up your organization profile to start creating hackathons on the Stellar platform.
-        </p>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Organization Name */}
-          <div>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
-              }}
-              placeholder="Organization Name"
-              className="h-[48px] w-full rounded-full border border-border bg-bg px-5 text-sm text-text transition-all duration-200 placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
-              autoFocus
-            />
-            {errors.name && <p className="mt-1.5 pl-5 text-xs text-error">{errors.name}</p>}
-          </div>
-
-          {/* Website URL */}
-          <div>
-            <input
-              type="url"
-              value={website}
-              onChange={(e) => {
-                setWebsite(e.target.value);
-                if (errors.website) setErrors((prev) => ({ ...prev, website: '' }));
-              }}
-              placeholder="Website URL"
-              className="h-[48px] w-full rounded-full border border-border bg-bg px-5 text-sm text-text transition-all duration-200 placeholder:text-text-muted hover:border-border-hover focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
-            />
-            {errors.website && <p className="mt-1.5 pl-5 text-xs text-error">{errors.website}</p>}
-          </div>
-
-          {/* Terms & Conditions */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={() => {
-                setTermsAccepted(!termsAccepted);
-                if (errors.terms) setErrors((prev) => ({ ...prev, terms: '' }));
-              }}
-              className="group flex items-start gap-3 text-left"
-            >
-              <div
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${
-                  termsAccepted
-                    ? 'border-brand bg-brand'
-                    : 'border-border group-hover:border-border-hover'
-                }`}
-              >
-                {termsAccepted && <Check className="h-3.5 w-3.5 text-brand-fg" />}
-              </div>
-              <span className="text-sm leading-snug text-text-secondary">
-                I agree to Stellar&apos;s{' '}
-                <span className="font-medium text-text underline underline-offset-2">Terms &amp; Conditions</span>
-              </span>
-            </button>
-            {errors.terms && <p className="mt-1.5 ml-8 text-xs text-error">{errors.terms}</p>}
-          </div>
-
-          {/* Submit */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              className="flex h-[48px] w-full items-center justify-center gap-2 rounded-full bg-brand text-sm font-semibold text-brand-fg transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
-            >
-              Continue
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-        </form>
-
-        {/* Footer */}
-        <p className="mt-6 text-center text-xs leading-relaxed text-text-muted">
-          By continuing, you agree to our{' '}
-          <a href="#" className="font-medium text-text-secondary underline underline-offset-2 hover:text-text">
-            Terms of Service
-          </a>{' '}
-          and{' '}
-          <a href="#" className="font-medium text-text-secondary underline underline-offset-2 hover:text-text">
-            Privacy Policy
-          </a>
-        </p>
-      </div>
-    </div>
-  );
-}
-
 /* ── Avatar placeholder ── */
 function Avatar({ name }: { name: string }) {
   const initial = name.charAt(0).toUpperCase();
@@ -460,12 +309,11 @@ export function OrganizationDashboard({
   onRemoveMember,
   onUpdateMemberRole,
   onSwitchOrg,
-  onCreate,
+  onCreateNew,
   onSave,
 }: OrganizationDashboardProps) {
   const [showInvite, setShowInvite] = useState(false);
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
-  const [showCreateOrg, setShowCreateOrg] = useState(false);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -542,7 +390,7 @@ export function OrganizationDashboard({
                       <button
                         type="button"
                         onClick={() => {
-                          setShowCreateOrg(true);
+                          onCreateNew();
                           setShowOrgSwitcher(false);
                         }}
                         className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-bg-hover"
@@ -849,14 +697,6 @@ export function OrganizationDashboard({
         <InviteModal
           onClose={() => setShowInvite(false)}
           onInvite={onAddMember}
-        />
-      )}
-
-      {/* ── Create Organization Modal ── */}
-      {showCreateOrg && (
-        <CreateOrgModal
-          onClose={() => setShowCreateOrg(false)}
-          onCreate={onCreate}
         />
       )}
     </div>
