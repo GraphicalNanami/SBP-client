@@ -46,7 +46,7 @@ const PlansSection = () => {
 
       <div className="container-main relative z-10">
         {/* Heading */}
-        <div className="text-center mb-6" style={{ fontFamily: 'var(--font-jersey)' }}>
+        <div className="text-center mb-6" style={{ fontFamily: 'var(--font-onest)' }}>
           <h2 className="heading-section">
             Built for the <CircleHighlight>entire</CircleHighlight>
             <br />

@@ -113,10 +113,10 @@ const Posts = () => {
             </div>
           </div>
 
-          <h2 className="text-5xl sm:text-6xl font-bold tracking-tighter mt-5 text-center" style={{ fontFamily: 'var(--font-jersey)' }}>
+          <h2 className="text-5xl sm:text-6xl font-bold tracking-tighter mt-5 text-center" style={{ fontFamily: 'var(--font-onest)' }}>
             What the Stellar Community is Saying
           </h2>
-          <p className="text-center text-xl mt-5 opacity-75" style={{ fontFamily: 'var(--font-jersey)' }}>
+          <p className="text-center text-xl mt-5 opacity-75" style={{ fontFamily: 'var(--font-onest)' }}>
             Real-time updates from Twitter and Reddit about Stellar events and discussions.
           </p>
           
