@@ -23,16 +23,6 @@ import { CircleHighlight } from "@/src/shared/components/ui/highlightText";
     <p className="text-body max-w-lg mx-auto mb-10">
       Discover hackathons, connect with top builders, and scale the next generation of Stellar projects.
     </p>
-    
-    {/* CTA Buttons */}
-    <div className="flex items-center justify-center gap-4 items-center flex justify-center mt-10 gap-4">
-      <button className="px-6 py-3.5 text-base font-medium text-foreground border border-border bg-card rounded-xl hover:bg-secondary transition-all duration-200">
-        Try for free
-      </button>
-      <button className="px-6 py-3.5 text-base font-medium bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-all duration-200">
-        Get a demo
-      </button>
-    </div>
   </div>
 </div>
                  

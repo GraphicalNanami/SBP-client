@@ -34,9 +34,6 @@ const Navbar = () => {
                 <ProfileDropdown />
               ) : (
                 <>
-                  <button className="px-5 py-2.5 text-sm font-medium text-foreground hover:bg-secondary rounded-xl transition-all duration-200">
-                    Try for free
-                  </button>
                   <Link href="/src/auth">
                     <button className="px-5 py-2.5 text-sm font-medium bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-all duration-200 flex items-center gap-2">
                       sign up / sign in
