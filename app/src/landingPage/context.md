@@ -88,6 +88,24 @@ All endpoints use base URL from `process.env.NEXT_PUBLIC_API_BASE_URL`
 - ✅ Implemented loading/error/empty states
 - ✅ Used 3-column responsive grid with scroll animations
 
+## Recent Changes (2026-02-07)
+- ✅ Improved Plans section hover contrast (title/description text and CTA button)
+- ✅ Updated logo carousel with Stellar ecosystem topic tags and custom SVG icons
+- ✅ Replaced generic company logos with 8 Stellar-specific topics from TOPIC_TAGS
+- ✅ Created black & white SVG icons for each topic (stellar, network, payments, soroban, etc.)
+- ✅ Connected Featured Events section to real event data from events section
+- ✅ Featured section now displays real events marked with `featured: true` from MOCK_EVENTS
+- ✅ Added navigation to event details pages from featured cards
+- ✅ Synchronized event data structure between landing page and events page
+- ✅ Made Plans section cards clickable with navigation
+- ✅ Hackers card navigates to /src/hackathons page
+- ✅ Organizers card navigates to /src/regions (country sections)
+- ✅ Integrated DiceBear avatar generation across all event and region components
+- ✅ Created shared avatar utility in `src/shared/utils/avatar.ts`
+- ✅ Installed `@dicebear/core` and `@dicebear/collection` packages
+- ✅ Updated EventDetailModal, event detail page, and regions pages to use DiceBear avatars
+- ✅ Avatars now deterministically generated using lorelei style with name as seed
+
 ## Future Enhancements
 - Add infinite scroll for posts loading
 - Implement real-time updates via WebSocket

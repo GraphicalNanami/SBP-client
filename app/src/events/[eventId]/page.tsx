@@ -5,6 +5,7 @@ import { MOCK_EVENTS } from '../components/eventsService/mockData';
 import Image from 'next/image';
 import { Calendar, MapPin, X as XIcon, Flag, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
+import { Avatar } from '@/src/shared/components/Avatar';
 
 const getTagColor = (tag: string) => {
   switch (tag) {
@@ -97,14 +98,13 @@ export default function EventDetailPage() {
               {/* Main Organizer */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                  {event.organizer.avatar && (
-                    <Image
-                      src={event.organizer.avatar}
-                      alt={event.organizer.name}
-                      fill
-                      className="object-cover"
-                    />
-                  )}
+                  <Avatar
+                    src={event.organizer.avatar}
+                    alt={event.organizer.name}
+                    seed={event.organizer.name}
+                    className="object-cover"
+                    size={48}
+                  />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-[#1A1A1A]">{event.organizer.name}</p>
@@ -128,14 +128,13 @@ export default function EventDetailPage() {
                   {event.hostedBy.map((host, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-200">
-                        {host.avatar && (
-                          <Image
-                            src={host.avatar}
-                            alt={host.name}
-                            fill
-                            className="object-cover"
-                          />
-                        )}
+                        <Avatar
+                          src={host.avatar}
+                          alt={host.name}
+                          seed={host.name}
+                          className="object-cover"
+                          size={32}
+                        />
                       </div>
                       <span className="text-xs text-[#4D4D4D]">{host.name}</span>
                     </div>
@@ -159,14 +158,13 @@ export default function EventDetailPage() {
                       className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white bg-gray-200"
                       title={attendee.name}
                     >
-                      {attendee.avatar && (
-                        <Image
-                          src={attendee.avatar}
-                          alt={attendee.name}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
+                      <Avatar
+                        src={attendee.avatar}
+                        alt={attendee.name}
+                        seed={attendee.name}
+                        className="object-cover"
+                        size={40}
+                      />
                     </div>
                   ))}
                   {event.attendees.length > 10 && (

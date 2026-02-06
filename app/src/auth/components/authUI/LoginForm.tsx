@@ -38,7 +38,8 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
   return (
     <div className="text-center">
       <h1 className="text-2xl md:text-3xl font-semibold mb-2" style={{ fontFamily: 'var(--font-onest)' }}>
-        Let's build something amazing
+               Build On Stellar
+
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
         Enter your email below.
