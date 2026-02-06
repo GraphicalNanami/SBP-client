@@ -6,10 +6,21 @@ import { Post } from '../../types/posts.types';
 
 interface PostCardProps {
   post: Post;
+  onUnpause?: () => void;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, onUnpause }: PostCardProps) {
   const PlatformIcon = post.platform === 'twitter' ? Twitter : MessageCircle;
+
+  const handleClick = () => {
+    if (post.url) {
+      window.open(post.url, '_blank', 'noopener,noreferrer');
+      // Unpause scroll immediately after click
+      if (onUnpause) {
+        setTimeout(() => onUnpause(), 100);
+      }
+    }
+  };
 
   return (
     <motion.div
@@ -17,7 +28,8 @@ export function PostCard({ post }: PostCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="bg-white rounded-2xl p-6 border border-[#E5E5E5] hover:border-[#E6FF80] hover:shadow-lg transition-all"
+      onClick={handleClick}
+      className="bg-white rounded-2xl p-6 border border-[#E5E5E5] hover:border-[#E6FF80] hover:shadow-lg transition-all cursor-pointer"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">

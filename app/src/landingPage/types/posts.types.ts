@@ -1,10 +1,14 @@
 // API Response Types for Events Indexer
 
 export interface Post {
+  id: string;
   author_name: string;
   platform: 'twitter' | 'reddit';
   topics: string[];
   content: string;
+  url: string;
+  created_at: string;
+  entity_count: number;
 }
 
 export interface StatsResponse {

@@ -1,17 +1,81 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { usePosts, useStats } from "./postsService/usePosts";
 import { PostsColumn } from "./postsUI/PostsColumn";
+import { matchTopic } from './postsService/posts-api';
+import { Check } from 'lucide-react';
+
+const TOPIC_TAGS = [
+  'stellar',
+  'stellar network',
+  'cross border payments',
+  'soroban',
+  'stellar laboratory',
+  'xlm',
+  'stellar lumens',
+  'moneygram',
+];
 
 const Posts = () => {
   const { posts, isLoading, error } = usePosts();
   const { stats, isLoading: statsLoading } = useStats(72);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [isMatchingTopics, setIsMatchingTopics] = useState(false);
+  const [filteredPosts, setFilteredPosts] = useState(posts);
 
-  // Split posts into three columns for animation
-  const firstColumn = posts.slice(0, 3);
-  const secondColumn = posts.slice(3, 6);
-  const thirdColumn = posts.slice(6, 9);
+  // Handle topic selection
+  const handleTopicToggle = async (topic: string) => {
+    const newSelectedTopics = selectedTopics.includes(topic)
+      ? selectedTopics.filter((t) => t !== topic)
+      : [...selectedTopics, topic];
+    
+    setSelectedTopics(newSelectedTopics);
+
+    // If no topics selected, show all posts
+    if (newSelectedTopics.length === 0) {
+      setFilteredPosts(posts);
+      return;
+    }
+
+    // Match selected topics
+    setIsMatchingTopics(true);
+    try {
+      // Call matchTopic API for each selected topic
+      const matchPromises = newSelectedTopics.map((t) => matchTopic(t));
+      await Promise.all(matchPromises);
+      
+      // Filter posts that match any of the selected topics
+      const filtered = posts.filter((post) =>
+        post.topics.some((postTopic) =>
+          newSelectedTopics.some((selectedTopic) =>
+            postTopic.toLowerCase().includes(selectedTopic.toLowerCase()) ||
+            selectedTopic.toLowerCase().includes(postTopic.toLowerCase())
+          )
+        )
+      );
+      setFilteredPosts(filtered);
+    } catch (err) {
+      console.error('Failed to match topics:', err);
+      setFilteredPosts(posts);
+    } finally {
+      setIsMatchingTopics(false);
+    }
+  };
+
+  // Update filtered posts when posts change
+  useEffect(() => {
+    if (selectedTopics.length === 0) {
+      setFilteredPosts(posts);
+    }
+  }, [posts, selectedTopics.length]);
+
+  // Split filtered posts into three columns for animation
+  const displayPosts = filteredPosts.length > 0 ? filteredPosts : posts;
+  const firstColumn = displayPosts.slice(0, 3);
+  const secondColumn = displayPosts.slice(3, 6);
+  const thirdColumn = displayPosts.slice(6, 9);
 
   return (
     <section className="bg-background my-20 relative">
@@ -36,6 +100,28 @@ const Posts = () => {
           <p className="text-center text-xl mt-5 opacity-75">
             Real-time updates from Twitter and Reddit about Stellar events and discussions.
           </p>
+          
+          {/* Topic Tags */}
+          <div className="flex flex-wrap justify-center gap-2 mt-8 max-w-2xl mx-auto">
+            {TOPIC_TAGS.map((topic) => {
+              const isSelected = selectedTopics.includes(topic);
+              return (
+                <button
+                  key={topic}
+                  onClick={() => handleTopicToggle(topic)}
+                  disabled={isMatchingTopics}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    isSelected
+                      ? 'bg-[#E6FF80] text-[#1A1A1A] border-2 border-[#1A1A1A]'
+                      : 'bg-white text-[#4D4D4D] border border-[#E5E5E5] hover:border-[#1A1A1A]'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {isSelected && <Check className="w-4 h-4" />}
+                  {topic}
+                </button>
+              );
+            })}
+          </div>
         </motion.div>
 
         {/* Stats Banner */}
@@ -61,9 +147,25 @@ const Posts = () => {
         {/* Posts Grid - Same layout as Testimonials */}
         {!isLoading && !error && posts.length > 0 && (
           <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
-            <PostsColumn posts={firstColumn} duration={15} />
-            <PostsColumn posts={secondColumn} className="hidden md:block" duration={19} />
-            <PostsColumn posts={thirdColumn} className="hidden lg:block" duration={17} />
+            {firstColumn.length > 0 && <PostsColumn posts={firstColumn} duration={15} />}
+            {secondColumn.length > 0 && <PostsColumn posts={secondColumn} className="hidden md:block" duration={19} />}
+            {thirdColumn.length > 0 && <PostsColumn posts={thirdColumn} className="hidden lg:block" duration={17} />}
+          </div>
+        )}
+
+        {/* Filtered Empty State */}
+        {!isLoading && !error && selectedTopics.length > 0 && filteredPosts.length === 0 && (
+          <div className="flex justify-center items-center py-20">
+            <div className="text-center">
+              <p className="text-[#4D4D4D] text-lg">No posts found for selected topics.</p>
+              <p className="text-[#4D4D4D] text-sm mt-2">Try selecting different topics or clear filters.</p>
+              <button
+                onClick={() => setSelectedTopics([])}
+                className="mt-4 px-6 py-2 bg-[#E6FF80] text-[#1A1A1A] rounded-full font-medium hover:bg-[#d4ed6e] transition-all"
+              >
+                Clear Filters
+              </button>
+            </div>
           </div>
         )}
 
