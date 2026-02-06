@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { organizationApi } from '../../../../src/services/api/organizationApi';
+// import { organizationApi } from '../../../../src/services/api/organizationApi';
 import type {
   OrganizationCreatePayload,
   OrganizationProfile,
@@ -60,7 +60,11 @@ export function useOrganization() {
       setIsLoading(true);
       setError(null);
 
-      const orgs = await organizationApi.getUserOrganizations();
+      // TODO: Re-enable API call when backend is ready
+      // const orgs = await organizationApi.getUserOrganizations();
+      
+      // Mock: No organizations initially
+      const orgs: OrganizationProfile[] = [];
       setOrganizations(orgs);
 
       // If user has organizations, set first as active and go to dashboard
@@ -88,7 +92,23 @@ export function useOrganization() {
         setIsLoading(true);
         setError(null);
 
-        const newOrg = await organizationApi.createOrganization(payload);
+        // TODO: Re-enable API call when backend is ready
+        // const newOrg = await organizationApi.createOrganization(payload);
+        
+        // Mock: Create organization locally
+        const newOrg: OrganizationProfile = {
+          id: `org-${Date.now()}`,
+          name: payload.name,
+          slug: payload.name.toLowerCase().replace(/\s+/g, '-'),
+          logo: '',
+          tagline: '',
+          about: '',
+          website: payload.website,
+          status: 'ACTIVE',
+          socialLinks: { ...EMPTY_SOCIAL_LINKS },
+          teamMembers: [],
+          createdAt: new Date().toISOString(),
+        };
 
         // Add to organizations list
         setOrganizations((prev) => [...prev, newOrg]);
@@ -120,14 +140,10 @@ export function useOrganization() {
         setIsLoading(true);
         setError(null);
 
-        // Fetch fresh organization details
-        const orgDetails = await organizationApi.getOrganization(orgId);
+        // TODO: Re-enable API call when backend is ready
+        // const orgDetails = await organizationApi.getOrganization(orgId);
 
-        // Update organization in list
-        setOrganizations((prev) =>
-          prev.map((org) => (org.id === orgId ? orgDetails : org))
-        );
-
+        // Mock: Just switch to the organization in local state
         setActiveOrgId(orgId);
         setStep('dashboard');
         setSaveSuccess(false);
@@ -181,7 +197,16 @@ export function useOrganization() {
       try {
         setError(null);
 
-        const newMember = await organizationApi.inviteMember(activeOrgId, email, role);
+        // TODO: Re-enable API call when backend is ready
+        // const newMember = await organizationApi.inviteMember(activeOrgId, email, role);
+        
+        // Mock: Create member locally
+        const newMember: TeamMember = {
+          id: `member-${Date.now()}`,
+          email,
+          role,
+          joinedAt: new Date().toISOString(),
+        };
 
         // Update local state
         setOrganizations((prev) =>
@@ -217,7 +242,8 @@ export function useOrganization() {
       try {
         setError(null);
 
-        await organizationApi.removeMember(activeOrgId, memberId);
+        // TODO: Re-enable API call when backend is ready
+        // await organizationApi.removeMember(activeOrgId, memberId);
 
         // Update local state
         setOrganizations((prev) =>
@@ -249,11 +275,12 @@ export function useOrganization() {
       try {
         setError(null);
 
-        const updatedMember = await organizationApi.updateMemberRole(
-          activeOrgId,
-          memberId,
-          role
-        );
+        // TODO: Re-enable API call when backend is ready
+        // const updatedMember = await organizationApi.updateMemberRole(
+        //   activeOrgId,
+        //   memberId,
+        //   role
+        // );
 
         // Update local state
         setOrganizations((prev) =>
@@ -262,7 +289,7 @@ export function useOrganization() {
               ? {
                   ...org,
                   teamMembers: org.teamMembers.map((m) =>
-                    m.id === memberId ? updatedMember : m
+                    m.id === memberId ? { ...m, role } : m
                   ),
                 }
               : org
@@ -295,22 +322,15 @@ export function useOrganization() {
       setSaveSuccess(false);
       setError(null);
 
-      // Save profile updates
-      await organizationApi.updateProfile(activeOrgId, {
-        logo: activeOrg.logo || undefined,
-        tagline: activeOrg.tagline || undefined,
-        about: activeOrg.about || undefined,
-      });
-
-      // Save social links (filter out empty strings)
-      const socialLinks: SocialLinks = {};
-      if (activeOrg.socialLinks.x) socialLinks.x = activeOrg.socialLinks.x;
-      if (activeOrg.socialLinks.telegram) socialLinks.telegram = activeOrg.socialLinks.telegram;
-      if (activeOrg.socialLinks.github) socialLinks.github = activeOrg.socialLinks.github;
-      if (activeOrg.socialLinks.discord) socialLinks.discord = activeOrg.socialLinks.discord;
-      if (activeOrg.socialLinks.linkedin) socialLinks.linkedin = activeOrg.socialLinks.linkedin;
-
-      await organizationApi.updateSocialLinks(activeOrgId, socialLinks);
+      // TODO: Re-enable API calls when backend is ready
+      // await organizationApi.updateProfile(activeOrgId, {
+      //   logo: activeOrg.logo || undefined,
+      //   tagline: activeOrg.tagline || undefined,
+      //   about: activeOrg.about || undefined,
+      // });
+      
+      // Mock: Simulate save delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Show success message
       setSaveSuccess(true);

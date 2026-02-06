@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Save,
   Check,
@@ -709,17 +710,17 @@ export function OrganizationDashboard({
               <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-brand-fg/20 bg-brand-fg/10">
                 <Rocket className="h-5 w-5 text-brand-fg" />
               </div>
-              <h3 className="text-base font-semibold text-brand-fg">Create Hackathon</h3>
+              <h3 className="text-base font-semibold text-brand-fg">Host a Hackathon</h3>
               <p className="mt-1.5 text-sm text-brand-fg/60">
                 Launch a hackathon and bring builders together on Stellar.
               </p>
-              <button
-                disabled
-                className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand-fg text-sm font-semibold text-brand transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-80"
+              <Link
+                href="/hackathon/manage/new"
+                className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand-fg text-sm font-semibold text-brand transition-all duration-200 hover:opacity-90 active:scale-[0.97]"
               >
-                Coming Soon
+                Create Hackathon
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
           </div>
         </div>

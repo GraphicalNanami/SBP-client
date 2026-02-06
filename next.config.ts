@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
         destination: "/src/organization",
       },
       {
-        source: "/hackathon",
-        destination: "/src/hackathon",
+        source: "/hackathon/:path*",
+        destination: "/src/hackathon/:path*",
       },
     ];
   },
