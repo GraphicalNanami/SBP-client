@@ -6,7 +6,7 @@ import PlansSection from "./components/plansSection";
 import Footer from "./components/Footer";
 import LogoCarousel from "./components/logoCarousel";
 import FeaturedSection from "./components/featuredSection";
-import Testimonials from "./components/Posts";
+import Posts from "./components/Posts";
 import { Component } from "@/src/shared/components/ui/heroBackground";
 
 export default function LandingPage() {
@@ -22,7 +22,7 @@ export default function LandingPage() {
         <Hero />
         <LogoCarousel />
         <FeaturedSection />
-        <Testimonials />
+        <Posts />
         <PlansSection />
       </main>
       <Footer />
