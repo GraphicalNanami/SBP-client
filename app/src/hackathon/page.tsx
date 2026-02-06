@@ -22,8 +22,6 @@ import {
 } from './components/mockData';
 import { hackathonApi, transformHackathonToCard } from '@/src/shared/lib/api/hackathonApi';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
-import { JoinCommunitySection } from '@/src/events/components/eventsUI/JoinCommunitySection';
-import { HowItWorksSection } from '@/src/events/components/eventsUI/HowItWorksSection';
 import Footer from '@/src/landingPage/components/Footer';
 
 export default function HackathonListingsPage() {
@@ -383,10 +381,6 @@ export default function HackathonListingsPage() {
             </>
           )}
         </div>
-
-        {/* ── Extra Sections ── */}
-        <JoinCommunitySection />
-        <HowItWorksSection />
       </main>
 
       <Footer />
