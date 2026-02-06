@@ -4,6 +4,7 @@ import { Web3Event } from '../../types/event.types';
 import { X, Calendar, MapPin, Users, Clock, ExternalLink, Flag } from 'lucide-react';
 import Image from 'next/image';
 import { format } from 'date-fns';
+import { getAvatarUrl } from '@/src/shared/utils/avatar';
 
 interface EventDetailModalProps {
   event: Web3Event;
@@ -128,11 +129,14 @@ export const EventDetailModal = ({ event, onClose }: EventDetailModalProps) => {
                 {/* Organizer */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    {event.organizer.avatar && (
-                      <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                        <Image src={event.organizer.avatar} alt={event.organizer.name} fill className="object-cover" />
-                      </div>
-                    )}
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden">
+                      <Image 
+                        src={getAvatarUrl(event.organizer.avatar, event.organizer.name)} 
+                        alt={event.organizer.name} 
+                        fill 
+                        className="object-cover" 
+                      />
+                    </div>
                     <span className="text-sm font-medium text-foreground">{event.organizer.name}</span>
                   </div>
                   {event.organizer.twitter && (
@@ -147,11 +151,14 @@ export const EventDetailModal = ({ event, onClose }: EventDetailModalProps) => {
                 {/* Additional Hosts */}
                 {event.hostedBy && event.hostedBy.length > 0 && event.hostedBy.map((host, idx) => (
                   <div key={idx} className="flex items-center gap-3">
-                    {host.avatar && (
-                      <div className="relative w-8 h-8 rounded-full overflow-hidden">
-                        <Image src={host.avatar} alt={host.name} fill className="object-cover" />
-                      </div>
-                    )}
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                      <Image 
+                        src={getAvatarUrl(host.avatar, host.name)} 
+                        alt={host.name} 
+                        fill 
+                        className="object-cover" 
+                      />
+                    </div>
                     <span className="text-sm text-muted-foreground">{host.name}</span>
                   </div>
                 ))}
@@ -165,7 +172,12 @@ export const EventDetailModal = ({ event, onClose }: EventDetailModalProps) => {
                 <div className="flex -space-x-2">
                   {event.attendees.slice(0, 5).map((attendee, idx) => (
                     <div key={idx} className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-background">
-                      <Image src={attendee.avatar} alt={attendee.name} fill className="object-cover" />
+                      <Image 
+                        src={getAvatarUrl(attendee.avatar, attendee.name)} 
+                        alt={attendee.name} 
+                        fill 
+                        className="object-cover" 
+                      />
                     </div>
                   ))}
                   {event.attendeeCount > 5 && (
