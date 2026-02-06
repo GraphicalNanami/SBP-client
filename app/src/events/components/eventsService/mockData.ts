@@ -285,7 +285,7 @@ export const MOCK_EVENTS: Web3Event[] = [
     startDate: '2026-03-05T14:00:00Z',
     endDate: '2026-03-26T18:00:00Z',
     timezone: 'CLT',
-    coverImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80',
     status: 'Open Registration',
     organizer: {
       name: 'Stellar LATAM',
