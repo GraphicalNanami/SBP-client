@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Search,
@@ -9,14 +9,17 @@ import {
   Rocket,
   X,
   BookOpen,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import HackathonCard from './components/HackathonCard';
 import {
-  MOCK_HACKATHONS,
   CATEGORY_OPTIONS,
   STATUS_OPTIONS,
   SORT_OPTIONS,
+  type HackathonCardData,
 } from './components/mockData';
+import { hackathonApi, transformHackathonToCard } from '@/src/shared/lib/api/hackathonApi';
 
 export default function HackathonListingsPage() {
   const [search, setSearch] = useState('');
@@ -25,9 +28,46 @@ export default function HackathonListingsPage() {
   const [sort, setSort] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
 
+  // API state
+  const [hackathons, setHackathons] = useState<HackathonCardData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  /* ── Fetch hackathons from API ── */
+  useEffect(() => {
+    async function fetchHackathons() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Map frontend status filter to backend filter
+        let filter: 'all' | 'upcoming' | 'ongoing' | 'past' = 'all';
+        if (status === 'Upcoming') filter = 'upcoming';
+        else if (status === 'Ongoing') filter = 'ongoing';
+        else if (status === 'Ended') filter = 'past';
+
+        const response = await hackathonApi.listPublicHackathons({
+          filter,
+          limit: 100, // Fetch all for client-side filtering
+        });
+
+        // Transform backend data to card format
+        const transformed = response.hackathons.map(transformHackathonToCard);
+        setHackathons(transformed);
+      } catch (err) {
+        console.error('Failed to fetch hackathons:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load hackathons');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchHackathons();
+  }, [status]); // Refetch when status filter changes
+
   /* ── Filtered & sorted data ── */
   const filtered = useMemo(() => {
-    let list = [...MOCK_HACKATHONS];
+    let list = [...hackathons];
 
     // Search
     if (search.trim()) {
@@ -226,27 +266,59 @@ export default function HackathonListingsPage() {
 
       {/* ── Grid ── */}
       <main className="container-main py-10">
-        {/* Result count */}
-        <p className="mb-6 text-sm text-muted-foreground">
-          {filtered.length} hackathon{filtered.length !== 1 ? 's' : ''} found
-        </p>
+        {/* Loading state */}
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+            <p className="text-sm text-muted-foreground">Loading hackathons...</p>
+          </div>
+        )}
 
-        {filtered.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((h) => (
-              <HackathonCard key={h.id} hackathon={h} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-              <Search className="h-6 w-6 text-muted-foreground" />
+        {/* Error state */}
+        {error && !isLoading && (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/50 bg-destructive/5 py-20 text-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+              <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
-            <p className="text-base font-medium text-foreground">No hackathons found</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Try adjusting your search or filters.
+            <p className="text-base font-medium text-foreground">Failed to load hackathons</p>
+            <p className="mt-1 text-sm text-muted-foreground max-w-md">
+              {error}
             </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 rounded-full bg-foreground px-6 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-all"
+            >
+              Try again
+            </button>
           </div>
+        )}
+
+        {/* Success state */}
+        {!isLoading && !error && (
+          <>
+            {/* Result count */}
+            <p className="mb-6 text-sm text-muted-foreground">
+              {filtered.length} hackathon{filtered.length !== 1 ? 's' : ''} found
+            </p>
+
+            {filtered.length > 0 ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((h) => (
+                  <HackathonCard key={h.id} hackathon={h} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+                  <Search className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-base font-medium text-foreground">No hackathons found</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Try adjusting your search or filters.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
 

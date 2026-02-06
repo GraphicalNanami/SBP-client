@@ -50,7 +50,7 @@ export const ENDPOINTS = {
   },
   HACKATHONS: {
     // Public endpoints
-    PUBLIC_LIST: '/hackathons/public',
+    PUBLIC_LIST: '/hackathons/public/list',
     PUBLIC_DETAIL: (slug: string) => `/hackathons/public/${slug}`,
 
     // Organizer endpoints

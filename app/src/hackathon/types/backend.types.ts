@@ -522,6 +522,16 @@ export interface ListHackathonsQuery {
 }
 
 /**
+ * Public Hackathons List Query Parameters
+ * Matches the backend /hackathons/public/list endpoint
+ */
+export interface PublicHackathonsQuery {
+  filter?: 'all' | 'upcoming' | 'ongoing' | 'past';
+  limit?: number; // 1-100, default 20
+  offset?: number; // 0+, default 0
+}
+
+/**
  * Paginated Hackathons Response
  */
 export interface PaginatedHackathonsResponse {
@@ -530,4 +540,15 @@ export interface PaginatedHackathonsResponse {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+/**
+ * Public Hackathons List Response
+ * Matches the backend /hackathons/public/list endpoint response
+ */
+export interface PublicHackathonsResponse {
+  hackathons: BackendHackathon[];
+  total: number;
+  limit: number;
+  offset: number;
 }

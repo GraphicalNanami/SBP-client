@@ -404,3 +404,24 @@ Backend enforces valid state transitions:
 - Section reordering: Prizes now appears before Tracks in both preview and public detail pages
 - Updated context.md with full documentation of the preview feature
 
+### February 7, 2026 - Public Hackathons API Integration
+- ✅ **Integrated public hackathons listing with backend API**:
+  - Updated endpoint to `/hackathons/public/list` to match backend specification
+  - Added `PublicHackathonsQuery` and `PublicHackathonsResponse` types to `backend.types.ts`
+  - Updated `hackathonApi.listPublicHackathons()` to use correct query parameters (`filter`, `limit`, `offset`)
+  - Created `transformHackathonToCard()` function to map backend data to card format
+  - Updated `/hackathon` page to fetch from API instead of using mock data
+  - Added loading state with spinner animation
+  - Added error state with retry functionality
+  - Implemented real-time filtering based on backend `filter` parameter (all/upcoming/ongoing/past)
+- **API Filter Mapping**:
+  - Frontend "Upcoming" → Backend `filter=upcoming`
+  - Frontend "Ongoing" → Backend `filter=ongoing`
+  - Frontend "Ended" → Backend `filter=past`
+  - Frontend "All" → Backend `filter=all`
+- **Data Flow**: Page loads → API fetch → Transform to card format → Display in grid
+- **Environment**: Requires `NEXT_PUBLIC_API_URL=http://localhost:3001` in `.env.local`
+- **Status Determination**: Card status calculated from `startTime`, `submissionDeadline`, and backend `status`
+- **Analytics**: Builder and project counts pulled from backend `analytics` or `analyticsTracking` fields
+- Client-side search and category filtering still applied after fetching from API
+
