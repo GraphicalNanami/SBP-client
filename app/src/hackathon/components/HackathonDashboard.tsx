@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -51,6 +51,8 @@ interface HackathonDashboardProps {
   setActiveTab: (tab: HackathonDashboardTab) => void;
   isSaving: boolean;
   saveSuccess: boolean;
+  isLoading?: boolean;
+  error?: string | null;
   isNew: boolean;
   canPublish: boolean;
   updateGeneral: <K extends keyof HackathonGeneral>(field: K, value: HackathonGeneral[K]) => void;
@@ -147,6 +149,8 @@ export default function HackathonDashboard({
   setActiveTab,
   isSaving,
   saveSuccess,
+  isLoading = false,
+  error = null,
   isNew,
   canPublish,
   updateGeneral,
@@ -160,6 +164,72 @@ export default function HackathonDashboard({
   removeTag,
   handleSave,
 }: HackathonDashboardProps) {
+  const posterInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle poster upload
+  const handlePosterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    // Convert to base64 or data URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      updateGeneral('poster', result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerPosterInput = () => {
+    posterInputRef.current?.click();
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="aurora-bg min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[var(--brand)]" />
+          <p className="text-sm text-[var(--text-muted)]">Loading hackathon...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="aurora-bg min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 mx-auto">
+            <X className="h-6 w-6 text-red-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-[var(--text)] mb-2">Failed to Load Hackathon</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-6">{error}</p>
+          <Link
+            href="/organization"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand-fg)] transition-all hover:opacity-90"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Organization
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="aurora-bg min-h-screen">
       {/* ── Header ── */}
@@ -259,7 +329,15 @@ export default function HackathonDashboard({
       {/* ── Tab Content ── */}
       <main className="mx-auto max-w-[1200px] px-6 py-8">
         {activeTab === 'general' && (
-          <GeneralTab hackathon={hackathon} updateGeneral={updateGeneral} addTag={addTag} removeTag={removeTag} />
+          <GeneralTab
+            hackathon={hackathon}
+            updateGeneral={updateGeneral}
+            addTag={addTag}
+            removeTag={removeTag}
+            posterInputRef={posterInputRef}
+            handlePosterUpload={handlePosterUpload}
+            triggerPosterInput={triggerPosterInput}
+          />
         )}
         {activeTab === 'tracks' && (
           <TracksTab tracks={hackathon.tracks} addTrack={addTrack} updateTrack={updateTrack} removeTrack={removeTrack} />
@@ -286,11 +364,17 @@ function GeneralTab({
   updateGeneral,
   addTag,
   removeTag,
+  posterInputRef,
+  handlePosterUpload,
+  triggerPosterInput,
 }: {
   hackathon: Hackathon;
   updateGeneral: <K extends keyof HackathonGeneral>(field: K, value: HackathonGeneral[K]) => void;
   addTag: (tag: string) => void;
   removeTag: (tag: string) => void;
+  posterInputRef: React.RefObject<HTMLInputElement>;
+  handlePosterUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  triggerPosterInput: () => void;
 }) {
   const g = hackathon.general;
   const [tagInput, setTagInput] = useState('');
@@ -365,11 +449,26 @@ function GeneralTab({
           {/* Poster */}
           <div className="mb-5">
             <Label>Poster Image</Label>
-            <div className="flex h-32 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-muted)] transition-colors hover:border-[var(--border-hover)]">
-              <div className="text-center">
-                <ImageIcon className="mx-auto mb-2 h-6 w-6 text-[var(--text-muted)]" />
-                <p className="text-xs text-[var(--text-muted)]">Click to upload poster (recommended 1200×630)</p>
-              </div>
+            <input
+              ref={posterInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePosterUpload}
+              className="hidden"
+              aria-label="Upload hackathon poster"
+            />
+            <div
+              onClick={triggerPosterInput}
+              className="flex h-32 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-muted)] transition-colors hover:border-[var(--border-hover)]"
+            >
+              {g.poster ? (
+                <img src={g.poster} alt="Poster" className="h-full w-full rounded-2xl object-cover" />
+              ) : (
+                <div className="text-center">
+                  <ImageIcon className="mx-auto mb-2 h-6 w-6 text-[var(--text-muted)]" />
+                  <p className="text-xs text-[var(--text-muted)]">Click to upload poster (recommended 1200×630)</p>
+                </div>
+              )}
             </div>
           </div>
 

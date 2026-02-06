@@ -61,6 +61,12 @@ Left column (2/3 width):
    - Remove button per non-owner member
    - "Invite Member" button → opens the **InviteModal**
    - Empty state with illustration when no members exist
+4. **Managed Hackathons** — Grid display of organization's hackathons with:
+   - Hackathon cards showing status, dates, prize pool, and details
+   - Links to manage each hackathon (`/hackathon/manage/[id]`)
+   - Empty state with "Create Hackathon" CTA
+   - Loading spinner and error states with retry button
+   - Refresh button to manually reload hackathons
 
 Right column (1/3 width):
 1. **Quick Info** — Read-only summary card (name, website, tagline, team size)
@@ -258,8 +264,36 @@ All organization operations now communicate with the backend via the centralized
 
 ## What's Next (Not Yet Implemented)
 
-- **Hackathon Creation** — The "Create Hackathon" CTA in the dashboard sidebar is currently a disabled placeholder. The full hackathon creation flow (basic details, tracks, details, administrators, analytics, registration, judging & results) is specified in `Docs/organization-flow.md` but not yet built.
 - **Logo Upload** — The logo upload area is a visual placeholder. File upload and image cropping need implementation (currently accepts URL strings only).
 - **Email Invitations** — Member invitations are created in the backend but invitation emails are not yet sent.
 - **Token Refresh** — JWT token refresh mechanism not yet implemented (tokens will expire).
 - **Error Recovery** — More sophisticated error recovery and retry logic for failed API calls.
+
+---
+
+## Recent Changes
+
+### February 6, 2026 - Hackathon Management Section
+- ✅ **Added hackathon management section** to organization dashboard:
+  - New "Managed Hackathons" card displays all hackathons for active organization
+  - Reuses `HackathonCard` component from hackathon feature with transformation layer
+  - Integrated with backend endpoint: GET `/api/hackathons/organization/:orgId`
+  - Full loading, error, and empty state handling with retry functionality
+  - Links to hackathon management page for each hackathon (`/hackathon/manage/[id]`)
+  - Positioned in left column after Team Members section
+  - Refresh button allows manual reload of hackathons
+- **Components Added**: `ManagedHackathonsCard.tsx` (pure UI component in `organizationUI/`)
+- **Service Updates**: Extended `useOrganization` hook with:
+  - `organizationHackathons` state array
+  - `isLoadingHackathons` and `hackathonsError` state
+  - `fetchOrganizationHackathons()` handler
+  - `refreshHackathons()` manual refresh handler
+  - Automatic fetch on org load and org switch
+
+### February 6, 2026 - Hackathon Creation Integration
+- ✅ **Enabled hackathon creation flow** from organization dashboard:
+  - Updated "Host a Hackathon" link to pass active organization ID via query parameter
+  - Link now navigates to `/hackathon/manage/new?orgId={activeOrgId}`
+  - Ensures hackathons are always created under the correct organization context
+  - Removed "disabled placeholder" status from the CTA card
+- **Flow**: User selects org in dashboard → clicks "Host a Hackathon" → hackathon creation page opens with correct organization context

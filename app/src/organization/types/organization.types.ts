@@ -86,14 +86,24 @@ export interface BackendOrganization {
 export interface BackendOrganizationMember {
   _id: string;
   organizationId: string;
-  userId: string;
+  userId: string | {
+    _id: string;
+    email: string;
+    name: string;
+    avatarUrl?: string;
+  };
   role: 'ADMIN' | 'EDITOR' | 'VIEWER';
   status: 'PENDING' | 'ACTIVE' | 'REMOVED';
-  invitedBy: string;
+  invitedBy: string | {
+    _id: string;
+    email: string;
+    name: string;
+  };
   invitedAt: string;
   joinedAt?: string;
   createdAt: string;
   updatedAt: string;
+  // Deprecated: Backend now populates userId directly instead of separate user field
   user?: {
     _id: string;
     email: string;

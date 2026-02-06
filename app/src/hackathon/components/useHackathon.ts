@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { hackathonApi } from '@/src/shared/lib/api/hackathonApi';
 import type {
   Hackathon,
   HackathonGeneral,
   HackathonTrack,
   HackathonDashboardTab,
-  HackathonStatus,
   HackathonAdmin,
 } from '../types/hackathon.types';
 
@@ -32,21 +32,13 @@ const emptyGeneral: HackathonGeneral = {
 function createEmptyHackathon(orgId: string): Hackathon {
   const now = new Date().toISOString();
   return {
-    id: `hack-${Date.now()}`,
+    id: 'new',
     organizationId: orgId,
     status: 'Draft',
     general: { ...emptyGeneral },
     tracks: [],
     description: '',
-    admins: [
-      {
-        id: `admin-${Date.now()}`,
-        email: 'you@example.com',
-        name: 'You',
-        permission: 'Full Access',
-        addedAt: now,
-      },
-    ],
+    admins: [],
     prizes: [],
     judges: [],
     builders: [],
@@ -59,15 +51,46 @@ function createEmptyHackathon(orgId: string): Hackathon {
 /* ═══════════════════════════════════════════════════════
    useHackathon hook
    ═══════════════════════════════════════════════════════ */
-export function useHackathon(hackathonId: string) {
+export function useHackathon(hackathonId: string, organizationId?: string) {
   const isNew = hackathonId === 'new';
 
   const [hackathon, setHackathon] = useState<Hackathon>(() =>
-    createEmptyHackathon('org-placeholder'),
+    createEmptyHackathon(organizationId || 'org-placeholder'),
   );
   const [activeTab, setActiveTab] = useState<HackathonDashboardTab>('general');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /* ── Update organizationId when it changes (for new hackathons) ── */
+  useEffect(() => {
+    if (isNew && organizationId && organizationId !== hackathon.organizationId) {
+      setHackathon((prev) => ({
+        ...prev,
+        organizationId,
+      }));
+    }
+  }, [organizationId, isNew, hackathon.organizationId]);
+
+  /* ── Load hackathon from backend if not new ── */
+  useEffect(() => {
+    if (!isNew && hackathonId) {
+      setIsLoading(true);
+      setError(null);
+
+      hackathonApi.getHackathon(hackathonId)
+        .then((data) => {
+          setHackathon(data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error('Failed to load hackathon:', err);
+          setError(err.message || 'Failed to load hackathon');
+          setIsLoading(false);
+        });
+    }
+  }, [hackathonId, isNew]);
 
   /* ── Sync hackathon data to sessionStorage for preview ── */
   useEffect(() => {
@@ -174,15 +197,46 @@ export function useHackathon(hackathonId: string) {
     }));
   }, []);
 
-  /* ── Save (mock) ── */
-  const handleSave = useCallback(() => {
+  /* ── Save to backend ── */
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    setError(null);
+
+    try {
+      if (isNew) {
+        // Validate organizationId before creating
+        if (!hackathon.organizationId || hackathon.organizationId.includes('placeholder')) {
+          throw new Error('Invalid organization. Please select a valid organization.');
+        }
+
+        // Create new hackathon
+        const created = await hackathonApi.createHackathon(hackathon.general, hackathon.organizationId);
+        setHackathon(created);
+        // Update URL to the new ID (in a real app, you'd use router.replace)
+        window.history.replaceState(null, '', `/hackathon/manage/${created.id}`);
+      } else {
+        // Update existing hackathon
+        const updated = await hackathonApi.updateGeneral(hackathon.id, {
+          name: hackathon.general.name,
+          prizePool: hackathon.general.prizePool,
+          prizeAsset: hackathon.general.prizeAsset,
+          tags: hackathon.general.tags,
+          adminContact: hackathon.general.adminContact,
+          posterUrl: hackathon.general.poster || undefined,
+        });
+        setHackathon(updated);
+      }
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
-    }, 800);
-  }, []);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save hackathon';
+      console.error('Failed to save hackathon:', err);
+      setError(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [hackathon, isNew]);
 
   /* ── Publish validation ── */
   const canPublish = useMemo(() => {
@@ -204,6 +258,8 @@ export function useHackathon(hackathonId: string) {
     setActiveTab,
     isSaving,
     saveSuccess,
+    isLoading,
+    error,
     isNew,
     canPublish,
     updateGeneral,

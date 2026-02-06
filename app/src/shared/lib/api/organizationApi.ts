@@ -113,19 +113,33 @@ function transformOrganization(backend: BackendOrganization, members: BackendOrg
  * Transform backend member to frontend format
  */
 function transformMember(backend: BackendOrganizationMember): TeamMember {
+  // Backend now populates userId directly (not a separate user field)
+  const user = typeof backend.userId === 'string'
+    ? backend.user || { email: '', name: 'Unknown User', avatarUrl: undefined }
+    : backend.userId;
+
+  // Handle populated invitedBy field
+  const inviterId = typeof backend.invitedBy === 'string'
+    ? backend.invitedBy
+    : backend.invitedBy._id;
+
+  const inviterName = typeof backend.invitedBy === 'string'
+    ? 'Team Admin'
+    : backend.invitedBy.name;
+
   return {
     id: backend._id,
-    email: backend.user?.email || '',
-    name: backend.user?.name || 'Unknown User',
+    email: user.email || '',
+    name: user.name || 'Unknown User',
     role: transformRole(backend.role),
     status: transformStatus(backend.status),
-    avatarUrl: backend.user?.avatarUrl,
+    avatarUrl: user.avatarUrl,
     joinedAt: backend.joinedAt || backend.invitedAt,
     invitedAt: backend.invitedAt,
-    invitedBy: backend.invitedBy ? {
-      id: backend.invitedBy,
-      name: 'Team Admin', // Will be populated if backend sends this info
-    } : undefined,
+    invitedBy: {
+      id: inviterId,
+      name: inviterName,
+    },
   };
 }
 

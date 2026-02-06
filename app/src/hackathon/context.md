@@ -225,7 +225,96 @@ Card style: `rounded-2xl border bg-white p-6 shadow`. Inputs: `rounded-full h-[4
 
 ---
 
+---
+
+## Backend Integration
+
+### API Service (`@/src/shared/lib/api/hackathonApi.ts`)
+
+All hackathon operations use the centralized API client with automatic token injection and error handling.
+
+**Key Methods:**
+- `createHackathon(general, organizationId)` - Create new hackathon
+- `getHackathon(id)` - Fetch hackathon by ID
+- `getOrganizationHackathons(orgId)` - List hackathons for an organization
+- `updateGeneral(id, updates)` - Update hackathon general info
+- `createTrack(hackathonId, payload)` - Add a track
+- `updateTrack(hackathonId, trackId, payload)` - Update a track
+- `deleteTrack(hackathonId, trackId)` - Delete a track
+- `inviteAdministrator(hackathonId, payload)` - Invite admin
+- `submitForReview(id)` - Submit for platform approval
+- `getInsights(hackathonId)` - Fetch analytics data
+
+**Data Transformation:**
+- Frontend uses human-readable types (e.g., `'Draft'`, `'Public'`, `'DeFi on Stellar'`)
+- Backend uses UPPERCASE enums (e.g., `'DRAFT'`, `'PUBLIC'`, `'DEFI'`)
+- `hackathonApi` handles bidirectional transformation automatically via utility functions:
+  - `transformCategory()` / `transformCategoryToBackend()`
+  - `transformVisibility()` / `transformVisibilityToBackend()`
+  - `transformStatus()`
+  - `transformHackathon()` - Complete transformation from backend to frontend format
+
+### Backend Types (`types/backend.types.ts`)
+
+Defines exact backend schema types matching the NestJS API:
+- **Enums**: `BackendHackathonStatus`, `BackendHackathonCategory`, `BackendHackathonVisibility`, etc.
+- **Schema Interfaces**: `BackendHackathon`, `BackendTrack`, `BackendPrize`, `BackendCustomQuestion`, etc.
+- **API Payloads**: `CreateHackathonPayload`, `UpdateHackathonGeneralPayload`, `TrackPayload`, etc.
+- **Response Types**: `PaginatedHackathonsResponse`, etc.
+
+### API Endpoints (`@/src/shared/lib/api/endpoints.ts`)
+
+Comprehensive endpoint definitions for:
+- **Public**: List hackathons, get detail by slug
+- **Organizer**: CRUD operations, submit for review, cancel, archive
+- **Tracks**: CRUD operations for tracks
+- **Custom Questions**: CRUD operations for registration questions
+- **Prizes**: CRUD operations for prizes and placements
+- **Administrators**: Invite, update permissions, remove
+- **Judges**: Invite, assign tracks, remove
+- **Winners**: Assign winners, update distribution, remove
+- **Analytics**: Insights, daily trends, traffic sources
+- **Registrations**: List, export (organizer view)
+- **Submissions**: List, get detail, update status (organizer view)
+
+### Status Transitions
+
+Backend enforces valid state transitions:
+1. `DRAFT` → `UNDER_REVIEW` (when "Submit for Review" clicked)
+2. `UNDER_REVIEW` → `APPROVED` | `REJECTED` (platform admin action)
+3. `REJECTED` → `DRAFT` (organizer can re-edit and resubmit)
+4. `APPROVED` → `ENDED` | `CANCELLED`
+5. `ENDED` (terminal, results phase begins)
+6. `CANCELLED` (terminal)
+
+---
+
 ## Recent Changes
+
+### February 6, 2026 - Organization Context & Backend Response Fix
+- 🐛 **Fixed organization context flow** for hackathon creation:
+  - Updated "Host a Hackathon" link in OrganizationDashboard to pass `orgId` query parameter
+  - Link now correctly navigates to `/hackathon/manage/new?orgId={activeOrgId}`
+  - Added `useEffect` in `useHackathon` hook to update `organizationId` when it changes
+  - Prevents "Invalid organization" error when creating new hackathons
+  - Ensures hackathon is always created under the correct organization from which the button was clicked
+- 🐛 **Fixed backend transformation errors**:
+  - Updated `transformHackathon` to handle actual backend response structure
+  - Fixed field name mismatch: backend returns `customRegistrationQuestions` not `customQuestions`
+  - Added safe fallbacks for optional arrays (`tracks`, `prizes`, `tags`)
+  - Added optional chaining for nested objects (`submissionRequirements?.customInstructions`)
+  - Updated `BackendHackathon` type to match actual API response with optional fields
+- **Flow**: User selects org → clicks "Host a Hackathon" → orgId is passed → hackathon is created under that org → backend response is correctly transformed
+
+### February 6, 2026 - Backend Integration Completed
+- ✅ Created complete backend type definitions (`types/backend.types.ts`)
+- ✅ Implemented `hackathonApi` service with full CRUD operations
+- ✅ Added hackathon endpoints to centralized endpoints configuration
+- ✅ Set up bidirectional data transformation layer
+- ✅ Mapped all frontend types to backend schema
+- ✅ Documented API integration in context.md
+- 🔄 **Next**: Update `useHackathon` hook to integrate with `hackathonApi` service
+- 🔄 **Next**: Update `HackathonDashboard` component to handle API errors and loading states
 
 ### February 6, 2026 - Dashboard Forms & UTC Timezone Enhancement
 - ✨ **Added Prize form** to Winners & Prizes tab:

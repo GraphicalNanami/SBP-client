@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import {
   Save,
@@ -28,6 +28,8 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import type { OrganizationProfile, SocialLinks, TeamMember } from '../types/organization.types';
+import type { Hackathon } from '@/src/hackathon/types/hackathon.types';
+import { ManagedHackathonsCard } from './organizationUI/ManagedHackathonsCard';
 
 interface OrganizationDashboardProps {
   profile: OrganizationProfile;
@@ -37,6 +39,9 @@ interface OrganizationDashboardProps {
   saveSuccess: boolean;
   isLoading?: boolean;
   error?: string | null;
+  organizationHackathons: Hackathon[];
+  isLoadingHackathons: boolean;
+  hackathonsError: string | null;
   onProfileChange: (field: keyof OrganizationProfile, value: string) => void;
   onSocialChange: (field: keyof SocialLinks, value: string) => void;
   onAddMember: (email: string, role: TeamMember['role']) => void;
@@ -46,6 +51,7 @@ interface OrganizationDashboardProps {
   onCreateNew: () => void;
   onSave: () => void;
   onClearError?: () => void;
+  onRefreshHackathons?: () => void;
 }
 
 const SOCIAL_FIELDS: {
@@ -309,6 +315,9 @@ export function OrganizationDashboard({
   saveSuccess,
   isLoading = false,
   error = null,
+  organizationHackathons,
+  isLoadingHackathons,
+  hackathonsError,
   onProfileChange,
   onSocialChange,
   onAddMember,
@@ -318,9 +327,41 @@ export function OrganizationDashboard({
   onCreateNew,
   onSave,
   onClearError,
+  onRefreshHackathons,
 }: OrganizationDashboardProps) {
   const [showInvite, setShowInvite] = useState(false);
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle logo upload
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    // Convert to base64 or data URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      onProfileChange('logo', result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="min-h-screen bg-bg">
@@ -495,7 +536,18 @@ export function OrganizationDashboard({
 
               {/* Logo upload */}
               <div className="mb-6 flex items-center gap-5">
-                <div className="flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-border bg-bg-muted transition-colors hover:border-border-hover">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  aria-label="Upload organization logo"
+                />
+                <div
+                  onClick={triggerFileInput}
+                  className="flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-border bg-bg-muted transition-colors hover:border-border-hover"
+                >
                   {profile.logo ? (
                     <img src={profile.logo} alt="Logo" className="h-full w-full rounded-2xl object-cover" />
                   ) : (
@@ -678,6 +730,15 @@ export function OrganizationDashboard({
                 </div>
               )}
             </Card>
+
+            {/* ── Managed Hackathons ── */}
+            <ManagedHackathonsCard
+              hackathons={organizationHackathons}
+              isLoading={isLoadingHackathons}
+              error={hackathonsError}
+              organizationId={activeOrgId || ''}
+              onRefresh={onRefreshHackathons}
+            />
           </div>
 
           {/* ── Right Column ── */}
@@ -715,7 +776,7 @@ export function OrganizationDashboard({
                 Launch a hackathon and bring builders together on Stellar.
               </p>
               <Link
-                href="/hackathon/manage/new"
+                href={`/hackathon/manage/new?orgId=${activeOrgId}`}
                 className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand-fg text-sm font-semibold text-brand transition-all duration-200 hover:opacity-90 active:scale-[0.97]"
               >
                 Create Hackathon
