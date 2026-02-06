@@ -65,9 +65,19 @@ export default function HackathonDetailPage() {
 
   useEffect(() => {
     async function fetchHackathon() {
+      // Safety check: ensure we have a valid ID
+      if (!id || id === '[id]' || id.includes('[') || id.includes(']')) {
+        console.error('Invalid hackathon ID:', id);
+        setError('Invalid hackathon ID');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
         setError(null);
+
+        console.log('Fetching hackathon with ID:', id);
 
         // Fetch hackathon by ID/slug from backend
         const response = await hackathonApi.getPublicHackathon(id);
