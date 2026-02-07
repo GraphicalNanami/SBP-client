@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { REGIONAL_CHAPTERS, RegionName } from '../events/types/region.types';
 import { Twitter, MessageCircle, Send, Instagram, Linkedin, Youtube, ExternalLink, Sparkles, Users, Globe } from 'lucide-react';
-import { getAvatarUrl } from '@/src/shared/utils/avatar';
+import { getAvatarUrl, isDataUri } from '@/src/shared/utils/avatar';
 
 export default function RegionsPage() {
   const router = useRouter();
@@ -139,10 +139,11 @@ export default function RegionsPage() {
                   <div className="flex items-center gap-4">
                     <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-[#E6FF80] to-blue-500/20 border-2 border-[#E5E5E5]">
                       <Image
-                        src={getAvatarUrl(chapter.president.avatar, chapter.president.name)}
+                        src={getAvatarUrl(chapter.president.avatar, `${chapter.name}-${chapter.president.name}`)}
                         alt={chapter.president.name}
                         fill
                         className="object-cover"
+                        unoptimized={isDataUri(getAvatarUrl(chapter.president.avatar, `${chapter.name}-${chapter.president.name}`))}
                       />
                     </div>
                     <div>

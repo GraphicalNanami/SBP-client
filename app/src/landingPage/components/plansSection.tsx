@@ -11,7 +11,7 @@ const PlansSection = () => {
   const handleCardClick = (cardType: string) => {
     switch (cardType) {
       case 'Hackers':
-        router.push('/src/hackathons');
+        router.push('/users');
         break;
       case 'Organizers':
         router.push('/src/regions');
