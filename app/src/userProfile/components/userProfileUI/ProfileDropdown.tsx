@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { User, LogOut, Calendar, Briefcase, Settings } from 'lucide-react';
+import { User, LogOut, Calendar, Briefcase, Settings, Hammer } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/src/auth/hooks/useAuth';
 
@@ -86,6 +86,16 @@ const ProfileDropdown = () => {
                 Coming Soon
               </span>
             </button>
+
+            <Link href="/builds/my-builds">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors"
+              >
+                <Hammer className="w-4 h-4 text-muted-foreground" />
+                <span>My Builds</span>
+              </button>
+            </Link>
 
             <button
               disabled

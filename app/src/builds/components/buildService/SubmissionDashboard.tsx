@@ -2,18 +2,19 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  ArrowLeft, 
-  FileText, 
-  Link2, 
-  Edit, 
-  Users, 
+import {
+  ArrowLeft,
+  FileText,
+  Link2,
+  Edit,
+  Users,
   Zap,
   Check,
   Upload,
   Plus,
   X,
-  ExternalLink
+  ExternalLink,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/src/shared/components/ui/button';
 import { ChipInput } from '@/src/shared/components/factories/ChipInput';
@@ -64,6 +65,8 @@ interface SubmissionDashboardProps {
   isSaving: boolean;
   saveSuccess: boolean;
   canPublish: boolean;
+  isInitializing: boolean;
+  error: string | null;
   setActiveTab: (tab: BuildDashboardTab) => void;
   updateDetails: (details: Partial<BuildSubmission['details']>) => void;
   updateLinks: (links: Partial<BuildSubmission['links']>) => void;
@@ -78,8 +81,50 @@ interface SubmissionDashboardProps {
 }
 
 export default function SubmissionDashboard(props: SubmissionDashboardProps) {
+  // Show loading state while initializing
+  if (props.isInitializing) {
+    return (
+      <div className="min-h-screen bg-[#FCFCFC] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[#E5E5E5] border-t-[#1A1A1A] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-[#4D4D4D]">Creating your build...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if initialization failed
+  if (props.error && !props.build.id) {
+    return (
+      <div className="min-h-screen bg-[#FCFCFC] flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-[#1A1A1A] mb-2">Failed to Initialize Build</h2>
+          <p className="text-[#4D4D4D] mb-6">{props.error}</p>
+          <Link
+            href="/builds"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] text-white rounded-xl hover:bg-[#333] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Builds
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FCFCFC]">
+      {/* Error Banner */}
+      {props.error && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-800">{props.error}</p>
+          </div>
+        </div>
+      )}
+
       {/* Sticky Header */}
       <div className="sticky top-0 z-40 bg-white border-b border-[#E5E5E5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

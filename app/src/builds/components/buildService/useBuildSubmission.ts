@@ -1,16 +1,78 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import type { 
-  BuildSubmission, 
-  BuildDashboardTab, 
-  BuildDetails, 
-  BuildLinks, 
-  BuildTeam, 
+import { useState, useCallback, useEffect } from 'react';
+import type {
+  BuildSubmission,
+  BuildDashboardTab,
+  BuildDetails,
+  BuildLinks,
+  BuildTeam,
   BuildStellar,
-  BuildCategory,
-  NetworkType 
+  BuildCategory
 } from '@/src/builds/types/build.types';
+import type { CreateBuildPayload, BackendBuild } from '@/src/builds/types/backend.types';
+import * as buildsApi from './buildsApi';
+
+/**
+ * Transform BuildSubmission to CreateBuildPayload for API calls
+ */
+function transformToPayload(build: BuildSubmission): CreateBuildPayload {
+  return {
+    name: build.details.name,
+    tagline: build.details.tagline,
+    category: build.details.category as BuildCategory,
+    description: build.details.description,
+    logo: build.details.logo || undefined,
+    githubRepository: build.links.github || undefined,
+    website: build.links.website || undefined,
+    demoVideo: build.links.demoVideo || undefined,
+    socialLinks: build.links.socialLinks.length > 0 ? build.links.socialLinks : undefined,
+    teamDescription: build.team.description || undefined,
+    contactEmail: build.team.contactEmail || undefined,
+    teamSocials: build.team.teamSocials.length > 0
+      ? build.team.teamSocials.map(link => link.url)
+      : undefined,
+  };
+}
+
+/**
+ * Transform BackendBuild to BuildSubmission for UI state
+ */
+function transformFromBackend(backendBuild: BackendBuild): BuildSubmission {
+  return {
+    id: backendBuild.uuid,
+    userId: '', // Not provided by backend
+    status: backendBuild.status,
+    details: {
+      name: backendBuild.name,
+      logo: backendBuild.logo || '',
+      tagline: backendBuild.tagline,
+      description: backendBuild.description || '',
+      category: backendBuild.category,
+      techStack: [] // Not stored in backend yet
+    },
+    links: {
+      github: backendBuild.githubRepository || '',
+      website: backendBuild.website || '',
+      demoVideo: backendBuild.demoVideo || '',
+      liveDemo: backendBuild.website || '', // Use website as fallback
+      socialLinks: backendBuild.socialLinks || []
+    },
+    team: {
+      description: backendBuild.teamDescription || '',
+      teamSocials: (backendBuild.teamSocials || []).map(url => ({ platform: 'Website', url })),
+      contactEmail: backendBuild.contactEmail || ''
+    },
+    stellar: {
+      contractAddress: backendBuild.contractAddress || '',
+      stellarAddress: backendBuild.stellarAddress || '',
+      networkType: '' // Not provided by backend in current schema
+    },
+    createdAt: backendBuild.publishedAt || new Date().toISOString(),
+    updatedAt: backendBuild.publishedAt || new Date().toISOString(),
+    publishedAt: backendBuild.publishedAt || ''
+  };
+}
 
 export function useBuildSubmission() {
   // Initial state
@@ -50,10 +112,40 @@ export function useBuildSubmission() {
 
   // Tab navigation
   const [activeTab, setActiveTab] = useState<BuildDashboardTab>('details');
-  
+
   // UI state
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Create initial draft on mount
+  useEffect(() => {
+    async function initializeDraft() {
+      try {
+        setIsInitializing(true);
+
+        // Create an empty draft build
+        const initialPayload: CreateBuildPayload = {
+          name: 'Untitled Build',
+          tagline: '',
+          category: 'Other',
+        };
+
+        const createdBuild = await buildsApi.createBuild(initialPayload);
+        const transformedBuild = transformFromBackend(createdBuild);
+
+        setBuild(transformedBuild);
+      } catch (err) {
+        console.error('Failed to create initial draft:', err);
+        setError('Failed to initialize build. Please try again.');
+      } finally {
+        setIsInitializing(false);
+      }
+    }
+
+    initializeDraft();
+  }, []);
 
   // Validation helper
   const isValidEmail = (email: string) => {
@@ -143,57 +235,68 @@ export function useBuildSubmission() {
 
   // Save and publish actions
   const handleSave = useCallback(async () => {
+    if (!build.id) {
+      console.error('Cannot save: Build ID is missing');
+      return;
+    }
+
     try {
       setIsSaving(true);
-      
-      // TODO: Integrate with actual API
-      // For now, just simulate save
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setBuild(prev => ({
-        ...prev,
-        status: 'Draft',
-        updatedAt: new Date().toISOString()
-      }));
+      setError(null);
+
+      // Transform build to API payload (only send changed fields)
+      const payload = transformToPayload(build);
+
+      // Call PATCH endpoint to save draft
+      const updatedBuild = await buildsApi.updateBuild(build.id, payload);
+      const transformedBuild = transformFromBackend(updatedBuild);
+
+      setBuild(transformedBuild);
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-      
-    } catch (error) {
-      console.error('Save failed:', error);
-      // TODO: Handle error with toast notification
+
+    } catch (err) {
+      console.error('Save failed:', err);
+      setError('Failed to save build. Please try again.');
     } finally {
       setIsSaving(false);
     }
-  }, []);
+  }, [build]);
 
   const handlePublish = useCallback(async () => {
-    if (!canPublish) return;
+    if (!canPublish || !build.id) return;
 
     try {
       setIsSaving(true);
-      
-      // TODO: Integrate with actual API
-      // For now, just simulate publish
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setBuild(prev => ({
-        ...prev,
-        status: 'Published',
-        publishedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
+      setError(null);
+
+      // First, save the current draft state
+      const payload = transformToPayload(build);
+      await buildsApi.updateBuild(build.id, payload);
+
+      // Then publish the build
+      const publishPayload = {
+        contractAddress: build.stellar.contractAddress || build.stellar.stellarAddress, // Use whichever is provided
+        stellarAddress: build.stellar.stellarAddress || build.stellar.contractAddress,
+        visibility: 'PUBLIC' as const,
+      };
+
+      const publishedBuild = await buildsApi.publishBuild(build.id, publishPayload);
+      const transformedBuild = transformFromBackend(publishedBuild);
+
+      setBuild(transformedBuild);
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-      
-    } catch (error) {
-      console.error('Publish failed:', error);
-      // TODO: Handle error with toast notification
+
+    } catch (err) {
+      console.error('Publish failed:', err);
+      setError('Failed to publish build. Please check all required fields.');
     } finally {
       setIsSaving(false);
     }
-  }, [canPublish]);
+  }, [canPublish, build]);
 
   return {
     // State
@@ -202,6 +305,8 @@ export function useBuildSubmission() {
     isSaving,
     saveSuccess,
     canPublish,
+    isInitializing,
+    error,
 
     // Actions
     setActiveTab,

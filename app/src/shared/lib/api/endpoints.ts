@@ -108,6 +108,40 @@ export const ENDPOINTS = {
     SUBMISSION_BY_ID: (hackathonId: string, submissionId: string) => `/hackathons/${hackathonId}/submissions/${submissionId}`,
     UPDATE_SUBMISSION_STATUS: (hackathonId: string, submissionId: string) => `/hackathons/${hackathonId}/submissions/${submissionId}/status`,
   },
+  BUILDS: {
+    // Public endpoints
+    PUBLIC_LIST: '/builds/public/list',
+    PUBLIC_DETAIL: (slug: string) => `/builds/public/${slug}`,
+
+    // Private endpoints (auth required)
+    CREATE: '/builds',
+    MY_BUILDS: '/builds/my-builds',
+    BY_ID: (id: string) => `/builds/${id}`,
+    PUBLISH: (id: string) => `/builds/${id}/publish`,
+    ARCHIVE: (id: string) => `/builds/${id}/archive`,
+
+    // Team management
+    TEAM_INVITE: (buildId: string) => `/builds/${buildId}/team/invite`,
+    TEAM_ACCEPT: (buildId: string) => `/builds/${buildId}/team/accept`,
+    TEAM_DECLINE: (buildId: string) => `/builds/${buildId}/team/decline`,
+    TEAM_MEMBER: (buildId: string, memberUuid: string) => `/builds/${buildId}/team/${memberUuid}`,
+    TEAM_TRANSFER_LEADERSHIP: (buildId: string) => `/builds/${buildId}/team/transfer-leadership`,
+  },
+  SUBMISSIONS: {
+    // Participant endpoints
+    CREATE: '/submissions',
+    MY_SUBMISSIONS: '/submissions/my-submissions',
+    BY_ID: (id: string) => `/submissions/${id}`,
+    SUBMIT: (id: string) => `/submissions/${id}/submit`,
+    WITHDRAW: (id: string) => `/submissions/${id}/withdraw`,
+
+    // Organizer and judge endpoints  
+    BY_HACKATHON: (hackathonId: string) => `/submissions/hackathon/${hackathonId}`,
+    START_REVIEW: (hackathonId: string) => `/submissions/hackathon/${hackathonId}/start-review`,
+    JUDGE: (id: string) => `/submissions/${id}/judge`,
+    SELECT_WINNER: (id: string) => `/submissions/${id}/select-winner`,
+    DISQUALIFY: (id: string) => `/submissions/${id}/disqualify`,
+  },
   PARTICIPANT: {
     // Participant registration endpoints
     REGISTER: '/participant/registrations',
