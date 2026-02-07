@@ -69,27 +69,11 @@ export function useJoinHackathon({ hackathonId, hackathonName }: UseJoinHackatho
   }, [isModalOpen, fetchUserBuilds]);
 
   /* ── Create New Build ── */
-  const handleCreateNewBuild = useCallback(async () => {
-    try {
-      setIsSubmitting(true);
-      setError(null);
-
-      // Create a new draft build with minimal payload
-      const newBuild = await createBuild({
-        name: `${hackathonName} Project`,
-      });
-
-      // Navigate to build edit page with hackathon context
-      router.push(`/builds/edit/${newBuild.uuid}?hackathon=${hackathonId}`);
-
-      // Close modal
-      closeModal();
-    } catch (err) {
-      console.error('Failed to create new build:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create build');
-      setIsSubmitting(false);
-    }
-  }, [hackathonName, hackathonId, router, closeModal]);
+  const handleCreateNewBuild = useCallback(() => {
+    // Simply navigate to builds page
+    router.push('/builds');
+    closeModal();
+  }, [router, closeModal]);
 
   /* ── Submit Existing Build ── */
   const handleSelectExistingBuild = useCallback(

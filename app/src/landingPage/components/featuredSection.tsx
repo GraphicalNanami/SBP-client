@@ -99,7 +99,7 @@ const FeaturedSection = () => {
               <div className="absolute inset-0">
                 {hackathonImages.map((img, index) => (
                   <div
-                    key={img}
+                    key={`carousel-image-${index}`}
                     className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
                       index === currentImageIndex ? "opacity-100" : "opacity-0"
                     }`}
