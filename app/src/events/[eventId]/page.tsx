@@ -1,11 +1,17 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { MOCK_EVENTS } from '../components/eventsService/mockData';
 import Image from 'next/image';
-import { Calendar, MapPin, X as XIcon, Flag, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Flag } from 'lucide-react';
 import { format } from 'date-fns';
 import { Avatar } from '@/src/shared/components/Avatar';
+import { useAuth } from '@/src/auth/context/AuthContext';
+import { liveEventsApi } from '../components/eventsService/liveEventsApi';
+import { MOCK_EVENTS } from '../components/eventsService/mockData';
+import { convertWeb3EventToPayload } from '../components/eventsService/useEvents';
+import type { LiveEvent } from '../types/live-events.types';
+import type { Web3Event } from '../types/event.types';
 
 const getTagColor = (tag: string) => {
   switch (tag) {
@@ -29,15 +35,194 @@ const getTagColor = (tag: string) => {
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const eventId = params.eventId as string;
-  
-  const event = MOCK_EVENTS.find((e) => e.id === eventId);
+  const [event, setEvent] = useState<LiveEvent | null>(null);
+  const [mockEvent, setMockEvent] = useState<Web3Event | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [registeredCount, setRegisteredCount] = useState(0);
 
-  if (!event) {
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Fetch all events to find the right UUID
+        const allEventsResponse = await liveEventsApi.list();
+        const liveEvents = allEventsResponse.events;
+        
+        // Try to find event by UUID (if eventId is already a UUID)
+        let targetEvent = liveEvents.find(e => e.uuid === eventId);
+        
+        // If not found by UUID, eventId might be a mock ID - match by title
+        if (!targetEvent) {
+          const mockMatch = MOCK_EVENTS.find(m => m.id === eventId);
+          if (mockMatch) {
+            // Find backend event with matching title
+            targetEvent = liveEvents.find(e => 
+              e.title.toLowerCase().trim() === mockMatch.title.toLowerCase().trim()
+            );
+            
+            // If no backend match, use mock data
+            if (!targetEvent) {
+              setMockEvent(mockMatch);
+              setEvent(null);
+              setRegisteredCount(mockMatch.attendeeCount || 0);
+              return;
+            }
+          }
+        }
+        
+        if (targetEvent) {
+          setEvent(targetEvent);
+          setMockEvent(null);
+          setRegisteredCount(targetEvent.registeredCount || 0);
+        } else {
+          setError('Event not found.');
+        }
+      } catch (err) {
+        console.error('Failed to load event:', err);
+        setError('Event not found. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (eventId) {
+      fetchEvent();
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      if (!isAuthenticated || !event) return;
+
+      try {
+        const registrations = await liveEventsApi.getMyRegistrations();
+        const isUserRegistered = registrations.registrations.some(
+          (registration) => registration.event.uuid === event.uuid
+        );
+        setIsRegistered(isUserRegistered);
+      } catch (err) {
+        console.error('Failed to load registrations:', err);
+      }
+    };
+
+    fetchRegistrations();
+  }, [event, isAuthenticated]);
+
+  const startDate = useMemo(() => {
+    if (event) return new Date(event.startDate);
+    if (mockEvent) return new Date(mockEvent.startDate);
+    return null;
+  }, [event, mockEvent]);
+  
+  const endDate = useMemo(() => {
+    if (event) return new Date(event.endDate);
+    if (mockEvent) return new Date(mockEvent.endDate);
+    return null;
+  }, [event, mockEvent]);
+  
+  const isCompleted = event?.status === 'COMPLETED' || mockEvent?.status === 'Past';
+
+  const primaryHost = event?.hosts?.[0] || (mockEvent ? {
+    name: mockEvent.organizer.name,
+    avatar: mockEvent.organizer.avatar,
+    role: 'Organizer'
+  } : undefined);
+  
+  const additionalHosts = event?.hosts?.slice(1) || mockEvent?.hostedBy?.map(host => ({
+    name: host.name,
+    avatar: host.avatar,
+    role: 'Co-host'
+  })) || [];
+  
+  const eventTags = event?.tags || mockEvent?.tags || [];
+  
+  const eventTitle = event?.title || mockEvent?.title || '';
+  const eventDescription = event?.description || mockEvent?.description || '';
+  const eventLocation = event?.location || mockEvent?.location || '';
+  const eventCountry = event?.country || mockEvent?.country || '';
+  const eventBanner = event?.bannerUrl || mockEvent?.coverImage || '';
+  const eventExternalUrl = event?.externalUrl || mockEvent?.registrationLink;
+
+  const handleRegisterToggle = async () => {
+    if (isRegistering) return;
+    if (!isAuthenticated) {
+      router.push('/src/auth');
+      return;
+    }
+
+    try {
+      setIsRegistering(true);
+      
+      // If this is a mock event, auto-create it in backend first
+      if (mockEvent && !event) {
+        console.log('Creating mock event in backend:', mockEvent.title);
+        try {
+          const payload = convertWeb3EventToPayload(mockEvent);
+          const createdEvent = await liveEventsApi.create(payload);
+          console.log('Mock event created successfully:', createdEvent.uuid);
+          
+          // Update state to use the newly created backend event
+          setEvent(createdEvent);
+          setMockEvent(null);
+          
+          // Now register the user
+          const response = await liveEventsApi.register(createdEvent.uuid);
+          setIsRegistered(true);
+          setRegisteredCount(response.registeredCount);
+        } catch (createErr) {
+          console.error('Failed to create mock event in backend:', createErr);
+          throw new Error('Unable to register for this event. Please try again.');
+        }
+      } else if (event) {
+        // Normal registration flow for backend events
+        if (isRegistered) {
+          const response = await liveEventsApi.unregister(event.uuid);
+          setIsRegistered(false);
+          setRegisteredCount(response.registeredCount);
+        } else {
+          try {
+            const response = await liveEventsApi.register(event.uuid);
+            setIsRegistered(true);
+            setRegisteredCount(response.registeredCount);
+          } catch (registerErr: unknown) {
+            // Check if error is "event not found" - this shouldn't happen but handle it
+            const errorMessage = registerErr instanceof Error ? registerErr.message : String(registerErr);
+            if (errorMessage.includes('not found') || errorMessage.includes('404')) {
+              console.error('Event not found in backend, this should not happen for live events');
+            }
+            throw registerErr;
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update registration:', err);
+      alert(err instanceof Error ? err.message : 'Failed to update registration. Please try again.');
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading event details...</p>
+      </div>
+    );
+  }
+
+  if (error || (!event && !mockEvent) || !startDate || !endDate) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">Event Not Found</h1>
+          <p className="text-sm text-muted-foreground mb-4">{error || 'This event is unavailable.'}</p>
           <button
             onClick={() => router.push('/src/events')}
             className="text-[#1A1A1A] hover:underline"
@@ -48,11 +233,6 @@ export default function EventDetailPage() {
       </div>
     );
   }
-
-  const startDate = new Date(event.startDate);
-  const endDate = new Date(event.endDate);
-  const isSoldOut = event.status === 'Sold Out';
-  const isRegistrationOpen = !isSoldOut && new Date() < startDate;
 
   return (
     <div className="min-h-screen bg-[#FCFCFC]">
@@ -76,18 +256,14 @@ export default function EventDetailPage() {
           <div className="lg:col-span-5 space-y-6">
             {/* Event Banner */}
             <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#E6FF80]/20 to-blue-500/20">
-              {event.coverImage ? (
+              {eventBanner && (
                 <Image
-                  src={event.coverImage}
-                  alt={event.title}
+                  src={eventBanner}
+                  alt={eventTitle}
                   fill
                   className="object-cover"
                   priority
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-4xl font-bold text-[#1A1A1A]/20">{event.title}</span>
-                </div>
               )}
             </div>
 
@@ -99,33 +275,24 @@ export default function EventDetailPage() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
                   <Avatar
-                    src={event.organizer.avatar}
-                    alt={event.organizer.name}
-                    seed={event.organizer.name}
+                    src={primaryHost?.avatar}
+                    alt={primaryHost?.name || 'Stellar Community'}
+                    seed={primaryHost?.name || 'Stellar Community'}
                     className="object-cover"
                     size={48}
                   />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-[#1A1A1A]">{event.organizer.name}</p>
-                  {event.organizer.twitter && (
-                    <a
-                      href={`https://twitter.com/${event.organizer.twitter}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-[#4D4D4D] hover:text-[#1A1A1A] flex items-center gap-1"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      @{event.organizer.twitter}
-                    </a>
-                  )}
+                  <p className="text-sm font-semibold text-[#1A1A1A]">
+                    {primaryHost?.name || 'Stellar Community'}
+                  </p>
                 </div>
               </div>
 
               {/* Additional Hosts */}
-              {event.hostedBy && event.hostedBy.length > 0 && (
+              {additionalHosts.length > 0 && (
                 <div className="space-y-2 pt-4 border-t border-[#E5E5E5]">
-                  {event.hostedBy.map((host, index) => (
+                  {additionalHosts.map((host, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-200">
                         <Avatar
@@ -143,57 +310,22 @@ export default function EventDetailPage() {
               )}
             </div>
 
-            {/* Attendees Section */}
-            {event.attendees && event.attendees.length > 0 && (
-              <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
-                <h3 className="text-sm font-semibold text-[#1A1A1A] mb-4">
-                  {event.attendees.length} Going
-                </h3>
-                
-                {/* Attendee Avatars */}
-                <div className="flex -space-x-2 mb-4">
-                  {event.attendees.slice(0, 10).map((attendee, index) => (
-                    <div
-                      key={index}
-                      className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white bg-gray-200"
-                      title={attendee.name}
-                    >
-                      <Avatar
-                        src={attendee.avatar}
-                        alt={attendee.name}
-                        seed={attendee.name}
-                        className="object-cover"
-                        size={40}
-                      />
-                    </div>
-                  ))}
-                  {event.attendees.length > 10 && (
-                    <div className="relative w-10 h-10 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
-                      <span className="text-xs font-semibold text-[#4D4D4D]">
-                        +{event.attendees.length - 10}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Attendee Names */}
-                <div className="text-xs text-[#4D4D4D] space-y-1">
-                  {event.attendees.slice(0, 5).map((attendee, index) => (
-                    <p key={index}>{attendee.name}</p>
-                  ))}
-                  {event.attendees.length > 5 && (
-                    <p className="font-medium">and {event.attendees.length - 5} others</p>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* Registration Count */}
+            <div className="bg-white rounded-xl border border-[#E5E5E5] p-6">
+              <h3 className="text-sm font-semibold text-[#1A1A1A] mb-2">
+                {registeredCount} registered
+              </h3>
+              <p className="text-xs text-[#4D4D4D]">
+                Join builders across the Stellar ecosystem.
+              </p>
+            </div>
 
             {/* Tags and Actions */}
             <div className="space-y-4">
               {/* Tags */}
-              {event.tags && event.tags.length > 0 && (
+              {eventTags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {event.tags.map((tag, index) => (
+                  {eventTags.map((tag, index) => (
                     <span
                       key={index}
                       className={`px-3 py-1 rounded-full text-xs font-medium border ${getTagColor(tag)}`}
@@ -222,24 +354,31 @@ export default function EventDetailPage() {
             {/* Event Title and Status */}
             <div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-[#1A1A1A] mb-4 -tracking-tight leading-tight">
-                {event.title}
+                {eventTitle}
               </h1>
 
               {/* Registration Status Badge */}
-              {isSoldOut ? (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="w-2 h-2 bg-red-500 rounded-full" />
-                  <span className="text-sm font-semibold text-red-700">Sold Out</span>
+              {mockEvent && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg mb-2">
+                  <span className="text-sm font-semibold text-yellow-700">
+                    Community Event - Register to sync with backend
+                  </span>
                 </div>
-              ) : isRegistrationOpen ? (
+              )}
+              {isCompleted ? (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  <span className="text-sm font-semibold text-blue-700">Completed</span>
+                </div>
+              ) : (event?.status === 'ONGOING' || mockEvent?.status === 'Live') ? (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="w-2 h-2 bg-amber-500 rounded-full" />
+                  <span className="text-sm font-semibold text-amber-700">Ongoing</span>
+                </div>
+              ) : (
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
                   <span className="text-sm font-semibold text-green-700">Open Registration</span>
-                </div>
-              ) : (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                  <span className="text-sm font-semibold text-blue-700">Registration Closed</span>
                 </div>
               )}
             </div>
@@ -255,7 +394,7 @@ export default function EventDetailPage() {
                     {format(startDate, 'EEEE, d MMMM yyyy')}
                   </p>
                   <p className="text-sm text-[#4D4D4D]">
-                    {format(startDate, 'h:mm a')} - {format(endDate, 'h:mm a')} {event.timezone || 'GMT+3'}
+                    {format(startDate, 'h:mm a')} - {format(endDate, 'h:mm a')} UTC
                   </p>
                 </div>
               </div>
@@ -269,34 +408,52 @@ export default function EventDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#1A1A1A] mb-1">
-                    {event.venue || 'Register to See Address'}
+                    {eventLocation || 'Location to be announced'}
                   </p>
-                  <p className="text-sm text-[#4D4D4D]">{event.location}</p>
+                  <p className="text-sm text-[#4D4D4D]">{eventCountry}</p>
                 </div>
               </div>
             </div>
 
             {/* Register Button */}
             <button
-              disabled={isSoldOut}
+              onClick={handleRegisterToggle}
+              disabled={isCompleted || isRegistering}
               className={`w-full py-4 px-6 rounded-xl text-base font-semibold transition-all ${
-                isSoldOut
+                isCompleted
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-[#8B4513] text-white hover:bg-[#6F3410] shadow-sm hover:shadow-md'
+                  : isRegistered
+                  ? 'bg-white text-[#1A1A1A] border border-[#E5E5E5] hover:border-[#1A1A1A]'
+                  : 'bg-[#1A1A1A] text-white hover:bg-[#333] shadow-sm hover:shadow-md'
               }`}
             >
-              {isSoldOut ? 'Sold Out' : 'Register'}
+              {isCompleted
+                ? 'Registration Closed'
+                : isRegistering
+                ? 'Processing...'
+                : !isAuthenticated
+                ? 'Sign in to register'
+                : isRegistered
+                ? 'Unregister'
+                : 'Register'}
             </button>
+
+            {eventExternalUrl && (
+              <a
+                href={eventExternalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center text-sm font-medium text-[#1A1A1A] hover:underline"
+              >
+                Visit event website
+              </a>
+            )}
 
             {/* About Event */}
             <div className="bg-white rounded-xl border border-[#E5E5E5] p-8">
               <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">About Event</h2>
-              <div className="prose prose-sm max-w-none text-[#4D4D4D] leading-relaxed">
-                {event.longDescription ? (
-                  <div dangerouslySetInnerHTML={{ __html: event.longDescription.replace(/\n/g, '<br />') }} />
-                ) : (
-                  <p>{event.description}</p>
-                )}
+              <div className="prose prose-sm max-w-none text-[#4D4D4D] leading-relaxed whitespace-pre-line">
+                <p>{mockEvent?.longDescription || eventDescription || 'Details will be shared soon.'}</p>
               </div>
             </div>
           </div>

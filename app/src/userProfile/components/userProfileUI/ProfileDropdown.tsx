@@ -87,16 +87,15 @@ const ProfileDropdown = () => {
               </span>
             </button>
 
-            <button
-              disabled
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground cursor-not-allowed opacity-60 relative"
-            >
-              <Briefcase className="w-4 h-4 text-muted-foreground" />
-              <span className="flex-1">My Events</span>
-              <span className="px-2 py-1 text-xs bg-orange-50 text-orange-600 rounded-full border border-orange-200 whitespace-nowrap">
-                Coming Soon
-              </span>
-            </button>
+            <Link href="/src/userProfile/my-events">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors"
+              >
+                <Briefcase className="w-4 h-4 text-muted-foreground" />
+                <span>My Events</span>
+              </button>
+            </Link>
 
             <Link href="/src/dashboard/settings">
               <button

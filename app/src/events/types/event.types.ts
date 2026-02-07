@@ -1,7 +1,7 @@
 export type EventType = 'Hackathon' | 'Conference' | 'Meetup' | 'Workshop' | 'Bootcamp' | 'University';
 export type EventLocationType = 'Virtual' | 'In-Person' | 'Hybrid';
 export type EventStatus = 'Live' | 'Upcoming' | 'Past' | 'Sold Out' | 'Open Registration';
-export type EventTag = 'meetups' | 'builder house' | 'hackathon' | 'stellar ecosystem' | 'bootcamp' | 'university';
+export type EventTag = string;
 export type EventRegion = 
   | 'India'
   | 'Brazil'
@@ -12,7 +12,8 @@ export type EventRegion =
   | 'West Africa'
   | 'East Africa'
   | 'Southern Africa'
-  | 'Virtual';
+  | 'Virtual'
+  | 'Global';
 
 export interface EventOrganizer {
   name: string;
