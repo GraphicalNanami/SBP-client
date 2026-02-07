@@ -22,6 +22,8 @@ import { hackathonApi } from '@/src/shared/lib/api/hackathonApi';
 import type { HackathonCardData } from '../components/mockData';
 import type { Hackathon } from '@/src/hackathon/types/hackathon.types';
 import { getProxiedImageUrl } from '@/src/shared/utils/image-proxy';
+import JoinHackathonModal from '@/src/submissions/components/submissionUI/JoinHackathonModal';
+import { useJoinHackathon } from '@/src/submissions/components/submissionService/useJoinHackathon';
 
 /* ── Status badge colors ── */
 const statusStyles: Record<string, { bg: string; dot: string; text: string }> = {
@@ -64,6 +66,12 @@ export default function HackathonDetailPage() {
   const [fullHackathon, setFullHackathon] = useState<Hackathon | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Join hackathon functionality
+  const joinHackathon = useJoinHackathon({
+    hackathonId: hackathon?.id || '',
+    hackathonName: hackathon?.name || '',
+  });
 
   useEffect(() => {
     async function fetchHackathon() {
@@ -360,6 +368,7 @@ export default function HackathonDetailPage() {
 
             {/* Join Button */}
             <button
+              onClick={isActive ? joinHackathon.openModal : undefined}
               disabled={!isActive}
               className={`w-full py-4 px-6 rounded-xl text-base font-semibold transition-all ${
                 !isActive
@@ -494,6 +503,20 @@ export default function HackathonDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Join Hackathon Modal */}
+      <JoinHackathonModal
+        isOpen={joinHackathon.isModalOpen}
+        onClose={joinHackathon.closeModal}
+        hackathonId={hackathon?.id || ''}
+        hackathonName={hackathon?.name || ''}
+        userBuilds={joinHackathon.userBuilds}
+        isLoadingBuilds={joinHackathon.isLoadingBuilds}
+        onSelectExistingBuild={joinHackathon.handleSelectExistingBuild}
+        onCreateNewBuild={joinHackathon.handleCreateNewBuild}
+        isSubmitting={joinHackathon.isSubmitting}
+        error={joinHackathon.error}
+      />
     </div>
   );
 }
