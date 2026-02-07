@@ -87,16 +87,11 @@ const ProfileDropdown = () => {
               </span>
             </button>
 
-            <Link href="/src/userProfile/my-events">
             <Link href="/builds/my-builds">
               <button
                 onClick={() => setIsOpen(false)}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors"
               >
-                <Briefcase className="w-4 h-4 text-muted-foreground" />
-                <span>My Events</span>
-              </button>
-            </Link>
                 <Hammer className="w-4 h-4 text-muted-foreground" />
                 <span>My Builds</span>
               </button>
