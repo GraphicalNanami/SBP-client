@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/src/auth/hooks/useAuth";
 import ProfileDropdown from "@/src/userProfile/components/userProfileUI/ProfileDropdown";
 
@@ -13,10 +14,16 @@ const Navbar = () => {
       <div className="container-main flex items-center justify-between">
         {/* Logo */}
         <Link href="/src/landingPage" className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
-            <span className="text-background text-xs font-bold">≡</span>
+          <div className="w-12 h-20 rounded-sm flex items-center justify-center relative">
+            <Image 
+              src="/logo.svg" 
+              alt="SBP Logo" 
+              width={32} 
+              height={40} 
+              className="object-contain" 
+            />
           </div>
-          <span className="text-md  ">SBP</span>
+          <span className="text-md">SBP</span>
         </Link>
         
         {/* Navigation Links */}

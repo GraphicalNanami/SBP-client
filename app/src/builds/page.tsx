@@ -174,7 +174,7 @@ export default function BuildsListingPage() {
                 className="flex h-9 items-center gap-2 rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:ring-2 hover:ring-accent"
               >
                 <Rocket className="h-3.5 w-3.5" />
-                <span>Submit a Build</span>
+                <span>Create a Build</span>
               </Link>
               <Link
                 href="#"

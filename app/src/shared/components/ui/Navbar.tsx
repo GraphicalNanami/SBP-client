@@ -13,9 +13,8 @@ const Navbar = () => {
       <div className="container-main flex items-center justify-between">
         {/* Logo */}
         <Link href="/src/landingPage" className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
-            <span className="text-background text-xs font-bold">≡</span>
-          </div>
+          <img src="logo.png" alt="SBP Logo" className="w-6 h-6 object-contain" />
+
           <span className="text-xl font-semibold text-foreground">SBP</span>
         </Link>
         
