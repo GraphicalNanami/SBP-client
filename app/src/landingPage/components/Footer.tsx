@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container-main py-16">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
-            <p className="text-lg font-semibold mb-3">Stellar Global</p>
+            <p className="text-lg font-semibold mb-3">Stellar Builder Platform</p>
             <p className="text-sm text-muted-foreground">
               Institutional-grade tooling, grant rounds, and community programs that
               accelerate the next generation of Stellar builders.
@@ -39,7 +39,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-10 flex flex-col gap-2 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <span>© {currentYear} Stellar Global. All rights reserved.</span>
+          <span>© {currentYear} Stellar Builder Platform. All rights reserved.</span>
           <span>Terms · Privacy · Security</span>
         </div>
       </div>
