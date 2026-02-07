@@ -12,7 +12,11 @@ export async function getUsersList(params: UsersListParams = {}): Promise<UsersL
   if (params.sortBy) queryParams.set('sortBy', params.sortBy);
   if (params.sortOrder) queryParams.set('sortOrder', params.sortOrder);
 
-  const response = await fetch(`${API_BASE_URL}/users/list?${queryParams.toString()}`);
+  const response = await fetch(`${API_BASE_URL}/users/list?${queryParams.toString()}`, {
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+    },
+  });
   
   if (!response.ok) {
     throw new Error('Failed to fetch users');
@@ -22,7 +26,11 @@ export async function getUsersList(params: UsersListParams = {}): Promise<UsersL
 }
 
 export async function getPublicProfile(identifier: string): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/api/profile/public/${identifier}`);
+  const response = await fetch(`${API_BASE_URL}/api/profile/public/${identifier}`, {
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+    },
+  });
   
   if (!response.ok) {
     if (response.status === 404) {
