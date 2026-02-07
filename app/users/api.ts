@@ -12,7 +12,7 @@ export async function getUsersList(params: UsersListParams = {}): Promise<UsersL
   if (params.sortBy) queryParams.set('sortBy', params.sortBy);
   if (params.sortOrder) queryParams.set('sortOrder', params.sortOrder);
 
-  const response = await fetch(`${API_BASE_URL}/api/users/list?${queryParams.toString()}`);
+  const response = await fetch(`${API_BASE_URL}/users/list?${queryParams.toString()}`);
   
   if (!response.ok) {
     throw new Error('Failed to fetch users');
