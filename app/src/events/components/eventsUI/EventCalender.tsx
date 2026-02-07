@@ -1,44 +1,46 @@
 "use client"
 
+import { useMemo } from "react";
 import { FullScreenCalendar } from "@/src/shared/components/ui/full-screen-calender"
-import { MOCK_EVENTS } from "../eventsService/mockData"
+import type { Web3Event } from "../../types/event.types"
 
 interface CalendarDemoProps {
+  events: Web3Event[];
   onEventClick?: (eventId: string) => void;
 }
 
-// Transform MOCK_EVENTS to calendar format
-const calendarEvents = MOCK_EVENTS.map(event => ({
-  day: new Date(event.startDate),
-  events: [{
-    id: Number(event.id),
-    name: event.title,
-    time: new Date(event.startDate).toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    }),
-    datetime: event.startDate,
-    eventId: event.id // Keep original event ID for click handling
-  }]
-}));
+export default function CalendarDemo({ events, onEventClick }: CalendarDemoProps) {
+  const groupedEvents = useMemo(() => {
+    const calendarEvents = events.map((event, index) => ({
+      day: new Date(event.startDate),
+      events: [{
+        id: index + 1,
+        name: event.title,
+        time: new Date(event.startDate).toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
+        }),
+        datetime: event.startDate,
+        eventId: event.id
+      }]
+    }));
 
-// Group events by date
-type CalendarEvent = typeof calendarEvents[number];
-const groupedEvents = calendarEvents.reduce((acc: CalendarEvent[], curr) => {
-  const dateKey = curr.day.toDateString();
-  const existing = acc.find(item => item.day.toDateString() === dateKey);
-  
-  if (existing) {
-    existing.events.push(...curr.events);
-  } else {
-    acc.push(curr);
-  }
-  
-  return acc;
-}, []);
+    type CalendarEvent = typeof calendarEvents[number];
+    return calendarEvents.reduce((acc: CalendarEvent[], curr) => {
+      const dateKey = curr.day.toDateString();
+      const existing = acc.find(item => item.day.toDateString() === dateKey);
+      
+      if (existing) {
+        existing.events.push(...curr.events);
+      } else {
+        acc.push(curr);
+      }
+      
+      return acc;
+    }, []);
+  }, [events]);
 
-export default function CalendarDemo({ onEventClick }: CalendarDemoProps) {
   return (
     <div className="flex h-full flex-1 flex-col">
       <FullScreenCalendar 

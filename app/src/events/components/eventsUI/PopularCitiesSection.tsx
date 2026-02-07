@@ -1,71 +1,84 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { MOCK_EVENTS } from '../eventsService/mockData';
+import type { Web3Event } from '../../types/event.types';
 
-// Real cities from Stellar Ambassador Program
-const cities = [
-  { 
-    name: 'São Paulo', 
-    region: 'Brazil',
-    image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'Brazil').length,
-    description: 'Hub of Brazilian blockchain innovation'
-  },
-  { 
-    name: 'Mumbai', 
-    region: 'India',
-    image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'India').length,
-    description: 'India\'s blockchain capital'
-  },
-  { 
-    name: 'Bogotá', 
-    region: 'Colombia',
-    image: 'https://images.unsplash.com/photo-1568632234157-ce7aecd03d0d?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'Colombia').length,
-    description: 'StarMaker Colombia headquarters'
-  },
-  { 
-    name: 'Dar es Salaam', 
-    region: 'East Africa',
-    image: 'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'East Africa').length,
-    description: 'East African Stellar Community'
-  },
-  { 
-    name: 'Buenos Aires', 
-    region: 'Argentina',
-    image: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'Argentina').length,
-    description: 'LATAM blockchain hub'
-  },
-  { 
-    name: 'Mexico City', 
-    region: 'Mexico',
-    image: 'https://images.unsplash.com/photo-1512813195386-6cf811ad3542?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'Mexico').length,
-    description: 'Growing Stellar community'
-  },
-  { 
-    name: 'Santiago', 
-    region: 'Chile',
-    image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5b?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.region === 'Chile').length,
-    description: 'Chilean blockchain innovation'
-  },
-  { 
-    name: 'Kakuma', 
-    region: 'East Africa',
-    image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&q=80',
-    eventCount: MOCK_EVENTS.filter(e => e.country === 'Kenya').length,
-    description: 'Blockchain education in refugee camps'
-  },
-];
+const REGION_COUNTRIES: Record<string, string[]> = {
+  Brazil: ['Brazil'],
+  India: ['India'],
+  Colombia: ['Colombia'],
+  'East Africa': ['Kenya', 'Tanzania', 'Uganda', 'Rwanda', 'Ethiopia'],
+  Argentina: ['Argentina'],
+  Mexico: ['Mexico'],
+  Chile: ['Chile'],
+};
 
-export const PopularCitiesSection = () => {
+interface PopularCitiesSectionProps {
+  events: Web3Event[];
+}
+
+export const PopularCitiesSection = ({ events }: PopularCitiesSectionProps) => {
   const router = useRouter();
+  const cities = useMemo(
+    () => [
+      {
+        name: 'São Paulo',
+        region: 'Brazil',
+        image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&q=80',
+        description: 'Hub of Brazilian blockchain innovation',
+      },
+      {
+        name: 'Mumbai',
+        region: 'India',
+        image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=80',
+        description: "India's blockchain capital",
+      },
+      {
+        name: 'Bogotá',
+        region: 'Colombia',
+        image: 'https://images.unsplash.com/photo-1568632234157-ce7aecd03d0d?auto=format&fit=crop&q=80',
+        description: 'StarMaker Colombia headquarters',
+      },
+      {
+        name: 'Dar es Salaam',
+        region: 'East Africa',
+        image: 'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?auto=format&fit=crop&q=80',
+        description: 'East African Stellar Community',
+      },
+      {
+        name: 'Buenos Aires',
+        region: 'Argentina',
+        image: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&q=80',
+        description: 'LATAM blockchain hub',
+      },
+      {
+        name: 'Mexico City',
+        region: 'Mexico',
+        image: 'https://images.unsplash.com/photo-1512813195386-6cf811ad3542?auto=format&fit=crop&q=80',
+        description: 'Growing Stellar community',
+      },
+      {
+        name: 'Santiago',
+        region: 'Chile',
+        image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5b?auto=format&fit=crop&q=80',
+        description: 'Chilean blockchain innovation',
+      },
+      {
+        name: 'Kakuma',
+        region: 'East Africa',
+        image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&q=80',
+        description: 'Blockchain education in refugee camps',
+      },
+    ],
+    []
+  );
+
+  const getEventCount = (region: string) => {
+    const countries = REGION_COUNTRIES[region] || [];
+    return events.filter((event) => countries.includes(event.country)).length;
+  };
 
   const handleCityClick = (region: string) => {
     // Convert region name to region ID format (e.g., "East Africa" -> "east-africa")
@@ -128,7 +141,7 @@ export const PopularCitiesSection = () => {
                 <div className="mt-6">
                   <h3 className="text-xl font-bold text-foreground mb-1">{city.name}</h3>
                   <p className="text-sm text-muted-foreground mb-2">{city.description}</p>
-                  <p className="text-sm font-semibold text-accent">{city.eventCount} {city.eventCount === 1 ? 'event' : 'events'}</p>
+                  <p className="text-sm font-semibold text-accent">{getEventCount(city.region)} events</p>
                 </div>
               </div>
             ))}

@@ -48,6 +48,29 @@ Manage Freighter wallets:
 - Display wallet addresses with nicknames
 - Verified and Primary badges
 - Three-dot menu for options
+
+### My Events Page (`my-events/page.tsx`)
+**NEW - 2026-02-07**: Display all events the user has registered for:
+- Fetches registrations via `GET /live-events/me/registrations`
+- Auth guard (redirects to sign-in if not authenticated)
+- Grid layout of registered event cards (2 columns on large screens)
+- Each card shows:
+  - Event banner image with status badge
+  - Event title, description, dates, location
+  - Registration count
+  - Event tags
+  - Registration date
+  - Action buttons: "View Details" and "Unregister"
+  - External event website link
+- Empty state with CTA to browse events
+- Responsive design with mobile-first approach
+- Loading and error states
+- Accessible from profile dropdown menu
+
+## Recent Changes
+- 2026-02-07: Created My Events page with registration management
+- 2026-02-07: Integrated My Events link in ProfileDropdown (removed "Coming Soon" badge)
+- 2026-02-07: Added auth gating for My Events page
 - Set primary wallet for transactions
 
 ## Data Flow

@@ -13,17 +13,21 @@ import { HowItWorksSection } from './components/eventsUI/HowItWorksSection';
 import { CalendarButton } from './components/eventsUI/CalendarButton';
 import { CalendarModal } from './components/eventsUI/CalendarModal';
 import { Web3Event } from './types/event.types';
-import { MOCK_EVENTS } from './components/eventsService/mockData';
 import Navbar from '../landingPage/components/Navbar';
 import Footer from '../landingPage/components/Footer';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Plus } from 'lucide-react';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
+import { useAuth } from '../auth/hooks/useAuth';
+import Link from 'next/link';
 
 export default function EventsPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { 
     events, 
     filters, 
+    isLoading,
+    error,
     updateSearchQuery, 
     updateTypeFilter, 
     updateLocationFilter,
@@ -40,7 +44,7 @@ export default function EventsPage() {
   };
 
   const handleEventClick = (eventId: string) => {
-    const event = MOCK_EVENTS.find(e => e.id === eventId);
+    const event = events.find(e => e.id === eventId);
     if (event) {
       // For hackathons, show modal
       if (event.type === 'Hackathon') {
@@ -85,8 +89,19 @@ export default function EventsPage() {
               Join conferences, hackathons, and meetups building the future of blockchain technology.
             </p>
 
-            {/* Calendar Button */}
-            <CalendarButton onClick={() => setIsCalendarOpen(true)} />
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
+              <CalendarButton onClick={() => setIsCalendarOpen(true)} />
+              {isAuthenticated && (
+                <Link
+                  href="/src/events/create"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#E6FF80] text-[#1A1A1A] rounded-xl hover:bg-[#d4ed6e] transition-all font-medium"
+                >
+                  <Plus className="w-5 h-5" />
+                  Create Event
+                </Link>
+              )}
+            </div>
           </div>
         </section>
         
@@ -101,16 +116,22 @@ export default function EventsPage() {
         
         {/* Main Bento Grid */}
         <div className="container-main py-12">
+          {error && (
+            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
           <EventGrid 
             events={events} 
-            onEventClick={setSelectedEvent} 
+            onEventClick={setSelectedEvent}
+            isLoading={isLoading}
           />
         </div>
 
         {/* New Sections */}
         <JoinCommunitySection />
         <ExploreCategoriesSection />
-        <PopularCitiesSection />
+        <PopularCitiesSection events={events} />
         <HowItWorksSection />
       </main>
 
@@ -120,6 +141,7 @@ export default function EventsPage() {
       <CalendarModal 
         isOpen={isCalendarOpen}
         onClose={() => setIsCalendarOpen(false)}
+        events={events}
         onEventClick={handleEventClick}
       />
 

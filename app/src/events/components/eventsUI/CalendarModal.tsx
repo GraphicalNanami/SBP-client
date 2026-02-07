@@ -3,14 +3,16 @@
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import CalendarDemo from './EventCalender';
+import type { Web3Event } from '../../types/event.types';
 
 interface CalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
+  events: Web3Event[];
   onEventClick?: (eventId: string) => void;
 }
 
-export const CalendarModal = ({ isOpen, onClose, onEventClick }: CalendarModalProps) => {
+export const CalendarModal = ({ isOpen, onClose, events, onEventClick }: CalendarModalProps) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -68,7 +70,7 @@ export const CalendarModal = ({ isOpen, onClose, onEventClick }: CalendarModalPr
 
         {/* Calendar Content */}
         <div className="h-[calc(100%-100px)] overflow-auto">
-          <CalendarDemo onEventClick={onEventClick} />
+          <CalendarDemo events={events} onEventClick={onEventClick} />
         </div>
       </div>
     </div>
