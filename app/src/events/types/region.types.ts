@@ -43,7 +43,6 @@ export const REGIONAL_CHAPTERS: Record<RegionName, RegionalChapter> = {
     president: {
       name: 'Akash Panda',
       discord: 'web3warrior',
-      avatar: 'https://prod-files-secure.s3.us-west-2.amazonaws.com/df23f55a-e44b-49e1-ba4e-ff43954844f6/4ceca92d-de06-421d-b1ef-f6940861f579/fbb2d443-c021-494f-84ce-581a17427a54.png'
     },
     description: 'A passionate and diverse community dedicated to promoting the Stellar blockchain and its mission to create equitable access to the global financial system.',
     socials: {
@@ -59,7 +58,6 @@ export const REGIONAL_CHAPTERS: Record<RegionName, RegionalChapter> = {
     president: {
       name: 'Caio Mattos',
       discord: 'caiodemattos',
-      avatar: 'https://prod-files-secure.s3.us-west-2.amazonaws.com/df23f55a-e44b-49e1-ba4e-ff43954844f6/7883fd31-025d-423a-9269-28428fdc6cbc/1G6A5268.jpg'
     },
     description: 'Brazil has been a hotbed of innovation for Stellar, producing major projects like Soroswap, Cheesecake Lab, Emigro, Oinc, and Nearx. Our events focus on building technical architecture, team collaboration, and university students.',
     socials: {

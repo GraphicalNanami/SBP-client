@@ -6,7 +6,7 @@ import { MOCK_EVENTS } from '../../events/components/eventsService/mockData';
 import { Calendar, MapPin, Users, ExternalLink, Twitter, MessageCircle, Send, Instagram, Linkedin, Youtube, ArrowLeft, Sparkles, BookOpen, Rocket } from 'lucide-react';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { getAvatarUrl } from '@/src/shared/utils/avatar';
+import { getAvatarUrl, isDataUri } from '@/src/shared/utils/avatar';
 
 export default function RegionDetailPage() {
   const params = useParams();
@@ -144,10 +144,11 @@ export default function RegionDetailPage() {
               <div className="flex items-center gap-6 mb-6">
                 <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#E6FF80]">
                   <Image
-                    src={getAvatarUrl(region.president.avatar, region.president.name)}
+                    src={getAvatarUrl(region.president.avatar, `${region.name}-${region.president.name}`)}
                     alt={region.president.name}
                     fill
                     className="object-cover"
+                    unoptimized={isDataUri(getAvatarUrl(region.president.avatar, `${region.name}-${region.president.name}`))}
                   />
                 </div>
                 <div>
