@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { User } from '../types';
 import { MapPin, Github, Twitter, Linkedin } from 'lucide-react';
+import { getAvatarUrl } from '@/src/shared/utils/avatar';
+import Image from 'next/image';
 
 interface UserCardProps {
   user: User;
@@ -36,11 +38,12 @@ export default function UserCard({ user }: UserCardProps) {
       {/* Header */}
       <div className="relative mb-4">
         <div className="flex items-start justify-between">
-          <div className="relative">
-            <img
-              src={profilePicture}
-              alt={displayName}
-              className="w-20 h-20 rounded-full object-cover border-2 border-[#E5E5E5]"
+          <div className="relative w-16 h-16 rounded-full overflow-hidden">
+            <Image 
+              src={getAvatarUrl(user.profile?.profilePictureUrl || user.avatar, user.uuid)} 
+              alt={displayName} 
+              fill 
+              className="object-cover" 
             />
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${roleColor}`}>

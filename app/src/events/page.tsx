@@ -93,13 +93,13 @@ export default function EventsPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
               <CalendarButton onClick={() => setIsCalendarOpen(true)} />
               {isAuthenticated && (
-                <Link
-                  href="/src/events/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#E6FF80] text-[#1A1A1A] rounded-xl hover:bg-[#d4ed6e] transition-all font-medium"
-                >
-                  <Plus className="w-5 h-5" />
-                  Create Event
-                </Link>
+              <Link
+                href="/src/events/create"
+                className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-[#E6FF80] text-[#1A1A1A] rounded-xl hover:bg-[#d4ed6e] transition-all font-medium"
+              >
+                <Plus className="w-5 h-5" />
+                Create Event
+              </Link>
               )}
             </div>
           </div>
