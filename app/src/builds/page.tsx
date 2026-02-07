@@ -4,9 +4,12 @@ import Navbar from '../landingPage/components/Navbar';
 import Footer from '../landingPage/components/Footer';
 import { Sparkles, Hammer, Code2, Rocket, Bell } from 'lucide-react';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
+import { useAuth } from '@/src/auth/hooks/useAuth';
+import SubmitCTAButton from './components/buildUI/SubmitCTAButton';
 import { useState } from 'react';
 
 export default function BuildsPage() {
+  const { isAuthenticated, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
 
@@ -93,33 +96,9 @@ export default function BuildsPage() {
               </div>
             </div>
 
-            {/* Notify Me Form */}
+            {/* Submission CTA */}
             <div className="max-w-md mx-auto">
-              <form onSubmit={handleNotifyMe} className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-grow">
-                  <Bell className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-foreground text-background rounded-xl font-medium hover:bg-foreground/90 transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isSubscribed}
-                >
-                  {isSubscribed ? '✓ Subscribed!' : 'Notify Me'}
-                </button>
-              </form>
-              {isSubscribed && (
-                <p className="mt-3 text-sm text-accent-foreground animate-fade-in">
-                  Thanks! We&apos;ll notify you when Builds launches.
-                </p>
-              )}
+              <SubmitCTAButton isAuthenticated={isAuthenticated} isLoading={isLoading} />
             </div>
 
             {/* Launch Timeline */}
