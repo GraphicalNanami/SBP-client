@@ -209,31 +209,43 @@ The Builds feature is a comprehensive platform for discovering, managing, and su
 
 ## Recent Changes
 
-### 2026-02-07 - Build Submission API Integration
+### 2026-02-07 - Build Submission and Edit Functionality
 - **Integrated create and save draft functionality** with backend API
 - **Updated buildsApi.ts**:
   - Changed `updateBuild` to use PATCH method for incremental updates
   - All API methods now properly call backend endpoints
-- **Updated useBuildSubmission.ts**:
+- **Created useBuildSubmission.ts** (for new builds):
   - Added automatic draft creation on component mount via POST `/builds`
   - Implemented `handleSave` with PATCH `/builds/:id` for partial updates
   - Implemented `handlePublish` with save + POST `/builds/:id/publish`
   - Added transformation functions between UI state and API payloads
   - Added error handling and loading states (`isInitializing`, `error`)
   - Exports new state variables for UI feedback
+- **Created useBuildEdit.ts** (for editing existing builds):
+  - Loads existing build via GET `/builds/:id` on mount
+  - Uses same save/publish logic as useBuildSubmission
+  - Shares transformation functions with submission hook
 - **Updated SubmissionDashboard.tsx**:
-  - Added loading screen while creating initial draft
-  - Added error screen if draft creation fails
+  - Added loading screen while creating/loading build
+  - Added error screen if draft creation/loading fails
   - Added error banner for save/publish errors
   - Updated prop types to include `isInitializing` and `error`
-- **Workflow**:
-  - User clicks "New Build" or "Create Your First Build" buttons
-  - Navigation to `/builds/submit` triggers draft creation
-  - Hook automatically creates empty draft via POST `/builds`
-  - User fills out form across 5 tabs with real-time validation
-  - Click "Save Draft" triggers PATCH `/builds/:id` with partial updates
-  - Click "Publish" triggers save + POST `/builds/:id/publish` with validation
-- **Known Limitation**: Each visit to submission page creates a new draft. Future enhancement: support editing existing drafts via URL parameter (`/builds/submit?id=uuid` or `/builds/edit/:id`)
+- **Created edit route** at `/builds/edit/[id]/page.tsx`:
+  - Protected route with auth check
+  - Uses useBuildEdit hook to load existing build
+  - Renders same SubmissionDashboard component
+- **Updated BuildCard.tsx**:
+  - Added `editable` prop to switch between view/edit links
+  - When editable=true, links to `/builds/edit/:id`
+  - When editable=false, links to `/builds/:slug` (public view, not yet implemented)
+- **Updated My Builds page**:
+  - BuildCards now use `editable` prop so clicking navigates to edit page
+  - "New Build" button creates new draft at `/builds/submit`
+- **Workflows**:
+  - **Create New Build**: Click "New Build" → `/builds/submit` → Creates draft → Edit form
+  - **Edit Existing Build**: Click build card in My Builds → `/builds/edit/:id` → Loads build → Edit form
+  - **Save Draft**: PATCH `/builds/:id` with partial updates
+  - **Publish**: Save + POST `/builds/:id/publish` with validation
 
 ### 2026-02-07 - My Builds Page Implementation
 - **Created My Builds dashboard page** at `/builds/my-builds`

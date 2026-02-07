@@ -75,24 +75,26 @@ function formatViews(count: number) {
 interface BuildCardProps {
   build: BuildCardData;
   featured?: boolean;
+  editable?: boolean; // If true, links to edit page instead of view page
 }
 
-export default function BuildCard({ build, featured = false }: BuildCardProps) {
+export default function BuildCard({ build, featured = false, editable = false }: BuildCardProps) {
   if (featured) {
-    return <FeaturedBuildCard build={build} />;
+    return <FeaturedBuildCard build={build} editable={editable} />;
   }
-  return <RegularBuildCard build={build} />;
+  return <RegularBuildCard build={build} editable={editable} />;
 }
 
 /* ═══════════════════════════════════════════════════════
    Featured Card — large hero card for bento grid
    ═══════════════════════════════════════════════════════ */
-function FeaturedBuildCard({ build }: { build: BuildCardData }) {
+function FeaturedBuildCard({ build, editable = false }: { build: BuildCardData; editable?: boolean }) {
   const gradient = logoGradients[build.name.charCodeAt(0) % logoGradients.length];
+  const href = editable ? `/builds/edit/${build.id}` : `/builds/${build.slug}`;
 
   return (
     <Link
-      href={`/builds/${build.slug}`}
+      href={href}
       className="group relative overflow-hidden rounded-3xl min-h-[400px] lg:min-h-[520px] cursor-pointer flex"
     >
       {/* Background: logo image if available, otherwise gradient */}
@@ -188,10 +190,12 @@ function FeaturedBuildCard({ build }: { build: BuildCardData }) {
 /* ═══════════════════════════════════════════════════════
    Regular Card — compact card with logo thumbnail
    ═══════════════════════════════════════════════════════ */
-function RegularBuildCard({ build }: { build: BuildCardData }) {
+function RegularBuildCard({ build, editable = false }: { build: BuildCardData; editable?: boolean }) {
+  const href = editable ? `/builds/edit/${build.id}` : `/builds/${build.slug}`;
+
   return (
     <Link
-      href={`/builds/${build.slug}`}
+      href={href}
       className="group rounded-3xl overflow-hidden bg-white border border-[#E5E5E5] hover:shadow-lg transition-all duration-300 cursor-pointer"
     >
       {/* Logo/header section */}
