@@ -209,6 +209,30 @@ The Builds feature is a comprehensive platform for discovering, managing, and su
 
 ## Recent Changes
 
+### 2026-02-07 - Publish Functionality Implementation
+- **Fixed publish button** to properly enable when all required fields are filled
+- **Added missing required fields** for publishing:
+  - `vision` field in BuildDetails - long-term vision statement (required for publish)
+  - `teamLeadTelegram` field in BuildTeam - Telegram handle with @ (required for publish)
+- **Updated validation** in useBuildSubmission and useBuildEdit:
+  - Changed `canPublish` to match exact API requirements from `/builds/:id/publish` endpoint
+  - Removed unnecessary validations (techStack, networkType, name)
+  - Added required validations (vision, teamDescription, teamLeadTelegram)
+  - Both contractAddress AND stellarAddress now required (not either/or)
+- **Updated UI components**:
+  - Added Vision textarea in Details tab (after Tagline)
+  - Added Team Lead Telegram input in Team tab (after Contact Email)
+  - Marked Team Description as required with asterisk
+  - Updated PublishChecklist to show all 9 required fields
+- **Updated transformation functions**:
+  - transformToPayload now includes vision and teamLeadTelegram
+  - transformFromBackend now populates vision and teamLeadTelegram from backend
+- **Fixed publish payload** to send both addresses (not use one as fallback)
+- **Publish endpoint requirements** now properly enforced:
+  - tagline, category, vision, description
+  - teamDescription, teamLeadTelegram, contactEmail
+  - contractAddress (56 chars), stellarAddress (56 chars)
+
 ### 2026-02-07 - Build Submission and Edit Functionality
 - **Integrated create and save draft functionality** with backend API
 - **Updated buildsApi.ts**:

@@ -10,6 +10,7 @@ import type {
   BuildStellar,
   BuildCategory
 } from '@/src/builds/types/build.types';
+import { CATEGORY_MAPPING, BACKEND_TO_DISPLAY } from '@/src/builds/types/build.types';
 import type { CreateBuildPayload, BackendBuild } from '@/src/builds/types/backend.types';
 import * as buildsApi from './buildsApi';
 
@@ -17,10 +18,16 @@ import * as buildsApi from './buildsApi';
  * Transform BuildSubmission to CreateBuildPayload for API calls
  */
 function transformToPayload(build: BuildSubmission): CreateBuildPayload {
+  // Convert frontend category to backend category
+  const backendCategory = build.details.category
+    ? CATEGORY_MAPPING[build.details.category as BuildCategory]
+    : 'OTHER';
+
   return {
     name: build.details.name,
     tagline: build.details.tagline,
-    category: build.details.category as BuildCategory,
+    category: backendCategory,
+    vision: build.details.vision || undefined,
     description: build.details.description,
     logo: build.details.logo || undefined,
     githubRepository: build.links.github || undefined,
@@ -28,6 +35,7 @@ function transformToPayload(build: BuildSubmission): CreateBuildPayload {
     demoVideo: build.links.demoVideo || undefined,
     socialLinks: build.links.socialLinks.length > 0 ? build.links.socialLinks : undefined,
     teamDescription: build.team.description || undefined,
+    teamLeadTelegram: build.team.teamLeadTelegram || undefined,
     contactEmail: build.team.contactEmail || undefined,
     teamSocials: build.team.teamSocials.length > 0
       ? build.team.teamSocials.map(link => link.url)
@@ -39,6 +47,9 @@ function transformToPayload(build: BuildSubmission): CreateBuildPayload {
  * Transform BackendBuild to BuildSubmission for UI state
  */
 function transformFromBackend(backendBuild: BackendBuild): BuildSubmission {
+  // Convert backend category to frontend category
+  const frontendCategory = BACKEND_TO_DISPLAY[backendBuild.category] || 'Other';
+
   return {
     id: backendBuild.uuid,
     userId: '', // Not provided by backend
@@ -47,8 +58,9 @@ function transformFromBackend(backendBuild: BackendBuild): BuildSubmission {
       name: backendBuild.name,
       logo: backendBuild.logo || '',
       tagline: backendBuild.tagline,
+      vision: backendBuild.vision || '',
       description: backendBuild.description || '',
-      category: backendBuild.category,
+      category: frontendCategory,
       techStack: [] // Not stored in backend yet
     },
     links: {
@@ -60,6 +72,7 @@ function transformFromBackend(backendBuild: BackendBuild): BuildSubmission {
     },
     team: {
       description: backendBuild.teamDescription || '',
+      teamLeadTelegram: backendBuild.teamLeadTelegram || '',
       teamSocials: (backendBuild.teamSocials || []).map(url => ({ platform: 'Website', url })),
       contactEmail: backendBuild.contactEmail || ''
     },
@@ -84,6 +97,7 @@ export function useBuildSubmission() {
       name: '',
       logo: '',
       tagline: '',
+      vision: '',
       description: '',
       category: '',
       techStack: []
@@ -97,6 +111,7 @@ export function useBuildSubmission() {
     },
     team: {
       description: '',
+      teamLeadTelegram: '',
       teamSocials: [],
       contactEmail: ''
     },
@@ -152,17 +167,18 @@ export function useBuildSubmission() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  // Computed validation for publish
-  const canPublish = 
-    build.details.name.trim() !== '' &&
+  // Computed validation for publish (based on API requirements)
+  const canPublish =
     build.details.tagline.trim() !== '' &&
-    build.details.description.trim() !== '' &&
     build.details.category !== '' &&
-    build.details.techStack.length > 0 &&
+    build.details.vision.trim() !== '' &&
+    build.details.description.trim() !== '' &&
+    build.team.description.trim() !== '' &&
+    build.team.teamLeadTelegram.trim() !== '' &&
     build.team.contactEmail.trim() !== '' &&
     isValidEmail(build.team.contactEmail) &&
-    (build.stellar.contractAddress.trim() !== '' || build.stellar.stellarAddress.trim() !== '') &&
-    build.stellar.networkType !== '';
+    build.stellar.contractAddress.trim() !== '' &&
+    build.stellar.stellarAddress.trim() !== '';
 
   // Update handlers
   const updateDetails = useCallback((details: Partial<BuildDetails>) => {
@@ -275,10 +291,10 @@ export function useBuildSubmission() {
       const payload = transformToPayload(build);
       await buildsApi.updateBuild(build.id, payload);
 
-      // Then publish the build
+      // Then publish the build (both addresses are required)
       const publishPayload = {
-        contractAddress: build.stellar.contractAddress || build.stellar.stellarAddress, // Use whichever is provided
-        stellarAddress: build.stellar.stellarAddress || build.stellar.contractAddress,
+        contractAddress: build.stellar.contractAddress,
+        stellarAddress: build.stellar.stellarAddress,
         visibility: 'PUBLIC' as const,
       };
 

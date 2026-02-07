@@ -3,7 +3,8 @@
  * Based on the actual API endpoint specification from documentation
  */
 
-import type { BuildCategory, BuildStatus } from './build.types';
+import type { BuildCategory, BuildStatus, BackendBuildCategory } from './build.types';
+import { BACKEND_TO_DISPLAY } from './build.types';
 import type { BuildCardData } from '../components/buildUI/BuildCard';
 
 // ============================================
@@ -16,7 +17,7 @@ export interface PublicBuildsListResponse {
     slug: string;
     name: string;
     tagline: string;
-    category: BuildCategory;
+    category: BackendBuildCategory;
     logo?: string;
     publishedAt: string;
   }[];
@@ -36,7 +37,7 @@ export interface BackendBuild {
   slug: string;
   name: string;
   tagline: string;
-  category: BuildCategory;
+  category: BackendBuildCategory;
   status: BuildStatus;
   visibility: 'PRIVATE' | 'PUBLIC' | 'UNLISTED';
   logo?: string;
@@ -80,7 +81,7 @@ export interface BackendTeamMember {
 export interface CreateBuildPayload {
   name: string;
   tagline: string;
-  category: BuildCategory;
+  category: BackendBuildCategory;
   vision?: string;
   description?: string;
   logo?: string;
@@ -176,7 +177,7 @@ export function transformBuildToCard(backendBuild: BackendBuild | PublicBuildsLi
     slug: backendBuild.slug,
     name: backendBuild.name,
     tagline: backendBuild.tagline,
-    category: backendBuild.category,
+    category: BACKEND_TO_DISPLAY[backendBuild.category] || 'Other', // Transform backend category to display category
     status: 'status' in backendBuild ? backendBuild.status : 'Published', // Assume published for public list
     logo: backendBuild.logo || '',
     techStack: [], // Not available in listing API response

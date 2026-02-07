@@ -46,7 +46,7 @@ const selectClass = inputClass;
 
 // Build categories and tech stack suggestions
 const BUILD_CATEGORIES: BuildCategory[] = [
-  'DeFi', 'NFT & Gaming', 'Payments', 'Infrastructure', 'Developer Tools', 'Social Impact', 'Other'
+  'DeFi', 'NFT & Gaming', 'Payments', 'Infrastructure', 'Developer Tools', 'Social Impact', 'DAO', 'Other'
 ];
 
 const TECH_STACK_SUGGESTIONS = [
@@ -291,6 +291,21 @@ function DetailsTab(props: SubmissionDashboardProps) {
           </p>
         </div>
 
+        {/* Vision */}
+        <div>
+          <Label required>Vision</Label>
+          <textarea
+            value={props.build.details.vision}
+            onChange={(e) => props.updateDetails({ vision: e.target.value })}
+            className={textareaClass}
+            placeholder="What's the long-term vision for this build? What problem does it solve?"
+            rows={4}
+          />
+          <p className="text-xs text-[#4D4D4D] mt-1">
+            Explain the purpose and long-term goals of your project
+          </p>
+        </div>
+
         {/* Category */}
         <div>
           <Label required>Category</Label>
@@ -514,9 +529,24 @@ function TeamTab(props: SubmissionDashboardProps) {
           />
         </div>
 
+        {/* Team Lead Telegram */}
+        <div>
+          <Label required>Team Lead Telegram</Label>
+          <input
+            type="text"
+            value={props.build.team.teamLeadTelegram}
+            onChange={(e) => props.updateTeam({ teamLeadTelegram: e.target.value })}
+            className={inputClass}
+            placeholder="@username"
+          />
+          <p className="text-xs text-[#4D4D4D] mt-1">
+            Your Telegram handle for communication (include @)
+          </p>
+        </div>
+
         {/* Team Description */}
         <div>
-          <Label>Team Description</Label>
+          <Label required>Team Description</Label>
           <textarea
             value={props.build.team.description}
             onChange={(e) => props.updateTeam({ description: e.target.value })}
@@ -660,14 +690,15 @@ function StellarTab(props: SubmissionDashboardProps) {
 
 function PublishChecklist(props: SubmissionDashboardProps) {
   const checklistItems = [
-    { label: 'Build name', completed: props.build.details.name.trim() !== '' },
     { label: 'Tagline', completed: props.build.details.tagline.trim() !== '' },
-    { label: 'Description', completed: props.build.details.description.trim() !== '' },
     { label: 'Category', completed: props.build.details.category !== '' },
-    { label: 'Tech stack', completed: props.build.details.techStack.length > 0 },
+    { label: 'Vision', completed: props.build.details.vision.trim() !== '' },
+    { label: 'Description', completed: props.build.details.description.trim() !== '' },
+    { label: 'Team description', completed: props.build.team.description.trim() !== '' },
+    { label: 'Team lead telegram', completed: props.build.team.teamLeadTelegram.trim() !== '' },
     { label: 'Contact email', completed: props.build.team.contactEmail.trim() !== '' },
-    { label: 'Stellar integration', completed: props.build.stellar.contractAddress.trim() !== '' || props.build.stellar.stellarAddress.trim() !== '' },
-    { label: 'Network type', completed: props.build.stellar.networkType !== '' },
+    { label: 'Contract address', completed: props.build.stellar.contractAddress.trim() !== '' },
+    { label: 'Stellar address', completed: props.build.stellar.stellarAddress.trim() !== '' },
   ];
 
   const completedCount = checklistItems.filter(item => item.completed).length;
