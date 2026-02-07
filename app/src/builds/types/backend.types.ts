@@ -12,15 +12,7 @@ import type { BuildCardData } from '../components/buildUI/BuildCard';
 // ============================================
 
 export interface PublicBuildsListResponse {
-  builds: {
-    uuid: string;
-    slug: string;
-    name: string;
-    tagline: string;
-    category: BackendBuildCategory;
-    logo?: string;
-    publishedAt: string;
-  }[];
+  builds: BackendBuild[];
   total: number;
 }
 
@@ -38,7 +30,7 @@ export interface BackendBuild {
   name: string;
   tagline: string;
   category: BackendBuildCategory;
-  status: BuildStatus;
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'; // Backend uses uppercase
   visibility: 'PRIVATE' | 'PUBLIC' | 'UNLISTED';
   logo?: string;
   publishedAt?: string;
@@ -171,6 +163,18 @@ export interface SelectWinnerPayload {
 // Helper Functions
 // ============================================
 
+// Helper to transform backend status to frontend format
+export function transformStatus(backendStatus?: string): BuildStatus {
+  if (!backendStatus) return 'Published';
+
+  switch (backendStatus) {
+    case 'DRAFT': return 'Draft';
+    case 'PUBLISHED': return 'Published';
+    case 'ARCHIVED': return 'Archived';
+    default: return 'Published';
+  }
+}
+
 export function transformBuildToCard(backendBuild: BackendBuild | PublicBuildsListResponse['builds'][0]): BuildCardData {
   return {
     id: backendBuild.uuid,
@@ -178,7 +182,7 @@ export function transformBuildToCard(backendBuild: BackendBuild | PublicBuildsLi
     name: backendBuild.name,
     tagline: backendBuild.tagline,
     category: BACKEND_TO_DISPLAY[backendBuild.category] || 'Other', // Transform backend category to display category
-    status: 'status' in backendBuild ? backendBuild.status : 'Published', // Assume published for public list
+    status: 'status' in backendBuild ? transformStatus(backendBuild.status) : 'Published',
     logo: backendBuild.logo || '',
     techStack: [], // Not available in listing API response
     website: 'website' in backendBuild ? backendBuild.website || '' : '',

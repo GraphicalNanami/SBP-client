@@ -209,6 +209,16 @@ The Builds feature is a comprehensive platform for discovering, managing, and su
 
 ## Recent Changes
 
+### 2026-02-07 - Fixed Status Mapping Bug
+- **Fixed build listing display issue** where builds weren't showing on public page
+- **Root cause**: Backend returns status in uppercase ("PUBLISHED", "DRAFT", "ARCHIVED") but frontend expected title case ("Published", "Draft", "Archived")
+- **Solution**: Added `transformStatus()` helper function in backend.types.ts to map backend status values to frontend format
+- **Updated types**:
+  - Changed `BackendBuild.status` type from `BuildStatus` to `'DRAFT' | 'PUBLISHED' | 'ARCHIVED'`
+  - Simplified `PublicBuildsListResponse.builds` to use `BackendBuild[]` type
+  - Added status transformation in `transformBuildToCard()` function
+- **Impact**: Public builds listing page now correctly displays published builds
+
 ### 2026-02-07 - Publish Functionality Implementation
 - **Fixed publish button** to properly enable when all required fields are filled
 - **Added missing required fields** for publishing:

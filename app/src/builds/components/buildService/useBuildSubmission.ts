@@ -12,6 +12,7 @@ import type {
 } from '@/src/builds/types/build.types';
 import { CATEGORY_MAPPING, BACKEND_TO_DISPLAY } from '@/src/builds/types/build.types';
 import type { CreateBuildPayload, BackendBuild } from '@/src/builds/types/backend.types';
+import { transformStatus } from '@/src/builds/types/backend.types';
 import * as buildsApi from './buildsApi';
 
 /**
@@ -53,7 +54,7 @@ function transformFromBackend(backendBuild: BackendBuild): BuildSubmission {
   return {
     id: backendBuild.uuid,
     userId: '', // Not provided by backend
-    status: backendBuild.status,
+    status: transformStatus(backendBuild.status),
     details: {
       name: backendBuild.name,
       logo: backendBuild.logo || '',
@@ -144,7 +145,7 @@ export function useBuildSubmission() {
         const initialPayload: CreateBuildPayload = {
           name: 'Untitled Build',
           tagline: '',
-          category: 'Other',
+          category: 'OTHER',
         };
 
         const createdBuild = await buildsApi.createBuild(initialPayload);
