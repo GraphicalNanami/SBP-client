@@ -20,6 +20,7 @@ import * as buildsApi from './components/buildService/buildsApi';
 import { useAuth } from '@/src/auth/hooks/useAuth';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
 import Footer from '@/src/landingPage/components/Footer';
+import Navbar from '@/src/landingPage/components/Navbar';
 import type { BuildCategory } from '@/src/builds/types/build.types';
 
 // Filter options
@@ -130,6 +131,9 @@ export default function BuildsListingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Navigation Bar */}
+      <Navbar />
+      
       {/* ── Hero with wavy background text ── */}
       <section className="relative py-20 md:py-24 overflow-hidden">
         {/* Wavy Background Text */}

@@ -49,7 +49,7 @@ export function useJoinHackathon({ hackathonId, hackathonName }: UseJoinHackatho
 
       // Filter only published builds (cannot submit draft builds)
       const publishedBuilds = builds.filter(
-        (build) => build.status === 'Published' || build.status === 'PUBLISHED'
+        (build) => build.status === 'Published'
       );
 
       setUserBuilds(publishedBuilds);
