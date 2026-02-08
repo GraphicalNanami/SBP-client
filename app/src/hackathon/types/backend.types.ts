@@ -150,7 +150,7 @@ export interface BackendHackathon {
   category: BackendHackathonCategory;
   visibility: BackendHackathonVisibility;
   posterUrl?: string;
-  prizePool: number;
+  prizePool: string;  // Backend stores as string
   prizeAsset: string;
   tags?: string[];
   startTime: Date;
@@ -326,13 +326,14 @@ export interface CreateHackathonPayload {
   name: string;
   category: BackendHackathonCategory;
   visibility: BackendHackathonVisibility;
-  prizePool: number;
+  prizePool: string;  // Backend expects string, not number
   prizeAsset: string;
   tags?: string[];
   startTime: Date;
   preRegistrationEndTime?: Date;
   submissionDeadline: Date;
   venue: string;
+  description: string;  // Required field
   adminContact: string;
   organizationId: string;
   posterUrl?: string;
