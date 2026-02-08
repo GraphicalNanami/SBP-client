@@ -26,7 +26,7 @@ export async function getUsersList(params: UsersListParams = {}): Promise<UsersL
 }
 
 export async function getPublicProfile(identifier: string): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/api/profile/public/${identifier}`, {
+  const response = await fetch(`${API_BASE_URL}/profile/public/${identifier}`, {
     headers: {
       'ngrok-skip-browser-warning': 'true',
     },
