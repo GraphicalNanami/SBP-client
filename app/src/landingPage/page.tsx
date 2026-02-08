@@ -36,7 +36,7 @@ export default function LandingPage() {
       </div>
       
       <main className="relative z-10 flex-grow">
-        <Link href="/src/landingPage" className="flex items-center gap-2 py-2 px-8">
+        <Link href="/src/landingPage" className="flex items-center gap-2 py-8 px-16">
         
                  
                   <div className="w-12 h-20 rounded-sm flex items-center justify-center relative">
@@ -48,7 +48,7 @@ export default function LandingPage() {
                       className="object-contain" 
                     />
                   </div>
-                  <span className="text-md">SBP</span>
+                  <span className="text-md font-bold">SBP</span>
                 </Link>
                       <FloatingNav navItems={floatingNavItems} />
 

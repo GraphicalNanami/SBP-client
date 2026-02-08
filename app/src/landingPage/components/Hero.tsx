@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { CircleHighlight, UnderlineHighlight } from "@/src/shared/components/ui/highlightText";
 import Image from "next/image";
-import FloatingNav from "./FloatingNav";
 
 
 
@@ -22,7 +21,7 @@ const Hero = () => {
   
 
   return (
-    <section className="relative py-20 md:py-24 overflow-hidden">
+    <section className="relative py-13 md:py-17 overflow-hidden">
 
        
      
