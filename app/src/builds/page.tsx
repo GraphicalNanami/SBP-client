@@ -177,7 +177,7 @@ export default function BuildsListingPage() {
             {/* Desktop Dual Button */}
             <div className="hidden lg:flex items-center gap-0.5 rounded-full border border-border bg-white p-1">
               <Link
-                href="/builds/submit"
+                href="/src/builds/submit"
                 className="flex h-9 items-center gap-2 rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:ring-2 hover:ring-accent"
               >
                 <Rocket className="h-3.5 w-3.5" />
@@ -196,7 +196,7 @@ export default function BuildsListingPage() {
             <div className="lg:hidden">
               {isAuthenticated ? (
                 <Link
-                  href="/builds/submit"
+                  href="/src/builds/submit"
                   className="flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-colors font-medium"
                 >
                   <Plus className="w-4 h-4" />
@@ -204,7 +204,7 @@ export default function BuildsListingPage() {
                 </Link>
               ) : (
                 <Link
-                  href="/src/auth?redirect=/builds/submit"
+                  href="/src/auth?redirect=/src/builds/submit"
                   className="flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-colors font-medium"
                 >
                   <Plus className="w-4 h-4" />
@@ -248,7 +248,7 @@ export default function BuildsListingPage() {
 
             {isAuthenticated && (
               <Link
-                href="/builds/submit"
+                href="/src/builds/submit"
                 className="flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl hover:bg-accent/5 transition-colors text-foreground font-medium"
               >
                 <Plus className="w-4 h-4" />
