@@ -268,9 +268,8 @@ export function transformHackathonToCard(backend: BackendHackathon): {
 function transformToCreatePayload(
   general: Pick<Hackathon['general'], 'name' | 'category' | 'visibility' | 'prizePool' | 'prizeAsset' | 'tags' | 'startTime' | 'preRegEndTime' | 'submissionDeadline' | 'venue' | 'venueLocation' | 'adminContact' | 'poster'>,
   organizationId: string,
-  description?: string
-  organizationId: string,
-  description?: string
+  description?: string,
+
 ): CreateHackathonPayload {
   return {
     name: general.name,
@@ -284,8 +283,7 @@ function transformToCreatePayload(
     submissionDeadline: new Date(general.submissionDeadline),
     venue: general.venue === 'Online' ? 'Online' : general.venueLocation,
     description: description && description.trim() ? description : 'description',  // Use provided description or fallback to 'description'
-    description: description || '',  // Use provided description or empty string
-    adminContact: general.adminContact,
+     adminContact: general.adminContact,
     organizationId,
     posterUrl: general.poster || undefined,
   };
@@ -418,10 +416,7 @@ export const hackathonApi = {
     general: Pick<Hackathon['general'], 'name' | 'category' | 'visibility' | 'prizePool' | 'prizeAsset' | 'tags' | 'startTime' | 'preRegEndTime' | 'submissionDeadline' | 'venue' | 'venueLocation' | 'adminContact' | 'poster'>,
     organizationId: string,
     description?: string
-    organizationId: string,
-    description?: string
   ): Promise<Hackathon> {
-    const payload = transformToCreatePayload(general, organizationId, description);
     const payload = transformToCreatePayload(general, organizationId, description);
     const backend = await apiClient.post<BackendHackathon>(
       ENDPOINTS.HACKATHONS.CREATE,
