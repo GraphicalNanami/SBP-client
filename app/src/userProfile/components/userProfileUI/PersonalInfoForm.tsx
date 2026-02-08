@@ -6,9 +6,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Camera, Save, Loader2, Upload } from 'lucide-react';
 import { useProfile } from '../userProfileService/useProfile';
 import type { UpdatePersonalInfoPayload } from '@/src/userProfile/types/profile.types';
+import { getAvatarUrl, isDataUri } from '@/src/shared/utils/avatar';
 
 export default function PersonalInfoForm() {
   const { profile, data, isLoading, isUpdating, updatePersonalInfo, uploadProfilePicture, error } = useProfile();
@@ -138,25 +140,21 @@ export default function PersonalInfoForm() {
 
           {/* Profile Picture */}
           <div className="flex items-start gap-6 mb-8">
-            <div className="relative">
-              {profile?.profilePictureUrl ? (
-                <img
-                  src={profile.profilePictureUrl}
-                  alt={displayName}
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-2 border-[#E5E5E5]"
-                />
-              ) : (
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl md:text-3xl font-semibold">
-                  {initials}
-                </div>
-              )}
+            <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-muted">
+              <Image
+                src={getAvatarUrl(data?.user?.avatar, data?.user?.name || 'User')}
+                alt={data?.user?.name || 'User'}
+                fill
+                className="object-cover"
+                unoptimized={isDataUri(getAvatarUrl(data?.user?.avatar, data?.user?.name || 'User'))}
+              />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-8 h-8 md:w-10 md:h-10 bg-foreground text-background rounded-full flex items-center justify-center hover:bg-foreground/90 hover:ring-2 hover:ring-[hsl(var(--accent))] transition-all duration-200"
+                className="absolute bottom-0 right-0 w-3 h-3 md:w-10 md:h-10 bg-foreground text-background rounded-full flex items-center justify-center hover:bg-foreground/90 hover:ring-2 hover:ring-[hsl(var(--accent))] transition-all duration-200"
                 aria-label="Upload profile picture"
               >
-                <Camera className="w-4 h-4 md:w-5 md:h-5" />
+                <Camera className="w-4 h-4 md:w-5 md:h-5 " />
               </button>
               <input
                 ref={fileInputRef}

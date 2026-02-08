@@ -5,12 +5,30 @@ import Link from "next/link";
 
 import { CircleHighlight, UnderlineHighlight } from "@/src/shared/components/ui/highlightText";
 import Image from "next/image";
+import FloatingNav from "./FloatingNav";
+
+
+
+const floatingNavItems = [
+  { name: "Events", link: "/Events" },
+  { name: "Hackathons", link: "/src/hackathon" },
+  { name: "Builds", link: "/Builds" },
+  { name: "Swags", link: "#", disabled: true },
+];
 
 const Hero = () => {
+
+
   
 
   return (
     <section className="relative py-20 md:py-24 overflow-hidden">
+
+       
+     
+      
+
+
           {/* Wavy Background Text */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03] select-none">
             <div className="absolute top-20 left-10 text-9xl font-bold text-foreground transform -rotate-12">Build</div>

@@ -23,6 +23,15 @@ import {
 import { hackathonApi, transformHackathonToCard } from '@/src/shared/lib/api/hackathonApi';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
 import Footer from '@/src/landingPage/components/Footer';
+import { FloatingNav } from '@/src/shared/components/ui/floating-navbar';
+
+
+const floatingNavItems = [
+  { name: "Events", link: "/Events" },
+  { name: "Hackathons", link: "/src/hackathon" },
+  { name: "Builds", link: "/Builds" },
+  { name: "Swags", link: "#", disabled: true },
+];
 
 export default function HackathonListingsPage() {
   const [search, setSearch] = useState('');
@@ -120,6 +129,9 @@ export default function HackathonListingsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+
+            <FloatingNav navItems={floatingNavItems} />
+
       {/* ── Hero with wavy background text ── */}
       <section className="relative py-20 md:py-24 overflow-hidden">
         {/* Wavy Background Text */}

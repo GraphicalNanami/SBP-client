@@ -20,8 +20,8 @@ import * as buildsApi from './components/buildService/buildsApi';
 import { useAuth } from '@/src/auth/hooks/useAuth';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
 import Footer from '@/src/landingPage/components/Footer';
-import Navbar from '@/src/landingPage/components/Navbar';
 import type { BuildCategory } from '@/src/builds/types/build.types';
+import { FloatingNav } from '@/src/shared/components/ui/floating-navbar';
 
 // Filter options
 const CATEGORY_OPTIONS: (BuildCategory | 'All')[] = [
@@ -35,6 +35,13 @@ const SORT_OPTIONS = [
   { value: 'oldest', label: 'Oldest First' },
   { value: 'most-viewed', label: 'Most Viewed' },
   { value: 'alphabetical', label: 'A-Z' },
+];
+
+const floatingNavItems = [
+  { name: "Events", link: "/Events" },
+  { name: "Hackathons", link: "/src/hackathon" },
+  { name: "Builds", link: "/Builds" },
+  { name: "Swags", link: "#", disabled: true },
 ];
 
 export default function BuildsListingPage() {
@@ -132,7 +139,7 @@ export default function BuildsListingPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Navigation Bar */}
-      <Navbar />
+      <FloatingNav navItems={floatingNavItems} />
       
       {/* ── Hero with wavy background text ── */}
       <section className="relative py-20 md:py-24 overflow-hidden">

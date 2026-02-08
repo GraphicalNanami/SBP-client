@@ -13,12 +13,21 @@ import { HowItWorksSection } from './components/eventsUI/HowItWorksSection';
 import { CalendarButton } from './components/eventsUI/CalendarButton';
 import { CalendarModal } from './components/eventsUI/CalendarModal';
 import { Web3Event } from './types/event.types';
-import Navbar from '../landingPage/components/Navbar';
 import Footer from '../landingPage/components/Footer';
 import { Sparkles, Plus } from 'lucide-react';
 import { UnderlineHighlight, CircleHighlight } from '@/src/shared/components/ui/highlightText';
 import { useAuth } from '../auth/hooks/useAuth';
 import Link from 'next/link';
+import { FloatingNav } from '@/src/shared/components/ui/floating-navbar';
+
+
+
+const floatingNavItems = [
+  { name: "Events", link: "/Events" },
+  { name: "Hackathons", link: "/src/hackathon" },
+  { name: "Builds", link: "/Builds" },
+  { name: "Swags", link: "#", disabled: true },
+];
 
 export default function EventsPage() {
   const router = useRouter();
@@ -59,7 +68,7 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
+      <FloatingNav navItems={floatingNavItems} />
       
       <main className="flex-grow">
         {/* Simplified Hero */}

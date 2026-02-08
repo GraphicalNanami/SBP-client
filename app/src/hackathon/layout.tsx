@@ -1,4 +1,8 @@
-import Navbar from "@/src/landingPage/components/Navbar";
+import FloatingNav from "../landingPage/components/FloatingNav";
+
+
+
+
 
 export default function HackathonLayout({
   children,
@@ -7,7 +11,6 @@ export default function HackathonLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-grow">{children}</main>
     </div>
   );
