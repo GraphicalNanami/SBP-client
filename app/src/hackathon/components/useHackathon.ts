@@ -229,11 +229,7 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
         }
 
         // Create new hackathon
-        const created = await hackathonApi.createHackathon(
-          hackathon.general, 
-          hackathon.organizationId,
-          hackathon.description
-        );
+        const created = await hackathonApi.createHackathon(hackathon.general, hackathon.organizationId, hackathon.description);
         setHackathon(created);
         // Update URL to the new ID (in a real app, you'd use router.replace)
         window.history.replaceState(null, '', `/hackathon/manage/${created.id}`);

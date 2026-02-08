@@ -269,6 +269,8 @@ function transformToCreatePayload(
   general: Pick<Hackathon['general'], 'name' | 'category' | 'visibility' | 'prizePool' | 'prizeAsset' | 'tags' | 'startTime' | 'preRegEndTime' | 'submissionDeadline' | 'venue' | 'venueLocation' | 'adminContact' | 'poster'>,
   organizationId: string,
   description?: string
+  organizationId: string,
+  description?: string
 ): CreateHackathonPayload {
   return {
     name: general.name,
@@ -281,6 +283,7 @@ function transformToCreatePayload(
     preRegistrationEndTime: general.preRegEndTime ? new Date(general.preRegEndTime) : undefined,
     submissionDeadline: new Date(general.submissionDeadline),
     venue: general.venue === 'Online' ? 'Online' : general.venueLocation,
+    description: description && description.trim() ? description : 'description',  // Use provided description or fallback to 'description'
     description: description || '',  // Use provided description or empty string
     adminContact: general.adminContact,
     organizationId,
@@ -305,7 +308,8 @@ function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload 
   if (hackathon.general.prizePool) payload.prizePool = hackathon.general.prizePool;
   if (hackathon.general.prizeAsset) payload.prizeAsset = hackathon.general.prizeAsset;
   if (hackathon.general.tags) payload.tags = hackathon.general.tags;
-  if (hackathon.description) payload.description = hackathon.description;
+  // Always include description, use 'description' as fallback if empty
+  payload.description = hackathon.description && hackathon.description.trim() ? hackathon.description : 'description';
   if (hackathon.general.venue) {
     payload.venue = hackathon.general.venue === 'Online' ? 'Online' : hackathon.general.venueLocation;
   }
@@ -414,7 +418,10 @@ export const hackathonApi = {
     general: Pick<Hackathon['general'], 'name' | 'category' | 'visibility' | 'prizePool' | 'prizeAsset' | 'tags' | 'startTime' | 'preRegEndTime' | 'submissionDeadline' | 'venue' | 'venueLocation' | 'adminContact' | 'poster'>,
     organizationId: string,
     description?: string
+    organizationId: string,
+    description?: string
   ): Promise<Hackathon> {
+    const payload = transformToCreatePayload(general, organizationId, description);
     const payload = transformToCreatePayload(general, organizationId, description);
     const backend = await apiClient.post<BackendHackathon>(
       ENDPOINTS.HACKATHONS.CREATE,
