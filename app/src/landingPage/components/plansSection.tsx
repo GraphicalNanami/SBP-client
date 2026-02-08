@@ -64,13 +64,13 @@ const PlansSection = () => {
             title="Hackers"
             description="Join hackathons, build innovative projects, and win prizes in the Stellar ecosystem."
             onClick={() => handleCardClick('Hackers')}
-            doodle="/open-doodles/svg/UnboxingDoodle.svg"
+            doodle="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToqU9dWM5mB3UUTrX25C95o9LgzRTazQo2_A&s"
           />
           <PlanCard 
             title="Stellar Regions"
             description="Host world-class hackathons and manage your community with Stellar-integrated tools."
             onClick={() => handleCardClick('Organizers')}
-            doodle="/open-doodles/svg/LovingDoodle.svg"
+            doodle="https://novity.it/wp-content/uploads/2024/11/Stellar4_cover_540x540.jpg"
           />
         </div>
       </div>
@@ -92,12 +92,12 @@ const PlanCard = ({ title, description, onClick, doodle }: PlanCardProps) => {
       className="group relative bg-card border border-border rounded-3xl p-8 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:bg-black transition-all duration-300 flex flex-col justify-between min-h-[400px] cursor-pointer overflow-hidden"
     >
       {/* Doodle illustration */}
-      <div className="absolute bottom-0 right-0 w-48 h-48 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+      <div className="absolute bottom-0 right-0 w-58 h-58 opacity-100  group-hover:opacity-20 transition-opacity duration-300">
         <Image
           src={doodle}
           alt=""
           fill
-          className="object-contain"
+          className="object-contain rounded-xl h-full w-full group-hover:scale-110 transition-transform duration-300"
         />
       </div>
 

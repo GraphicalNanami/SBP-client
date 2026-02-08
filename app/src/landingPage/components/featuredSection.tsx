@@ -60,13 +60,7 @@ const FeaturedSection = () => {
   return (
     <section className="relative py-24">
       {/* Doodle decorations */}
-      <div className="absolute top-10 right-10 w-32 h-32 opacity-20 pointer-events-none hidden lg:block">
-        <img src="/open-doodles/svg/GroovySittingDoodle.svg" alt="" className="w-full h-full object-contain" />
-      </div>
-      <div className="absolute bottom-10 left-10 w-40 h-40 opacity-20 pointer-events-none hidden lg:block">
-        <img src="/open-doodles/svg/MeditatingDoodle.svg" alt="" className="w-full h-full object-contain" />
-      </div>
-
+      
       <div className="container-main relative z-10">
         {/* Section Header */}
         <div className="flex items-end justify-between mb-12">

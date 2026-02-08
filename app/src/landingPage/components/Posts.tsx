@@ -4,26 +4,24 @@ import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { usePosts, useStats } from "./postsService/usePosts";
 import { PostsColumn } from "./postsUI/PostsColumn";
-import { matchTopic } from './postsService/posts-api';
 import { Check } from 'lucide-react';
 import Image from 'next/image';
 
 const TOPIC_TAGS = [
-  'stellar',
-  'stellar network',
-  'cross border payments',
-  'soroban',
-  'stellar laboratory',
-  'xlm',
-  'stellar lumens',
-  'moneygram',
+  "stellar",
+                "xlm",
+                "stellar development foundation",
+                "stellar lumens",
+                  "soroban",
+                "stellar anchor"
 ];
+
+           
 
 const Posts = () => {
   const { posts, isLoading, error } = usePosts();
   const { stats, isLoading: statsLoading } = useStats(72);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [isMatchingTopics, setIsMatchingTopics] = useState(false);
   const [filteredPosts, setFilteredPosts] = useState(posts);
 
   // Handle topic selection
@@ -40,29 +38,15 @@ const Posts = () => {
       return;
     }
 
-    // Match selected topics
-    setIsMatchingTopics(true);
-    try {
-      // Call matchTopic API for each selected topic
-      const matchPromises = newSelectedTopics.map((t) => matchTopic(t));
-      await Promise.all(matchPromises);
-      
-      // Filter posts that match any of the selected topics
-      const filtered = posts.filter((post) =>
-        post.topics.some((postTopic) =>
-          newSelectedTopics.some((selectedTopic) =>
-            postTopic.toLowerCase().includes(selectedTopic.toLowerCase()) ||
-            selectedTopic.toLowerCase().includes(postTopic.toLowerCase())
-          )
+    // Filter posts that match any of the selected topics (exact match from backend topics)
+    const filtered = posts.filter((post) =>
+      post.topics.some((postTopic) =>
+        newSelectedTopics.some((selectedTopic) =>
+          postTopic.toLowerCase() === selectedTopic.toLowerCase()
         )
-      );
-      setFilteredPosts(filtered);
-    } catch (err) {
-      console.error('Failed to match topics:', err);
-      setFilteredPosts(posts);
-    } finally {
-      setIsMatchingTopics(false);
-    }
+      )
+    );
+    setFilteredPosts(filtered);
   };
 
   // Update filtered posts when posts change
@@ -81,23 +65,7 @@ const Posts = () => {
   return (
     <section className="bg-background py-20 relative overflow-hidden">
       {/* Decorative doodles */}
-      <div className="absolute top-20 left-10 w-32 h-32 opacity-10 pointer-events-none hidden lg:block">
-        <Image
-          src="/open-doodles/svg/MeditatingDoodle.svg"
-          alt=""
-          fill
-          className="object-contain"
-        />
-      </div>
-      <div className="absolute bottom-20 right-10 w-32 h-32 opacity-10 pointer-events-none hidden lg:block">
-        <Image
-          src="/open-doodles/svg/GroovyDoodle.svg"
-          alt=""
-          fill
-          className="object-contain"
-        />
-      </div>
-
+      
       <div className="container z-10 mx-auto relative">
         {/* Header */}
         <motion.div
@@ -107,10 +75,10 @@ const Posts = () => {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
-          <div className="flex justify-center">
+<div className="flex justify-center">
             <div className="border py-1 px-4 rounded-lg">
               Community Buzz
-            </div>
+            </div>          
           </div>
 
           <h2 className="text-5xl sm:text-6xl font-bold tracking-tighter mt-5 text-center" style={{ fontFamily: 'var(--font-onest)' }}>
@@ -128,12 +96,11 @@ const Posts = () => {
                 <button
                   key={topic}
                   onClick={() => handleTopicToggle(topic)}
-                  disabled={isMatchingTopics}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                     isSelected
                       ? 'bg-[#E6FF80] text-[#1A1A1A] border-2 border-[#1A1A1A]'
                       : 'bg-white text-[#4D4D4D] border border-[#E5E5E5] hover:border-[#1A1A1A]'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  }`}
                 >
                   {isSelected && <Check className="w-4 h-4" />}
                   {topic}

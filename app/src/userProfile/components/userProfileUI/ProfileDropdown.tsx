@@ -10,6 +10,7 @@ import { getAvatarUrl, isDataUri } from '@/src/shared/utils/avatar';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPositioned, setIsPositioned] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
@@ -23,6 +24,7 @@ const ProfileDropdown = () => {
         top: rect.bottom + 8, // mt-2 equivalent
         right: window.innerWidth - rect.right,
       });
+      setIsPositioned(true);
     }
   }, []);
 
@@ -41,6 +43,7 @@ const ProfileDropdown = () => {
 
     const handleScroll = () => {
       setIsOpen(false);
+      setIsPositioned(false);
     };
 
     if (isOpen) {
@@ -88,11 +91,11 @@ const ProfileDropdown = () => {
       </button>
 
       {/* Dropdown Menu - rendered via portal so backdrop-blur works independently */}
-      {isOpen && createPortal(
+      {isOpen && isPositioned && createPortal(
         <div
           ref={dropdownRef}
           style={{ top: dropdownPos.top, right: dropdownPos.right }}
-          className="fixed w-80 rounded-2xl backdrop-blur-xl bg-white/10 border border-transparent shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5001] animate-in fade-in  overflow-hidden"
+          className="fixed w-80 rounded-2xl backdrop-blur-xl bg-white/10 border border-transparent shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5001] animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden"
         >
           {/* User Info */}
           <div className="p-4 border-b border-white/10">

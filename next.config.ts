@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.dicebear.com",
       },
+
+      {
+        protocol: 'https',
+        hostname: 'novity.it',
+        pathname: '/**',
+      },
       {
         protocol: "https",
         hostname: "prod-files-secure.s3.us-west-2.amazonaws.com",
@@ -22,6 +28,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "**.ngrok.io", // Support older ngrok domains
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+        pathname: "/**",
       },
     ],
   },
