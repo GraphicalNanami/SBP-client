@@ -11,6 +11,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.dicebear.com",
       },
+      {
+        protocol:"https",
+        hostname: "cdn.prod.website-files.com"
+      },
+      {
+        protocol: "https",
+        hostname: "anthillonline.com",
+        pathname: "/**",
+      },
 
       {
         protocol: 'https',

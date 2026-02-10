@@ -133,7 +133,7 @@ export default function HackathonListingsPage() {
             <FloatingNav navItems={floatingNavItems} />
 
       {/* ── Hero with wavy background text ── */}
-      <section className="relative py-20 md:py-24 overflow-hidden">
+      <section className="relative py-20 md:py-24 overflow-hidden mt-4">
         {/* Wavy Background Text */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03] select-none">
           <div className="absolute top-20 left-10 text-9xl font-bold text-foreground transform -rotate-12">Hack</div>

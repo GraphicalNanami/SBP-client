@@ -1,7 +1,9 @@
 'use client';
 
+import { getAvatarUrl } from '@/src/shared/utils/avatar';
 import { User } from '../../users/types';
 import { MapPin, Share2, Flag } from 'lucide-react';
+import Image from 'next/image';
 
 interface ProfileHeaderProps {
   user: User;
@@ -13,7 +15,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
     ? `${user.profile.city}, ${user.profile.country}`
     : user.profile?.country || '';
   
-  const profilePicture = user.profile?.profilePictureUrl || user.avatar || '/default-avatar.png';
+  const profilePicture = getAvatarUrl(user.profile?.profilePictureUrl || user.avatar, user.uuid);
   
   // Generate deterministic gradient color from user ID
   const hashCode = (str: string) => {
@@ -67,6 +69,12 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                   alt={displayName}
                   className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-lg"
                 />
+                <Image 
+                              src={profilePicture} 
+                              alt={displayName} 
+                              fill 
+                              className="object-cover" 
+                            />
               </div>
 
               {/* Profile Info */}

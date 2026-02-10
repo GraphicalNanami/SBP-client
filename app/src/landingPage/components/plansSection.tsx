@@ -27,22 +27,7 @@ const PlansSection = () => {
   return (
     <section className="relative py-24 bg-[#FCF9EA] backdrop-blur-sm overflow-hidden">
       {/* Decorative doodles in background */}
-      <div className="absolute top-10 left-10 w-32 h-32 opacity-20 pointer-events-none hidden lg:block">
-        <Image
-          src="/open-doodles/svg/PlantDoodle.svg"
-          alt=""
-          fill
-          className="object-contain"
-        />
-      </div>
-      <div className="absolute bottom-10 right-10 w-40 h-40 opacity-20 pointer-events-none hidden lg:block">
-        <Image
-          src="/open-doodles/svg/CoffeeDoddle.svg"
-          alt=""
-          fill
-          className="object-contain"
-        />
-      </div>
+      
 
       <div className="container-main relative z-10">
         {/* Heading */}
@@ -64,13 +49,13 @@ const PlansSection = () => {
             title="Hackers"
             description="Join hackathons, build innovative projects, and win prizes in the Stellar ecosystem."
             onClick={() => handleCardClick('Hackers')}
-            doodle="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToqU9dWM5mB3UUTrX25C95o9LgzRTazQo2_A&s"
+            doodle="https://anthillonline.com/wp-content/uploads/2015/04/angelhack.jpg"
           />
           <PlanCard 
             title="Stellar Regions"
             description="Host world-class hackathons and manage your community with Stellar-integrated tools."
             onClick={() => handleCardClick('Organizers')}
-            doodle="https://novity.it/wp-content/uploads/2024/11/Stellar4_cover_540x540.jpg"
+            doodle="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiDeMQA5OD5wwDSu9w2S36a4x1UXB5sGPoHg&s"
           />
         </div>
       </div>
@@ -89,15 +74,15 @@ const PlanCard = ({ title, description, onClick, doodle }: PlanCardProps) => {
   return (
     <div 
       onClick={onClick}
-      className="group relative bg-card border border-border rounded-3xl p-8 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:bg-black transition-all duration-300 flex flex-col justify-between min-h-[400px] cursor-pointer overflow-hidden"
+      className="group relative bg-card border border-border rounded-3xl p-8 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:bg-black transition-all duration-300 flex flex-col justify-between min-w-[150px] min-h-[400px] cursor-pointer overflow-hidden"
     >
       {/* Doodle illustration */}
-      <div className="absolute bottom-0 right-0 w-58 h-58 opacity-100  group-hover:opacity-20 transition-opacity duration-300">
+      <div className="absolute bottom-0 right-0 w-78 h-58 opacity-100  group-hover:opacity-70 transition-opacity duration-300">
         <Image
           src={doodle}
           alt=""
           fill
-          className="object-contain rounded-xl h-full w-full group-hover:scale-110 transition-transform duration-300"
+          className="object-contain rounded-xl h-[400px] w-full group-hover:scale-110 transition-transform duration-300"
         />
       </div>
 
@@ -106,9 +91,9 @@ const PlanCard = ({ title, description, onClick, doodle }: PlanCardProps) => {
           <h3 className="text-3xl font-semibold text-foreground transition-colors duration-200 group-hover:text-white">
             {title}
           </h3>
-          <button className="w-12 h-12 rounded-full border border-border flex items-center justify-center transition-all duration-200 group-hover:bg-white group-hover:text-black group-hover:border-white/20">
+            <button className="w-12 h-12 rounded-full border border-border flex items-center justify-center transition-all duration-500 group-hover:bg-white group-hover:text-black group-hover:border-white/20 group-hover:-rotate-45">
             <ArrowRight className="w-5 h-5" />
-          </button>
+            </button>
         </div>
         
         <p className="text-muted-foreground text-base leading-relaxed transition-colors duration-200 group-hover:text-white/90">

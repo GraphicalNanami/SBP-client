@@ -80,7 +80,7 @@ export default function EventsPage() {
             <div className="absolute bottom-40 left-1/4 text-7xl font-bold text-foreground transform -rotate-6">Build</div>
           </div>
 
-          <div className="container-main relative z-10 text-center">
+          <div className="container-main relative z-10 text-center mt-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 mb-8">
               <Sparkles className="w-4 h-4 text-accent-foreground" />
               <span className="text-sm font-medium text-accent-foreground">

@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { CircleHighlight, UnderlineHighlight } from "@/src/shared/components/ui/highlightText";
 import Image from "next/image";
+import { useAuth } from "@/src/auth/context/AuthContext";
 
 
 
@@ -17,7 +18,7 @@ const floatingNavItems = [
 
 const Hero = () => {
 
-
+  const { isAuthenticated } = useAuth();
   
 
   return (
@@ -29,19 +30,7 @@ const Hero = () => {
 
 
           {/* Wavy Background Text */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03] select-none">
-            <div className="absolute top-20 left-10 text-9xl font-bold text-foreground transform -rotate-12">Build</div>
-            <Image
-              src="/open-doodles/svg/TechDoodle.svg"
-              alt=""
-              width={200}
-              height={200}
-              className="object-contain opacity-20 pointer-events-none"
-              style={{ filter: 'invert(1) sepia(1) saturate(5) hue-rotate(175deg)' }}
-            />
-            <div className="absolute top-60 right-20 text-8xl font-bold text-foreground transform rotate-6">Stellar</div>
-            <div className="absolute bottom-40 left-1/4 text-7xl font-bold text-foreground transform -rotate-6">Build</div>
-          </div>
+         
 
           <div className="container-main relative z-10 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 mb-8">
@@ -62,17 +51,22 @@ Discover hackathons, connect with top builders, and scale the next generation of
 
             {/* CTA Buttons */}
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <Link href="/src/auth">
+             {!isAuthenticated ? <Link href="/src/auth">
                 <button className="group px-8 py-4 text-base font-semibold bg-[#1A1A1A] text-white rounded-xl hover:bg-[#333] transition-all duration-200 flex items-center gap-2">
                   Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-              </Link>
-              <Link href="/src/events">
+              </Link> : <Link href="/Events">
+                <button className="group px-8 py-4 text-base font-semibold bg-[#1A1A1A] text-white rounded-xl hover:bg-[#333] transition-all duration-200 flex items-center gap-2">
+                  Join Upcoming Events
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>}
+             { !isAuthenticated && <Link href="/src/events">
                 <button className="px-8 py-4 text-base font-semibold bg-white text-[#1A1A1A] rounded-xl hover:bg-gray-50 transition-all duration-200 border-2 border-[#E5E5E5] hover:border-[#1A1A1A]">
                   Explore Events
                 </button>
-              </Link>
+              </Link>}
             </div>
 
             {/* Calendar Button */}
