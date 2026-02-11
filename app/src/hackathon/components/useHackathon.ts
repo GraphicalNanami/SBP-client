@@ -16,7 +16,7 @@ const emptyGeneral: HackathonGeneral = {
   category: '',
   visibility: 'Public',
   poster: '',
-  prizePool: 0,
+  prizePool: "0",
   prizeAsset: 'USDC',
   tags: [],
   startTime: '',
@@ -209,7 +209,7 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
       g.startTime !== '' &&
       g.submissionDeadline !== '' &&
       g.adminContact.trim() !== '' &&
-      g.prizePool > 0 &&
+      parseFloat(g.prizePool) > 0 &&
       hackathon.tracks.length > 0
     );
   }, [hackathon]);
@@ -229,7 +229,7 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
         }
 
         // Create new hackathon
-        const created = await hackathonApi.createHackathon(hackathon.general, hackathon.organizationId, hackathon.description);
+        const created = await hackathonApi.createHackathon(hackathon.general, hackathon.organizationId, hackathon.description, hackathon.tracks);
         setHackathon(created);
         // Update URL to the new ID (in a real app, you'd use router.replace)
         window.history.replaceState(null, '', `/hackathon/manage/${created.id}`);

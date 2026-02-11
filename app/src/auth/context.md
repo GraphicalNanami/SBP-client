@@ -143,11 +143,41 @@ Authentication feature for user registration and login with JWT-based session ma
 - ✅ Connected forms to backend endpoints (/auth/login, /auth/register)
 - ✅ Added redirect to home page after successful login/signup
 
+**2026-02-10 (Wallet Authentication Integration)**
+- ✅ Added Freighter wallet authentication as alternative to email/password
+- ✅ Created FreighterService (`app/src/shared/lib/freighter/freighter-service.ts`)
+  - Detects Freighter extension
+  - Connects wallet and retrieves public key
+  - Signs messages for authentication
+  - Validates Stellar address format
+- ✅ Created WalletAuthService (`app/src/shared/lib/auth/wallet-auth-service.ts`)
+  - Check wallet existence endpoint
+  - Request challenge for signing
+  - Register with wallet
+  - Login with wallet
+- ✅ Extended AuthContext with wallet methods
+  - `walletLogin(walletAddress, signature, challenge)`
+  - `walletSignup(walletAddress, signature, challenge, name, email?)`
+- ✅ Updated LoginForm with "Connect Freighter Wallet" button
+  - Checks wallet existence before challenge
+  - Redirects to signup if wallet not registered
+  - Shows appropriate error messages
+- ✅ Updated SignupForm for wallet registration
+  - Supports pre-filled wallet address via URL param (?wallet=...)
+  - Shows wallet mode when redirected from login
+  - Collects name (required) and email (optional)
+  - Completes signature-based registration
+- ✅ Added wallet-specific types to auth.types.ts
+- ✅ Updated API endpoints configuration with wallet endpoints
+
 ## Future Enhancements
 - [ ] Add password strength indicator
-- [ ] Add social login options (Google, GitHub)
 - [ ] Implement "Forgot Password" flow
 - [ ] Add email verification step
+- [ ] Support multiple wallet types (Albedo, LOBSTR, Rabet)
+- [ ] Add hardware wallet support (Ledger, Trezor)
+- [ ] Link wallet to existing email accounts
+- [ ] Wallet nickname/management in settings
 - [ ] Implement protected route HOC/middleware
 - [ ] Add form validation library (e.g., Zod, React Hook Form)
 - [ ] Implement toast notifications for better UX

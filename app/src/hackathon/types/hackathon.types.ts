@@ -57,7 +57,7 @@ export interface HackathonGeneral {
   category: HackathonCategory | '';
   visibility: HackathonVisibility;
   poster: string; // URL or empty
-  prizePool: number;
+  prizePool: string;
   prizeAsset: string; // e.g. "XLM", "USDC"
   tags: string[];
   startTime: string; // ISO datetime

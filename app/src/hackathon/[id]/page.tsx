@@ -123,7 +123,7 @@ export default function HackathonDetailPage() {
           category: response.general.category,
           status,
           poster: response.general.poster,
-          prizePool: response.general.prizePool,
+          prizePool: parseFloat(response.general.prizePool) || 0,
           prizeAsset: response.general.prizeAsset,
           startTime: response.general.startTime,
           submissionDeadline: response.general.submissionDeadline,

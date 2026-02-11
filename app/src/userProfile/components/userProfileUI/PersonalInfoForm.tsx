@@ -126,21 +126,21 @@ export default function PersonalInfoForm() {
       )}
 
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-semibold text-foreground mb-2 tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-semibold text-[#1A1A1A] mb-2 tracking-tight">
           Edit your Profile
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg">
+        <p className="text-[#4D4D4D] text-base md:text-lg">
           Change your profile and account settings
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div>
-          <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">Personal Info</h2>
+          <h2 className="text-xl md:text-2xl font-semibold text-[#1A1A1A] mb-6">Personal Info</h2>
 
           {/* Profile Picture */}
           <div className="flex items-start gap-6 mb-8">
-            <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-muted">
+            <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-gray-100">
               <Image
                 src={getAvatarUrl(data?.user?.avatar, data?.user?.name || 'User')}
                 alt={data?.user?.name || 'User'}
@@ -151,7 +151,7 @@ export default function PersonalInfoForm() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-3 h-3 md:w-10 md:h-10 bg-foreground text-background rounded-full flex items-center justify-center hover:bg-foreground/90 hover:ring-2 hover:ring-[hsl(var(--accent))] transition-all duration-200"
+                className="absolute bottom-0 right-0 w-8 h-8 md:w-10 md:h-10 bg-[#1A1A1A] text-white rounded-full flex items-center justify-center hover:bg-[#333] transition-all duration-200"
                 aria-label="Upload profile picture"
               >
                 <Camera className="w-4 h-4 md:w-5 md:h-5 " />
@@ -165,10 +165,10 @@ export default function PersonalInfoForm() {
               />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-sm text-[#4D4D4D] mb-2">
                 Upload a new profile picture (max 5MB)
               </p>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-gray-500">
                 Supported formats: JPEG, PNG, WebP
               </p>
             </div>
@@ -177,7 +177,7 @@ export default function PersonalInfoForm() {
           {/* Name Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
                 First Name
               </label>
               <input
@@ -186,11 +186,11 @@ export default function PersonalInfoForm() {
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="John"
-                className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))] focus:border-transparent transition-all duration-200 text-sm md:text-base"
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E6FF80] focus:border-transparent transition-all duration-200 text-sm md:text-base"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
                 Last Name
               </label>
               <input
@@ -199,37 +199,37 @@ export default function PersonalInfoForm() {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Doe"
-                className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))] focus:border-transparent transition-all duration-200 text-sm md:text-base"
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E6FF80] focus:border-transparent transition-all duration-200 text-sm md:text-base"
               />
             </div>
           </div>
 
           {/* Email (read-only) */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
               Email
             </label>
             <input
               type="email"
               value={data?.user?.email || ''}
               disabled
-              className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-muted-foreground cursor-not-allowed text-sm md:text-base"
+              className="w-full px-4 py-3 bg-gray-100 border border-[#E5E5E5] rounded-xl text-[#4D4D4D] cursor-not-allowed text-sm md:text-base"
             />
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Email cannot be changed
             </p>
           </div>
 
           {/* Gender */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
               Gender
             </label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))] focus:border-transparent transition-all duration-200 text-sm md:text-base"
+              className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E6FF80] focus:border-transparent transition-all duration-200 text-sm md:text-base"
             >
               <option value="">Select gender</option>
               <option value="MALE">Male</option>
@@ -243,7 +243,7 @@ export default function PersonalInfoForm() {
           {/* Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
                 City
               </label>
               <input
@@ -252,11 +252,11 @@ export default function PersonalInfoForm() {
                 value={formData.city}
                 onChange={handleChange}
                 placeholder="San Francisco"
-                className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))] focus:border-transparent transition-all duration-200 text-sm md:text-base"
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E6FF80] focus:border-transparent transition-all duration-200 text-sm md:text-base"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
                 Country
               </label>
               <input
@@ -265,14 +265,14 @@ export default function PersonalInfoForm() {
                 value={formData.country}
                 onChange={handleChange}
                 placeholder="United States"
-                className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))] focus:border-transparent transition-all duration-200 text-sm md:text-base"
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E6FF80] focus:border-transparent transition-all duration-200 text-sm md:text-base"
               />
             </div>
           </div>
 
           {/* Website */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
               Website
             </label>
             <input
@@ -281,7 +281,7 @@ export default function PersonalInfoForm() {
               value={formData.website}
               onChange={handleChange}
               placeholder="https://example.com"
-              className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))] focus:border-transparent transition-all duration-200 text-sm md:text-base"
+              className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E6FF80] focus:border-transparent transition-all duration-200 text-sm md:text-base"
             />
           </div>
         </div>
@@ -294,11 +294,11 @@ export default function PersonalInfoForm() {
         )}
 
         {/* Save Button */}
-        <div className="flex justify-end pt-6 border-t border-border">
+        <div className="flex justify-end pt-6 border-t border-[#E5E5E5]">
           <button
             type="submit"
             disabled={isUpdating}
-            className="inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-foreground text-background rounded-xl hover:bg-foreground/90 hover:ring-2 hover:ring-[hsl(var(--accent))] transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+            className="inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-[#1A1A1A] text-white rounded-xl hover:bg-[#333] transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
           >
             {isUpdating ? (
               <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />

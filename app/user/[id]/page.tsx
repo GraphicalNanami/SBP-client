@@ -40,7 +40,7 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-[#FCFCFC]">
         <div className="animate-pulse">
-          <div className="h-[280px] bg-gradient-to-r from-[#1A1A1A] to-[#4D4D4D]" />
+          <div className="h-[280px] bg-gradient-to-br from-[#E6FF80]/20 via-white to-[#E6FF80]/10" />
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="relative -mt-20 mb-8">
               <div className="rounded-xl border border-[#E5E5E5] bg-white p-8">
@@ -89,10 +89,10 @@ export default function UserProfilePage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 capitalize ${
+                className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap capitalize ${
                   activeTab === tab
-                    ? 'bg-[#1A1A1A] text-white'
-                    : 'text-[#4D4D4D] hover:bg-[#F5F5F5]'
+                    ? 'bg-[#1A1A1A] text-white shadow-lg'
+                    : 'bg-white text-[#4D4D4D] hover:bg-gray-50 border border-[#E5E5E5] hover:border-[#1A1A1A]'
                 }`}
               >
                 {tab}
@@ -116,7 +116,7 @@ export default function UserProfilePage() {
             {/* Right Column */}
             <div className="lg:col-span-4 space-y-6">
               {/* Contact & Links Card */}
-              <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+              <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
                 <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
                   Contact & Links
                 </h3>
@@ -140,7 +140,7 @@ export default function UserProfilePage() {
               </div>
 
               {/* Member Since */}
-              <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+              <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
                 <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
                   Member Since
                 </h3>

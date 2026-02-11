@@ -68,7 +68,7 @@ export function OrganizationHackathonCard({ hackathon }: OrganizationHackathonCa
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-[#999]" />
             <span>
-              {formatPrize(hackathon.general.prizePool)} {hackathon.general.prizeAsset}
+              {formatPrize(parseFloat(hackathon.general.prizePool))} {hackathon.general.prizeAsset}
             </span>
           </div>
 

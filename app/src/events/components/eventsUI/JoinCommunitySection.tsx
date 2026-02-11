@@ -68,15 +68,29 @@ export const JoinCommunitySection = () => {
                 Connect with builders, learn new technologies, find support, get out of your comfort zone, and pursue your blockchain passions, together. Membership is free.
               </p>
               
-              <a 
-                href="http://discord.gg/stellardev" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-foreground text-background rounded-2xl font-bold text-lg hover:bg-foreground/90 transition-all shadow-lg mt-4"
-              >
-                Join Discord Community
-                <ArrowRight className="w-5 h-5" />
-              </a>
+              <div className="relative inline-block group">
+                <a
+                  href="http://discord.gg/stellardev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-black/50 text-background rounded-2xl font-bold text-lg  transition-all shadow-lg mt-4 cursor-not-allowed"
+                  aria-disabled="true"
+                  tabIndex={0}
+                >
+                  Join Discord Community
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+
+                {/* Info box shown on hover */}
+                <div
+                  role="tooltip"
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                >
+                  <div className="bg-black/90 text-white text-sm rounded-xl px-4 py-2 shadow-md whitespace-nowrap">
+                    Coming soon...
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

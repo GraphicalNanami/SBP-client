@@ -337,6 +337,7 @@ export interface CreateHackathonPayload {
   adminContact: string;
   organizationId: string;
   posterUrl?: string;
+  tracks?: Partial<BackendTrack>[];  // Include tracks in creation payload
 }
 
 /**
@@ -381,7 +382,7 @@ export interface UpdateHackathonPayload {
   category?: BackendHackathonCategory;
   visibility?: BackendHackathonVisibility;
   posterUrl?: string;
-  prizePool?: number;
+  prizePool?: string;
   prizeAsset?: string;
   tags?: string[];
   description?: string;

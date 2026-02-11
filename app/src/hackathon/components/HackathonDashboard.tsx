@@ -459,7 +459,7 @@ function GeneralTab({
   // Helper to get error styling for inputs
   const getInputClass = (fieldName: string) => {
     const hasError = fieldErrors[fieldName];
-    return `h-[46px] w-full rounded-full border px-5 text-sm transition-all placeholder:text-[#4D4D4D] focus:outline-none focus:ring-2 ${
+    return `h-[46px] w-full rounded-full border px-5 text-sm transition-all placeholder:text-black/30 focus:outline-none focus:ring-2 ${
       hasError
         ? 'border-red-500 bg-red-50 text-red-900 focus:border-red-600 focus:ring-red-500/10'
         : 'border-[#E5E5E5] bg-white text-[#1A1A1A] hover:border-[#E5E5E5] focus:border-[#1A1A1A] focus:ring-[#1A1A1A]/10'
@@ -578,7 +578,7 @@ function GeneralTab({
                 id="h-prize"
                 type="number"
                 value={g.prizePool || ''}
-                onChange={(e) => updateGeneral('prizePool', Number(e.target.value))}
+                onChange={(e) => updateGeneral('prizePool', e.target.value)}
                 placeholder="50000"
                 className={getInputClass('prizePool')}
               />
@@ -817,7 +817,7 @@ function GeneralTab({
             {[
               { ok: !!g.name.trim(), text: 'Hackathon name' },
               { ok: !!g.category, text: 'Category selected' },
-              { ok: g.prizePool > 0, text: 'Prize pool set' },
+              { ok: parseFloat(g.prizePool) > 0, text: 'Prize pool set' },
               { ok: !!g.startTime, text: 'Start time' },
               { ok: !!g.submissionDeadline, text: 'Submission deadline' },
               { ok: !!g.adminContact.trim(), text: 'Admin contact' },

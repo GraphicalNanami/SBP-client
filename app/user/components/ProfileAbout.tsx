@@ -15,7 +15,7 @@ export default function ProfileAbout({ user }: ProfileAboutProps) {
 
   if (!bio) {
     return (
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+      <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
         <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">About</h2>
         <p className="text-[#999] italic">This user hasn't written a bio yet</p>
       </div>
@@ -23,7 +23,7 @@ export default function ProfileAbout({ user }: ProfileAboutProps) {
   }
 
   return (
-    <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+    <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
       <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">About</h2>
       <div className="text-[#4D4D4D] whitespace-pre-wrap">
         {displayBio}
