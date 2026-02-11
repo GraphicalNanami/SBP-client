@@ -26,15 +26,15 @@ const SettingsLayout = ({ children }: SettingsLayoutProps) => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}
           <aside className="w-full lg:w-64 flex-shrink-0">
-            <nav className="space-y-1 bg-white rounded-2xl p-4 shadow-sm">
+            <nav className="space-y-1 bg-white rounded-3xl p-4 border border-[#E5E5E5]">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block px-4 py-3 text-sm transition-all duration-200 rounded-xl ${
+                  className={`block px-4 py-3 text-sm font-semibold transition-all duration-200 rounded-xl ${
                     isActive(item.href)
-                      ? 'bg-[hsl(var(--accent))] text-foreground font-semibold border-l-4 border-foreground'
-                      : 'border-l-4 border-transparent text-muted-foreground hover:bg-secondary hover:text-foreground'
+                      ? 'bg-[#1A1A1A] text-white shadow-md'
+                      : 'text-[#4D4D4D] hover:bg-gray-50'
                   }`}
                 >
                   {item.name}
@@ -44,7 +44,7 @@ const SettingsLayout = ({ children }: SettingsLayoutProps) => {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 bg-white rounded-2xl p-8 lg:p-12 shadow-sm">
+          <main className="flex-1 bg-white rounded-3xl p-8 lg:p-12 border border-[#E5E5E5]">
             {children}
           </main>
         </div>

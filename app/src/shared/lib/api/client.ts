@@ -9,9 +9,18 @@ import type { ApiError } from '@/src/shared/types/api.types';
 
 class ApiClient {
   private baseUrl: string;
+  private onUnauthorized: (() => void) | null = null;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
+  }
+
+  /**
+   * Set callback to handle 401 Unauthorized responses
+   * This will be called by AuthContext to trigger automatic logout
+   */
+  setUnauthorizedHandler(handler: () => void): void {
+    this.onUnauthorized = handler;
   }
 
   private async request<T>(
@@ -49,6 +58,13 @@ class ApiClient {
       // Handle HTTP errors
       if (!response.ok) {
         const errorData = await this.parseErrorResponse(response);
+        
+        // Global Unauthorized handler - automatically logout on 401
+        if (response.status === 401 && this.onUnauthorized) {
+          console.warn('🔒 Unauthorized access detected - logging out user');
+          this.onUnauthorized();
+        }
+        
         throw errorData;
       }
 

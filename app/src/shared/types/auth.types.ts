@@ -26,3 +26,29 @@ export interface RegisterCredentials {
   password: string;
   name: string;
 }
+
+// Wallet Authentication Types
+export interface WalletChallenge {
+  challenge: string;
+  expiresAt: string;
+}
+
+export interface WalletCheckResponse {
+  exists: boolean;
+  userExists: boolean;
+  message: string;
+}
+
+export interface WalletLoginCredentials {
+  walletAddress: string;
+  signature: string;
+  challenge: string;
+}
+
+export interface WalletRegisterCredentials {
+  walletAddress: string;
+  signature: string;
+  challenge: string;
+  name: string;
+  email?: string;
+}

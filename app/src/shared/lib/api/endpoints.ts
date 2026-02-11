@@ -8,6 +8,12 @@ export const ENDPOINTS = {
     REGISTER: '/auth/register',
     REFRESH: '/auth/refresh',
     LOGOUT: '/auth/logout',
+    WALLET: {
+      CHECK_EXISTENCE: '/auth/wallet/check-existence',
+      CHALLENGE: '/auth/wallet/challenge',
+      REGISTER: '/auth/wallet/register',
+      LOGIN: '/auth/wallet/login',
+    },
   },
   USERS: {
     SEARCH: '/users/search',

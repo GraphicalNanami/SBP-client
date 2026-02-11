@@ -12,26 +12,17 @@ export default function ProfileExperience({ user }: ProfileExperienceProps) {
 
   if (!experience || (!experience.roles?.length && !experience.programmingLanguages?.length && !experience.developerTools?.length)) {
     return (
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+      <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
         <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Professional Experience</h2>
         <p className="text-[#999] italic">No experience added yet</p>
       </div>
     );
   }
 
-  const skillLevelColors = {
-    BEGINNER: 'bg-green-100 text-green-800',
-    INTERMEDIATE: 'bg-blue-100 text-blue-800',
-    ADVANCED: 'bg-purple-100 text-purple-800',
-    EXPERT: 'bg-orange-100 text-orange-800',
-  };
-
-  const skillLevelColor = experience.web3SkillLevel 
-    ? skillLevelColors[experience.web3SkillLevel]
-    : 'bg-[#F5F5F5] text-[#4D4D4D]';
+  const skillLevelColor = 'bg-[#E6FF80]/30 text-[#1A1A1A]';
 
   return (
-    <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+    <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
       <h2 className="text-xl font-semibold text-[#1A1A1A] mb-6">Professional Experience</h2>
       
       <div className="space-y-6">
@@ -46,7 +37,7 @@ export default function ProfileExperience({ user }: ProfileExperienceProps) {
               {experience.roles.map((role, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-full bg-[#F5F5F5] text-[#4D4D4D] text-sm"
+                  className="px-3 py-1 rounded-lg bg-[#FCFCFC] text-[#4D4D4D] text-sm border border-[#E5E5E5]"
                 >
                   {role}
                 </span>
@@ -62,14 +53,14 @@ export default function ProfileExperience({ user }: ProfileExperienceProps) {
               <Award className="w-5 h-5 text-[#4D4D4D]" />
               <h3 className="font-semibold text-[#1A1A1A]">Experience Level</h3>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
               {experience.yearsOfExperience !== undefined && (
-                <div className="text-sm text-[#4D4D4D]">
+                <div className="text-sm text-[#4D4D4D] px-3 py-1 rounded-lg bg-[#FCFCFC] border border-[#E5E5E5]">
                   <span className="font-medium">{experience.yearsOfExperience}</span> years of experience
                 </div>
               )}
               {experience.web3SkillLevel && (
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${skillLevelColor}`}>
+                <span className={`px-3 py-1 rounded-lg text-sm font-medium ${skillLevelColor}`}>
                   {experience.web3SkillLevel.replace('_', ' ')}
                 </span>
               )}
@@ -88,7 +79,7 @@ export default function ProfileExperience({ user }: ProfileExperienceProps) {
               {experience.programmingLanguages.map((lang, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-full border border-[#E5E5E5] bg-white text-[#4D4D4D] text-sm"
+                  className="px-3 py-1 rounded-lg bg-[#FCFCFC] text-[#4D4D4D] text-sm border border-[#E5E5E5]"
                 >
                   {lang}
                 </span>
@@ -108,7 +99,7 @@ export default function ProfileExperience({ user }: ProfileExperienceProps) {
               {experience.developerTools.map((tool, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-full border border-[#E5E5E5] bg-white text-[#4D4D4D] text-sm"
+                  className="px-3 py-1 rounded-lg bg-[#FCFCFC] text-[#4D4D4D] text-sm border border-[#E5E5E5]"
                 >
                   {tool}
                 </span>
@@ -117,6 +108,6 @@ export default function ProfileExperience({ user }: ProfileExperienceProps) {
           </div>
         )}
       </div>
-    </div>
-  );
-}
+      </div>
+      );
+      }

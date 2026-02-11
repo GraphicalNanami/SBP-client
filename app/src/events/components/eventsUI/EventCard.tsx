@@ -45,7 +45,7 @@ export const EventCard = ({ event, onClick, featured = false }: EventCardProps) 
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
         </div>
         
-        <div className="relative z-10 h-full p-8 flex flex-col justify-between text-white">
+        <div className="relative z-10  p-8 flex flex-col justify-between text-white">
           <div>
             <div className="flex items-center gap-3 mb-6">
               <span className="px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm font-semibold">
@@ -60,7 +60,7 @@ export const EventCard = ({ event, onClick, featured = false }: EventCardProps) 
             <h3 className="text-3xl lg:text-4xl font-semibold leading-tight mb-4">
               {event.title}
             </h3>
-            <p className="text-white/70 text-lg max-w-md">
+            <p className="text-white/70 text-sm max-w-md">
               {event.description}
             </p>
           </div>
@@ -94,10 +94,10 @@ export const EventCard = ({ event, onClick, featured = false }: EventCardProps) 
   return (
     <div 
       onClick={() => onClick(event)}
-      className={`group rounded-3xl ${getTypeColor(event.type)} overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer`}
+      className={`h-102 group rounded-3xl ${getTypeColor(event.type)} overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer`}
     >
       {/* Small Image Header */}
-      <div className="relative h-32 w-full">
+      <div className="relative h-58 w-full">
         <Image
           src={event.coverImage}
           alt={event.title}

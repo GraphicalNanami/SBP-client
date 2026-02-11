@@ -179,7 +179,7 @@ function transformHackathon(backend: BackendHackathon): Hackathon {
       category: transformCategory(backend.category),
       visibility: transformVisibility(backend.visibility),
       poster: backend.posterUrl || '',
-      prizePool: typeof backend.prizePool === 'string' ? parseFloat(backend.prizePool) || 0 : backend.prizePool,
+      prizePool:  backend.prizePool,
       prizeAsset: backend.prizeAsset,
       tags: backend.tags || [],
       startTime: new Date(backend.startTime).toISOString(),
@@ -269,9 +269,9 @@ function transformToCreatePayload(
   general: Pick<Hackathon['general'], 'name' | 'category' | 'visibility' | 'prizePool' | 'prizeAsset' | 'tags' | 'startTime' | 'preRegEndTime' | 'submissionDeadline' | 'venue' | 'venueLocation' | 'adminContact' | 'poster'>,
   organizationId: string,
   description?: string,
-
+  tracks?: HackathonTrack[]
 ): CreateHackathonPayload {
-  return {
+  const payload: CreateHackathonPayload = {
     name: general.name,
     category: transformCategoryToBackend(general.category)!,
     visibility: transformVisibilityToBackend(general.visibility),
@@ -283,10 +283,23 @@ function transformToCreatePayload(
     submissionDeadline: new Date(general.submissionDeadline),
     venue: general.venue === 'Online' ? 'Online' : general.venueLocation,
     description: description && description.trim() ? description : 'description',  // Use provided description or fallback to 'description'
-     adminContact: general.adminContact,
+    adminContact: general.adminContact,
     organizationId,
     posterUrl: general.poster || undefined,
   };
+
+  // Include tracks if provided (exclude temp IDs)
+  if (tracks && tracks.length > 0) {
+    payload.tracks = tracks.map((track) => ({
+      _id: track.id && track.id.startsWith('track-') ? undefined : track.id,
+      name: track.name,
+      description: track.description,
+      order: track.order,
+      isActive: true,
+    }));
+  }
+
+  return payload;
 }
 
 /**
@@ -415,9 +428,10 @@ export const hackathonApi = {
   async createHackathon(
     general: Pick<Hackathon['general'], 'name' | 'category' | 'visibility' | 'prizePool' | 'prizeAsset' | 'tags' | 'startTime' | 'preRegEndTime' | 'submissionDeadline' | 'venue' | 'venueLocation' | 'adminContact' | 'poster'>,
     organizationId: string,
-    description?: string
+    description?: string,
+    tracks?: HackathonTrack[]
   ): Promise<Hackathon> {
-    const payload = transformToCreatePayload(general, organizationId, description);
+    const payload = transformToCreatePayload(general, organizationId, description, tracks);
     const backend = await apiClient.post<BackendHackathon>(
       ENDPOINTS.HACKATHONS.CREATE,
       payload

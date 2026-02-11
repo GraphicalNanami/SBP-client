@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import type { Hackathon } from '../../types/hackathon.types';
+import { parse } from 'path';
 
 /**
  * Preview Page for Hackathon
@@ -266,7 +267,7 @@ export default function HackathonPreviewPage() {
                 <div>
                   <p className="text-sm font-semibold text-[#1A1A1A] mb-1">Prize Pool</p>
                   <p className="text-2xl font-bold text-[#1A1A1A]">
-                    {g.prizePool > 0 ? `${formatPrize(g.prizePool)} ${g.prizeAsset}` : '—'}
+                    {parseFloat(g.prizePool) > 0 ? `${formatPrize(parseFloat(g.prizePool))} ${g.prizeAsset}` : '—'}
                   </p>
                 </div>
               </div>
@@ -336,7 +337,7 @@ export default function HackathonPreviewPage() {
                 )}
 
                 {/* Prizes */}
-                {g.prizePool > 0 && (
+                {parseFloat(g.prizePool) > 0 && (
                   <>
                     <h3 className="text-[#1A1A1A] text-base font-semibold mt-6">Prizes</h3>
                     <div className="space-y-2 not-prose">
@@ -351,7 +352,7 @@ export default function HackathonPreviewPage() {
                         >
                           <span className="text-sm font-medium text-[#1A1A1A]">{p.place}</span>
                           <span className="text-sm font-semibold text-[#1A1A1A]">
-                            {formatPrize(Math.round(g.prizePool * (p.pct / 100)))} {g.prizeAsset}
+                            {formatPrize(Math.round(parseFloat(g.prizePool) * (p.pct / 100)))} {g.prizeAsset}
                           </span>
                         </div>
                       ))}
@@ -442,7 +443,7 @@ function getEmptyHackathonData(id: string): Hackathon {
       category: '',
       visibility: 'Public',
       poster: '',
-      prizePool: 0,
+      prizePool: '0',
       prizeAsset: 'USDC',
       tags: [],
       startTime: '',

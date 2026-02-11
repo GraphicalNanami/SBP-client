@@ -133,7 +133,7 @@ export default function HackathonListingsPage() {
             <FloatingNav navItems={floatingNavItems} />
 
       {/* ── Hero with wavy background text ── */}
-      <section className="relative py-20 md:py-24 overflow-hidden mt-4">
+      <section className="relative py-20 md:py-24 overflow-hidden mt-8">
         {/* Wavy Background Text */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03] select-none">
           <div className="absolute top-20 left-10 text-9xl font-bold text-foreground transform -rotate-12">Hack</div>
@@ -150,7 +150,7 @@ export default function HackathonListingsPage() {
           </div>
 
           <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-foreground"
+            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-foreground mt-5"
             style={{ fontFamily: 'var(--font-onest)' }}
           >
             Discover <UnderlineHighlight>Amazing</UnderlineHighlight>
@@ -166,7 +166,7 @@ export default function HackathonListingsPage() {
       </section>
 
       {/* ── Search & Filters (sticky) ── */}
-      <div className="sticky top-[72px] z-40 border-b border-border bg-background/80 backdrop-blur-xl">
+      <div className="relative top-[72px] z-40 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container-main py-4">
           <div className="flex items-center gap-3">
             {/* Search */}

@@ -45,7 +45,7 @@ export const FilterBar = ({
   const locations: (EventLocationType | 'All')[] = ['All', 'Virtual', 'In-Person', 'Hybrid'];
 
   return (
-    <div className="sticky top-[72px] z-40 w-full py-4 bg-background/80 backdrop-blur-xl border-b border-border">
+    <div className="relative top-[72px] z-40 w-full py-4 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container-main flex flex-wrap items-center justify-between gap-4">
         {/* Type Filter */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">

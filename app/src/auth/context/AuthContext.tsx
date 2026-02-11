@@ -7,6 +7,8 @@
 
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { authService } from '@/src/shared/lib/auth/auth-service';
+import { walletAuthService } from '@/src/shared/lib/auth/wallet-auth-service';
+import { apiClient } from '@/src/shared/lib/api/client';
 import { handleApiError } from '@/src/shared/utils/error-handler';
 import type { User } from '@/src/shared/types/auth.types';
 
@@ -17,6 +19,8 @@ interface AuthContextValue {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
+  walletLogin: (walletAddress: string, signature: string, challenge: string) => Promise<void>;
+  walletSignup: (walletAddress: string, signature: string, challenge: string, name: string, email?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
   clearError: () => void;
@@ -72,6 +76,56 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Wallet login function
+  const walletLogin = async (walletAddress: string, signature: string, challenge: string) => {
+    try {
+      setIsLoading(true);
+      clearError();
+      
+      const userData = await walletAuthService.loginWithWallet({
+        walletAddress,
+        signature,
+        challenge,
+      });
+      setUser(userData);
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Wallet signup function
+  const walletSignup = async (
+    walletAddress: string,
+    signature: string,
+    challenge: string,
+    name: string,
+    email?: string
+  ) => {
+    try {
+      setIsLoading(true);
+      clearError();
+      
+      const userData = await walletAuthService.registerWithWallet({
+        walletAddress,
+        signature,
+        challenge,
+        name,
+        email,
+      });
+      setUser(userData);
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Logout function
   const logout = async () => {
     try {
@@ -110,6 +164,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Initialize auth state on mount
   useEffect(() => {
     refreshAuth();
+    
+    // Register global unauthorized handler for automatic logout
+    apiClient.setUnauthorizedHandler(() => {
+      console.warn('🔒 Unauthorized access - clearing session');
+      setUser(null);
+      setError('Your session has expired. Please log in again.');
+    });
   }, []);
 
   const value: AuthContextValue = {
@@ -119,6 +180,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error,
     login,
     signup,
+    walletLogin,
+    walletSignup,
     logout,
     refreshAuth,
     clearError,

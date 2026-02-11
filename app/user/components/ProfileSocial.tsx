@@ -15,7 +15,7 @@ export default function ProfileSocial({ user }: ProfileSocialProps) {
 
   if (!hasSocialLinks) {
     return (
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+      <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
         <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Social Links</h2>
         <p className="text-[#999] italic">No social links added</p>
       </div>
@@ -23,7 +23,7 @@ export default function ProfileSocial({ user }: ProfileSocialProps) {
   }
 
   return (
-    <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+    <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 hover:border-[#E6FF80] hover:shadow-2xl transition-all">
       <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Social Links</h2>
       <div className="flex flex-wrap gap-3">
         {socialLinks.github && (
@@ -31,7 +31,7 @@ export default function ProfileSocial({ user }: ProfileSocialProps) {
             href={`https://github.com/${socialLinks.github}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white hover:bg-[#F5F5F5] transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#FCFCFC] hover:bg-[#E6FF80]/30 rounded-lg text-xs font-medium text-[#1A1A1A] transition-all border border-[#E5E5E5] hover:border-[#E6FF80]"
           >
             <Github className="w-5 h-5 text-[#1A1A1A]" />
             <span className="text-sm text-[#4D4D4D]">GitHub</span>
@@ -43,7 +43,7 @@ export default function ProfileSocial({ user }: ProfileSocialProps) {
             href={`https://twitter.com/${socialLinks.twitter}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white hover:bg-[#F5F5F5] transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#FCFCFC] hover:bg-[#E6FF80]/30 rounded-lg text-xs font-medium text-[#1A1A1A] transition-all border border-[#E5E5E5] hover:border-[#E6FF80]"
           >
             <Twitter className="w-5 h-5 text-[#1A1A1A]" />
             <span className="text-sm text-[#4D4D4D]">Twitter</span>
@@ -55,7 +55,7 @@ export default function ProfileSocial({ user }: ProfileSocialProps) {
             href={`https://linkedin.com/in/${socialLinks.linkedin}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white hover:bg-[#F5F5F5] transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#FCFCFC] hover:bg-[#E6FF80]/30 rounded-lg text-xs font-medium text-[#1A1A1A] transition-all border border-[#E5E5E5] hover:border-[#E6FF80]"
           >
             <Linkedin className="w-5 h-5 text-[#1A1A1A]" />
             <span className="text-sm text-[#4D4D4D]">LinkedIn</span>
@@ -67,7 +67,7 @@ export default function ProfileSocial({ user }: ProfileSocialProps) {
             href={website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white hover:bg-[#F5F5F5] transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#FCFCFC] hover:bg-[#E6FF80]/30 rounded-lg text-xs font-medium text-[#1A1A1A] transition-all border border-[#E5E5E5] hover:border-[#E6FF80]"
           >
             <Globe className="w-5 h-5 text-[#1A1A1A]" />
             <span className="text-sm text-[#4D4D4D]">Website</span>

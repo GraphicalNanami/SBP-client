@@ -59,7 +59,7 @@ export const EventGrid = ({ events, onEventClick, isLoading }: EventGridProps) =
   return (
     <div className="space-y-12">
       {/* Main 2-Column Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
         {/* Left: Large Rectangular Card */}
         {featured && (
           <EventCard 
@@ -70,7 +70,7 @@ export const EventGrid = ({ events, onEventClick, isLoading }: EventGridProps) =
         )}
 
         {/* Right: 2 Stacked Cards */}
-        <div className="grid grid-rows-2 gap-5 ">
+        <div className="grid grid-cols-3 gap-5 ">
           {second && (
             <EventCard 
               event={second} 
