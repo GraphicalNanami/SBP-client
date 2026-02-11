@@ -128,7 +128,7 @@ function transformStatus(backendStatus: BackendHackathonStatus): HackathonStatus
  */
 function transformTrack(backend: BackendTrack): HackathonTrack {
   return {
-    id: backend._id,
+    id: backend.uuid,
     name: backend.name,
     description: backend.description,
     order: backend.order,
@@ -140,7 +140,7 @@ function transformTrack(backend: BackendTrack): HackathonTrack {
  */
 function transformCustomQuestion(backend: BackendCustomQuestion): CustomQuestion {
   return {
-    id: backend._id,
+    id: backend.uuid,
     label: backend.questionText,
     type: backend.questionType.toLowerCase() as 'text' | 'select' | 'checkbox',
     options: backend.options,
@@ -153,11 +153,11 @@ function transformCustomQuestion(backend: BackendCustomQuestion): CustomQuestion
  */
 function transformPrize(backend: BackendPrize): HackathonPrize {
   return {
-    id: backend._id,
+    id: backend.uuid,
     name: backend.name,
-    trackId: backend.trackId || null,
+    trackId: backend.trackUuid || null,
     placements: backend.placements.map((p) => ({
-      id: `${backend._id}-${p.placement}`,
+      id: `${backend.uuid}-${p.placement}`,
       label: `${p.placement}${p.placement === 1 ? 'st' : p.placement === 2 ? 'nd' : p.placement === 3 ? 'rd' : 'th'} Place`,
       amount: p.amount,
       currency: 'USDC', // Will be from hackathon prizeAsset
@@ -291,7 +291,7 @@ function transformToCreatePayload(
   // Include tracks if provided (exclude temp IDs)
   if (tracks && tracks.length > 0) {
     payload.tracks = tracks.map((track) => ({
-      _id: track.id && track.id.startsWith('track-') ? undefined : track.id,
+      uuid: track.id && track.id.startsWith('track-') ? undefined : track.id,
       name: track.name,
       description: track.description,
       order: track.order,
@@ -338,7 +338,7 @@ function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload 
   // Tracks - Transform to backend format
   if (hackathon.tracks && hackathon.tracks.length > 0) {
     payload.tracks = hackathon.tracks.map((track) => ({
-      _id: track.id && track.id.startsWith('track-') ? undefined : track.id, // Exclude temp IDs
+      uuid: track.id && track.id.startsWith('track-') ? undefined : track.id, // Exclude temp IDs
       name: track.name,
       description: track.description,
       order: track.order,
@@ -349,9 +349,9 @@ function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload 
   // Prizes - Transform to backend format
   if (hackathon.prizes && hackathon.prizes.length > 0) {
     payload.prizes = hackathon.prizes.map((prize) => ({
-      _id: prize.id && prize.id.startsWith('prize-') ? undefined : prize.id, // Exclude temp IDs
+      uuid: prize.id && prize.id.startsWith('prize-') ? undefined : prize.id, // Exclude temp IDs
       name: prize.name,
-      trackId: prize.trackId || undefined,
+      trackUuid: prize.trackId || undefined,
       placements: prize.placements.map((p) => ({
         placement: parseInt(p.label.match(/\d+/)?.[0] || '1'),
         amount: p.amount,
@@ -363,7 +363,7 @@ function transformToUpdatePayload(hackathon: Hackathon): UpdateHackathonPayload 
   // Custom Questions - Transform to backend format
   if (hackathon.general.customQuestions && hackathon.general.customQuestions.length > 0) {
     payload.customRegistrationQuestions = hackathon.general.customQuestions.map((q, index) => ({
-      _id: q.id.startsWith('question-') ? undefined : q.id, // Exclude temp IDs
+      uuid: q.id.startsWith('question-') ? undefined : q.id, // Exclude temp IDs
       questionText: q.label,
       questionType: q.type.toUpperCase() as BackendQuestionType,
       options: q.options,

@@ -483,3 +483,34 @@ Backend enforces valid state transitions:
   → Fetch with ngrok header → Return image to browser
   ```
 
+### February 11, 2026 - Prize API Integration
+- ✅ **Connected Add Prize form to backend API**:
+  - Added `addPrize()` and `removePrize()` async functions to `useHackathon` hook
+  - Both update local state optimistically and immediately call `PATCH /hackathons/:id` with full prizes array
+  - On API failure, local state is reverted (optimistic rollback)
+  - `handleAddPrize()` in `WinnersTab` now calls `addPrize()` instead of logging to console
+  - If multiple tracks are selected, one prize is created per track; if none, an "Overall" prize (trackId = null) is created
+  - Add Prize button shows loading spinner during API call
+- ✅ **Added prize list display**:
+  - When prizes exist, they are rendered as cards showing name, track badge (or "Overall"), and placement count
+  - Each prize card has a delete button that calls `removePrize()` with loading state
+  - "Add Another Prize" button shown below the list
+  - Empty state still shown when no prizes configured
+- **Backend Endpoint**: `PATCH /hackathons/:id` with `prizes[]` array (full replacement)
+- **Data Flow**: User fills form → Click "Add Prize" → `addPrize()` updates local state → `hackathonApi.updateHackathon()` sends full hackathon via PATCH → Backend replaces prizes array → Response updates local state
+- **Note**: Backend prize model has no `description` field; form description is collected but not persisted
+
+### February 11, 2026 - Subdocument UUID Migration
+- 🔄 **Migrated subdocuments from `_id` to `uuid`**:
+  - Backend now returns `uuid` (not `_id`) for tracks, prizes, and custom registration questions
+  - Backend prizes use `trackUuid` (not `trackId`) for track references
+  - Updated `BackendTrack`, `BackendPrize`, `BackendCustomQuestion` interfaces to use `uuid`
+  - Updated `UpdateHackathonPayload` nested arrays to use `uuid` and `trackUuid`
+  - Updated `PrizePayload` to use `trackUuid`
+  - Updated all transform functions (`transformTrack`, `transformPrize`, `transformCustomQuestion`) to read `uuid`
+  - Updated `transformToCreatePayload` and `transformToUpdatePayload` to send `uuid` instead of `_id`
+- **ID Structure (updated)**:
+  - Main documents (Hackathon, Organization): `uuid`
+  - Embedded subdocuments (Tracks, Prizes, Questions): `uuid` (migrated from `_id`)
+  - Frontend temp IDs: `track-{timestamp}`, `prize-{timestamp}`, `question-{timestamp}` (excluded from payloads)
+

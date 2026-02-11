@@ -69,7 +69,7 @@ export type BackendPrizeDistributionStatus =
  * Track (embedded subdocument)
  */
 export interface BackendTrack {
-  _id: string;
+  uuid: string;
   name: string;
   description: string;
   order: number;
@@ -88,9 +88,9 @@ export interface BackendPlacement {
  * Prize (embedded subdocument)
  */
 export interface BackendPrize {
-  _id: string;
+  uuid: string;
   name: string;
-  trackId?: string; // Optional reference to track
+  trackUuid?: string; // Optional reference to track
   placements: BackendPlacement[];
   isActive: boolean;
 }
@@ -99,7 +99,7 @@ export interface BackendPrize {
  * Custom Question (embedded subdocument)
  */
 export interface BackendCustomQuestion {
-  _id: string;
+  uuid: string;
   questionText: string;
   questionType: BackendQuestionType;
   options?: string[];
@@ -400,9 +400,9 @@ export interface UpdateHackathonPayload {
   submissionDeadline?: Date | string;
   judgingDeadline?: Date | string;
 
-  // Nested Documents - include _id to update, omit to create
+  // Nested Documents - include uuid to update, omit to create
   tracks?: Array<{
-    _id?: string;
+    uuid?: string;
     name: string;
     description: string;
     order?: number;
@@ -410,15 +410,15 @@ export interface UpdateHackathonPayload {
   }>;
 
   prizes?: Array<{
-    _id?: string;
+    uuid?: string;
     name: string;
-    trackId?: string;
+    trackUuid?: string;
     placements: BackendPlacement[];
     isActive?: boolean;
   }>;
 
   customRegistrationQuestions?: Array<{
-    _id?: string;
+    uuid?: string;
     questionText: string;
     questionType: BackendQuestionType;
     options?: string[];
@@ -455,7 +455,7 @@ export interface CustomQuestionPayload {
  */
 export interface PrizePayload {
   name: string;
-  trackId?: string;
+  trackUuid?: string;
   placements: BackendPlacement[];
 }
 

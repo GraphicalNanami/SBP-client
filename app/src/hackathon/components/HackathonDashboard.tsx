@@ -44,6 +44,7 @@ import type {
   HackathonDashboardTab,
   HackathonCategory,
   HackathonAdmin,
+  HackathonPrize,
 } from '../types/hackathon.types';
 
 /* ═══════════════════════════════════════════════════════
@@ -70,6 +71,8 @@ interface HackathonDashboardProps {
   removeAdmin: (adminId: string) => void;
   addTag: (tag: string) => void;
   removeTag: (tag: string) => void;
+  addPrize: (prize: Omit<HackathonPrize, 'id'>) => Promise<void>;
+  removePrize: (prizeId: string) => Promise<void>;
   handleSave: () => void;
   handleSubmitForReview: () => void;
 }
@@ -170,6 +173,8 @@ export default function HackathonDashboard({
   removeAdmin,
   addTag,
   removeTag,
+  addPrize,
+  removePrize,
   handleSave,
   handleSubmitForReview,
 }: HackathonDashboardProps) {
@@ -411,7 +416,7 @@ export default function HackathonDashboard({
         )}
         {activeTab === 'insights' && <InsightsTab status={hackathon.status} />}
         {activeTab === 'participants' && <ParticipantsTab hackathon={hackathon} />}
-        {activeTab === 'winners' && <WinnersTab hackathon={hackathon} />}
+        {activeTab === 'winners' && <WinnersTab hackathon={hackathon} addPrize={addPrize} removePrize={removePrize} />}
       </main>
     </div>
   );
@@ -817,7 +822,7 @@ function GeneralTab({
             {[
               { ok: !!g.name.trim(), text: 'Hackathon name' },
               { ok: !!g.category, text: 'Category selected' },
-              { ok: parseFloat(g.prizePool) > 0, text: 'Prize pool set' },
+              { ok: parseFloat(g.prizePool) > 0 || hackathon.prizes.length > 0, text: 'Prize pool set' },
               { ok: !!g.startTime, text: 'Start time' },
               { ok: !!g.submissionDeadline, text: 'Submission deadline' },
               { ok: !!g.adminContact.trim(), text: 'Admin contact' },
@@ -1385,12 +1390,22 @@ function ParticipantsTab({ hackathon }: { hackathon: Hackathon }) {
 /* ═══════════════════════════════════════════════════════
    TAB: Winners & Prizes (placeholder)
    ═══════════════════════════════════════════════════════ */
-function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
+function WinnersTab({
+  hackathon,
+  addPrize,
+  removePrize,
+}: {
+  hackathon: Hackathon;
+  addPrize: (prize: Omit<HackathonPrize, 'id'>) => Promise<void>;
+  removePrize: (prizeId: string) => Promise<void>;
+}) {
   const [showAddPrize, setShowAddPrize] = useState(false);
   const [prizeName, setPrizeName] = useState('');
   const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
   const [prizeDescription, setPrizeDescription] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSavingPrize, setIsSavingPrize] = useState(false);
+  const [isDeletingPrize, setIsDeletingPrize] = useState<string | null>(null);
 
   const [showInviteJudge, setShowInviteJudge] = useState(false);
   const [judgeName, setJudgeName] = useState('');
@@ -1404,21 +1419,49 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
     );
   };
 
-  const handleAddPrize = () => {
+  const handleAddPrize = async () => {
     const newErrors: Record<string, string> = {};
     if (!prizeName.trim()) newErrors.prizeName = 'Prize name is required';
     if (!prizeDescription.trim()) newErrors.prizeDescription = 'Prize description is required';
-    
+
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length === 0) {
-      // TODO: Add prize logic here
-      console.log('Adding prize:', { prizeName, selectedTracks, prizeDescription });
-      // Reset form
-      setPrizeName('');
-      setSelectedTracks([]);
-      setPrizeDescription('');
-      setShowAddPrize(false);
+      setIsSavingPrize(true);
+      try {
+        // If multiple tracks selected, create one prize per track
+        // If none selected, create one "Overall" prize (trackId = null)
+        const trackIds = selectedTracks.length > 0 ? selectedTracks : [null];
+
+        for (const trackId of trackIds) {
+          await addPrize({
+            name: prizeName.trim(),
+            trackId,
+            placements: [],
+          });
+        }
+
+        // Reset form
+        setPrizeName('');
+        setSelectedTracks([]);
+        setPrizeDescription('');
+        setShowAddPrize(false);
+      } catch {
+        // Error is already handled in the hook
+      } finally {
+        setIsSavingPrize(false);
+      }
+    }
+  };
+
+  const handleRemovePrize = async (prizeId: string) => {
+    setIsDeletingPrize(prizeId);
+    try {
+      await removePrize(prizeId);
+    } catch {
+      // Error is already handled in the hook
+    } finally {
+      setIsDeletingPrize(null);
     }
   };
 
@@ -1592,18 +1635,75 @@ function WinnersTab({ hackathon }: { hackathon: Hackathon }) {
               </button>
               <button
                 onClick={handleAddPrize}
-                className="flex h-10 items-center gap-2 rounded-full bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97]"
+                disabled={isSavingPrize}
+                className="flex h-10 items-center gap-2 rounded-full bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97] disabled:opacity-50"
               >
-                <Plus className="h-4 w-4" />
-                Add Prize
+                {isSavingPrize ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                {isSavingPrize ? 'Saving...' : 'Add Prize'}
               </button>
             </div>
           </div>
         </Card>
       )}
 
-      {/* Empty State or Prize List */}
-      {!showAddPrize && (
+      {/* Prize List */}
+      {!showAddPrize && hackathon.prizes.length > 0 && (
+        <div className="space-y-3">
+          {hackathon.prizes.map((prize) => {
+            const track = hackathon.tracks.find((t) => t.id === prize.trackId);
+            return (
+              <Card key={prize.id}>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-[#1A1A1A]">{prize.name}</p>
+                      {track ? (
+                        <span className="rounded-full bg-[#F5F5F5] px-2.5 py-0.5 text-xs text-[#4D4D4D]">
+                          {track.name}
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-[#F5F5F5] px-2.5 py-0.5 text-xs text-[#4D4D4D]">
+                          Overall
+                        </span>
+                      )}
+                    </div>
+                    {prize.placements.length > 0 && (
+                      <p className="mt-1 text-xs text-[#4D4D4D]">
+                        {prize.placements.length} placement{prize.placements.length !== 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleRemovePrize(prize.id)}
+                    disabled={isDeletingPrize === prize.id}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4D4D4D] transition-colors hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                  >
+                    {isDeletingPrize === prize.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </Card>
+            );
+          })}
+          <button
+            onClick={() => setShowAddPrize(true)}
+            className="flex h-9 items-center gap-2 rounded-full border border-[#E5E5E5] px-4 text-xs font-medium text-[#4D4D4D] transition-all hover:bg-[#F5F5F5]"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add Another Prize
+          </button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!showAddPrize && hackathon.prizes.length === 0 && (
         <Card>
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <Trophy className="mb-3 h-8 w-8 text-[#4D4D4D]" />

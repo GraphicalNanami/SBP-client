@@ -8,6 +8,7 @@ import type {
   HackathonTrack,
   HackathonDashboardTab,
   HackathonAdmin,
+  HackathonPrize,
 } from '../types/hackathon.types';
 
 /* ── Empty defaults ── */
@@ -200,6 +201,83 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
     }));
   }, []);
 
+  /* ── Prizes ── */
+  const addPrize = useCallback(
+    async (prize: Omit<HackathonPrize, 'id'>) => {
+      const newPrize: HackathonPrize = {
+        id: `prize-${Date.now()}`,
+        ...prize,
+      };
+
+      const updatedHackathon = {
+        ...hackathon,
+        prizes: [...hackathon.prizes, newPrize],
+        updatedAt: new Date().toISOString(),
+      };
+
+      setHackathon(updatedHackathon);
+
+      // Immediately persist to backend if not a new hackathon
+      if (!isNew) {
+        try {
+          const saved = await hackathonApi.updateHackathon(updatedHackathon.id, updatedHackathon);
+          setHackathon(saved);
+        } catch (err: unknown) {
+          console.error('Failed to save prize:', err);
+          const error = err as { status?: number; message?: string };
+          if (error.status === 400) {
+            setValidationError(error.message || 'Failed to add prize');
+            setTimeout(() => setValidationError(null), 5000);
+          } else {
+            setError(error.message || 'Failed to save prize');
+          }
+          // Revert local state on failure
+          setHackathon((prev) => ({
+            ...prev,
+            prizes: prev.prizes.filter((p) => p.id !== newPrize.id),
+          }));
+          throw err;
+        }
+      }
+    },
+    [hackathon, isNew],
+  );
+
+  const removePrize = useCallback(
+    async (prizeId: string) => {
+      const removedPrize = hackathon.prizes.find((p) => p.id === prizeId);
+
+      const updatedHackathon = {
+        ...hackathon,
+        prizes: hackathon.prizes.filter((p) => p.id !== prizeId),
+        updatedAt: new Date().toISOString(),
+      };
+
+      setHackathon(updatedHackathon);
+
+      // Immediately persist to backend if not a new hackathon
+      if (!isNew) {
+        try {
+          const saved = await hackathonApi.updateHackathon(updatedHackathon.id, updatedHackathon);
+          setHackathon(saved);
+        } catch (err: unknown) {
+          console.error('Failed to remove prize:', err);
+          const error = err as { status?: number; message?: string };
+          setError(error.message || 'Failed to remove prize');
+          // Revert local state on failure
+          if (removedPrize) {
+            setHackathon((prev) => ({
+              ...prev,
+              prizes: [...prev.prizes, removedPrize],
+            }));
+          }
+          throw err;
+        }
+      }
+    },
+    [hackathon, isNew],
+  );
+
   /* ── Publish validation ── */
   const canPublish = useMemo(() => {
     const g = hackathon.general;
@@ -209,7 +287,7 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
       g.startTime !== '' &&
       g.submissionDeadline !== '' &&
       g.adminContact.trim() !== '' &&
-      parseFloat(g.prizePool) > 0 &&
+      (parseFloat(g.prizePool) > 0 || hackathon.prizes.length > 0) &&
       hackathon.tracks.length > 0
     );
   }, [hackathon]);
@@ -359,6 +437,8 @@ export function useHackathon(hackathonId: string, organizationId?: string) {
     removeAdmin,
     addTag,
     removeTag,
+    addPrize,
+    removePrize,
     handleSave,
     handleSubmitForReview,
   };
